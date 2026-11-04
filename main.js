@@ -941,6 +941,8 @@
     selectCase(n); $$('#casesList button')[n].focus();
   });
   selectCase(0);
+  // hidden case photos are clipped, so lazy loading never starts them: fetch all four once the section is near
+  new IntersectionObserver(([e], o) => { if (!e.isIntersecting) return; o.disconnect(); $$('#casePics img').forEach(i => { i.loading = 'eager'; }); }, { rootMargin: '600px 0px' }).observe($('#solutions'));
 
   /* ================= INTEGRATIONS ================= */
   const CATS = { all: 'All', comms: 'Communication', sales: 'CRM and sales', finance: 'Finance', eng: 'Engineering', docs: 'Docs and files', people: 'People' };
