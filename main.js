@@ -1,4 +1,5 @@
-/* VELTRIX landing page: motion, scroll scenes and the working product demos */
+/* VELTRIX — motion system, scroll scenes and interactive product demos.
+   Every number on the page comes from one seeded sample dataset (see DATA). */
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -9,1373 +10,1165 @@
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
   const motion = !!(G && ST) && !reduced;
   const wide = () => innerWidth > 960;
-  const fmt = n => n.toLocaleString('en-US');
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const lerp = (a, b, t) => a + (b - a) * t;
+  const fmt = n => Math.round(n).toLocaleString('en-US');
+  const money = n => n >= 1e6 ? `$${(n / 1e6).toFixed(2)}M` : n >= 1e4 ? `$${(n / 1e3).toFixed(1)}k` : `$${fmt(n)}`;
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const icon = (id, s = 14) => `<svg width="${s}" height="${s}"><use href="#${id}"/></svg>`;
   const now = () => new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const seeded = seed => () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
 
   if (!motion) root.classList.add('no-motion');
   if (G && ST) G.registerPlugin(ST);
+  const EASE = 'expo.out';
 
   /* ================= helpers ================= */
-  const countTo = (el, to, { dur = 0.9, prefix = '', suffix = '', dec = 0 } = {}) => {
+  const countTo = (el, to, { dur = 1, format = fmt } = {}) => {
     if (!el) return;
-    // start from what is on screen, and cancel a count that is still running on this element
     el._count?.kill();
-    const shown = el._shown ?? parseFloat(el.textContent.replace(/[^0-9.-]/g, ''));
-    const from = Number.isFinite(shown) ? shown : 0;
-    const render = v => { el._shown = v; el.textContent = prefix + (dec ? v.toFixed(dec) : fmt(Math.round(v))) + suffix; };
+    const from = el._shown ?? 0;
+    const render = v => { el._shown = v; el.textContent = format(v); };
     if (!motion) return render(to);
     const o = { v: from };
     el._count = G.to(o, { v: to, duration: dur, ease: 'power3.out', onUpdate: () => render(o.v) });
   };
-  const icon = (id, size = 14) => `<svg width="${size}" height="${size}"><use href="#${id}"/></svg>`;
-  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-
-  const toast = (text, opt = {}) => {
-    const wrap = $('#toasts');
-    const t = document.createElement('div');
+  const toast = (text, ic = 'i-check') => {
+    const wrap = $('#toasts'), t = document.createElement('div');
     t.className = 'toast';
-    t.innerHTML = (opt.av ? `<span class="av ${opt.av.cls}">${opt.av.i}</span>` : `<span class="t-ico">${icon(opt.icon || 'i-check')}</span>`) + `<span>${esc(text)}</span>`;
+    t.innerHTML = `<span class="ic">${icon(ic, 13)}</span><span>${esc(text)}</span>`;
     wrap.appendChild(t);
     while (wrap.children.length > 3) wrap.firstChild.remove();
-    if (motion) G.from(t, { y: 20, opacity: 0, scale: 0.96, duration: 0.5, ease: 'expo.out' });
-    setTimeout(() => {
-      if (motion) G.to(t, { opacity: 0, y: 10, duration: 0.3, onComplete: () => t.remove() });
-      else t.remove();
-    }, 3600);
+    if (motion) G.from(t, { y: 16, opacity: 0, duration: 0.5, ease: EASE });
+    setTimeout(() => { if (motion) G.to(t, { opacity: 0, y: 8, duration: 0.3, onComplete: () => t.remove() }); else t.remove(); }, 3600);
   };
-
-  /* ================= smooth scroll ================= */
-  let lenis = null;
-  if (motion && window.Lenis && finePointer) {
-    // inner scroll areas keep their own wheel scrolling instead of moving the page
-    // (only while they can actually scroll, so the page stays smooth over them otherwise)
-    const ownScroll = '.dir-list, .thread, .cp-a, .modal, .palette, .mnav, .note, .fit-scroll, .ex-tabs, .kanban';
-    const canScroll = el => el.scrollHeight > el.clientHeight + 2 || el.scrollWidth > el.clientWidth + 2;
-    lenis = new window.Lenis({ lerp: 0.11, wheelMultiplier: 1, prevent: node => { const el = node.closest?.(ownScroll); return !!el && (el.matches('.modal, .palette, .mnav') || canScroll(el)); } });
-    lenis.on('scroll', ST.update);
-    G.ticker.add(t => lenis.raf(t * 1000));
-    G.ticker.lagSmoothing(0);
-  }
-  const goTo = target => {
-    const el = typeof target === 'string' ? document.querySelector(target) : target;
-    if (!el) return;
-    if (lenis) lenis.scrollTo(el, { offset: el.id === 'top' ? 0 : -10, duration: 1.4 });
-    else el.scrollIntoView({ behavior: motion ? 'smooth' : 'auto' });
-  };
-  document.addEventListener('click', e => {
-    const a = e.target.closest('a[href^="#"]');
-    if (!a || a.hasAttribute('data-toast')) return;
-    const id = a.getAttribute('href');
-    if (id.length < 2) return;
-    const el = document.querySelector(id);
-    if (!el) return;
-    e.preventDefault();
-    if (a.dataset.feature) selectFeature(a.dataset.feature, true);
-    closeMenu();
-    goTo(el);
-    // move keyboard focus with the scroll (skip link, nav, rail)
-    if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
-    el.focus({ preventScroll: true });
-  });
-
-  /* ================= fitted fragments ================= */
-  const fits = $$('.fit');
-  fits.forEach(f => f.parentElement.classList.add('fit-box'));
-  const layoutFits = () => {
-    const phone = innerWidth <= 600;
-    fits.forEach(f => {
-      const box = f.parentElement;
-      const narrow = phone && !!f.dataset.wm;
-      const w = narrow ? +f.dataset.wm : +f.dataset.w, h = +f.dataset.h;
-      const cs = getComputedStyle(box);
-      const avail = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-      let s = Math.min(1, avail / w);
-      // pinned stages also have to fit the viewport height (short laptop screens)
-      if (f.dataset.vh && wide()) s = Math.min(s, Math.max(0.5, (innerHeight - +f.dataset.vh) / h));
-      // some fragments scroll sideways rather than shrink past legibility
-      const scroll = !!f.dataset.min && s < +f.dataset.min;
-      if (scroll) s = +f.dataset.min;
-      box.classList.toggle('fit-scroll', scroll);
-      f.style.width = `${w}px`;
-      const auto = narrow || (box.id === 'problemStage' && !wide());
-      f.style.height = auto ? 'auto' : `${h}px`;
-      f.style.setProperty('--s', s);
-      box.style.setProperty('--sw', `${w * s}px`);
-      box.style.height = `${f.offsetHeight * s + (scroll ? 14 : 0)}px`;
-    });
-  };
-  layoutFits();
-  let fitT;
-  addEventListener('resize', () => { clearTimeout(fitT); fitT = setTimeout(layoutFits, 100); });
-  // content that renders later (charts, stories, filtered lists) changes the page height:
-  // keep every scroll trigger measured against the real layout
-  let stT;
-  if (ST) new ResizeObserver(() => { clearTimeout(stT); stT = setTimeout(() => ST.refresh(), 200); }).observe(document.body);
-  const whenSeen = (el, fn, threshold = 0.15) => {
+  const whenSeen = (el, fn, threshold = 0.2) => {
     if (!el) return;
     const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) { o.disconnect(); fn(); } }, { threshold });
     o.observe(el);
   };
-
-  /* ================= split headings into words ================= */
-  const splitWords = el => {
-    const out = [];
-    const wrap = (word, emph) => `<span class="w"><span>${emph ? `<em>${word}</em>` : word}</span></span>`;
-    el.childNodes.forEach(n => {
-      if (n.nodeType === 3) n.textContent.split(/(\s+)/).forEach(p => out.push(/^\s+$/.test(p) ? ' ' : p ? wrap(esc(p)) : ''));
-      else if (n.tagName === 'EM') n.textContent.split(/(\s+)/).forEach(p => out.push(/^\s+$/.test(p) ? ' ' : p ? wrap(esc(p), true) : ''));
-      else out.push(n.outerHTML);
-    });
-    el.setAttribute('aria-label', el.textContent);
-    el.innerHTML = out.join('');
-    $$('.w', el).forEach(w => w.setAttribute('aria-hidden', 'true'));
+  const visibleFlag = (el, threshold = 0) => {
+    const f = { on: false };
+    new IntersectionObserver(([e]) => { f.on = e.isIntersecting; }, { threshold }).observe(el);
+    return f;
   };
-  $$('.split-words').forEach(splitWords);
-  const scrubText = $('#scrubText'), scrubAfter = $('#scrubAfter');
-  [scrubText, scrubAfter].forEach(el => {
-    el.setAttribute('aria-label', el.textContent);
-    el.innerHTML = el.textContent.split(' ').map(w => `<span class="sw" aria-hidden="true">${esc(w)}</span>`).join(' ');
+
+  /* ================= DATA: one seeded sample dataset ================= */
+  const DAYS = 730;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const DATA = (() => {
+    const r = seeded(20261104);
+    const rows = [];
+    for (let i = 0; i < DAYS; i++) {
+      const d = new Date(today); d.setDate(d.getDate() - (DAYS - 1 - i));
+      const t = i / DAYS, dow = d.getDay(), weekend = dow === 0 || dow === 6;
+      const season = Math.sin(t * Math.PI * 4) * 0.05;
+      rows.push({
+        d,
+        revenue: Math.round((weekend ? 0.35 : 1) * (5200 + 3400 * t) * (1 + season + (r() - 0.5) * 0.22)),
+        ontime: clamp(82 + 11 * t + (r() - 0.5) * 6, 70, 99),
+        cycle: clamp(6.1 - 2.3 * t + (r() - 0.5) * 0.9, 2.2, 8),
+        runs: Math.round((weekend ? 0.3 : 1) * (0.6 + 1.1 * t + r() * 1.1))
+      });
+    }
+    return rows;
+  })();
+  const METRICS = {
+    revenue: { label: 'Revenue', agg: 'sum', format: v => money(v), axis: v => v >= 1000 ? `$${+(v / 1000).toFixed(1)}k` : `$${Math.round(v)}`, better: 'up' },
+    ontime: { label: 'On-time delivery', agg: 'avg', format: v => `${v.toFixed(1)}%`, axis: v => `${Math.round(v)}%`, better: 'up' },
+    cycle: { label: 'Cycle time', agg: 'avg', format: v => `${v.toFixed(1)} d`, axis: v => `${v.toFixed(1)}d`, better: 'down' },
+    runs: { label: 'Automation runs', agg: 'sum', format: v => fmt(v), axis: v => fmt(v), better: 'up' }
+  };
+  const aggregate = (rows, key) => {
+    const vals = rows.map(x => x[key]);
+    const s = vals.reduce((a, b) => a + b, 0);
+    return METRICS[key].agg === 'sum' ? s : s / (vals.length || 1);
+  };
+  const windowRows = (days, offset = 0) => DATA.slice(DAYS - days - offset, DAYS - offset);
+  const periodValue = (key, days, offset = 0) => aggregate(windowRows(days, offset), key);
+  // chart buckets: 7 and 30 days daily, 90 days weekly, 12 months monthly
+  const buckets = (key, days, offset = 0) => {
+    const rows = windowRows(days, offset);
+    if (days <= 30) return rows.map(x => ({ label: x.d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), short: days === 7 ? x.d.toLocaleDateString('en-US', { weekday: 'short' }) : x.d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), v: x[key] }));
+    const size = days <= 120 ? 7 : null, out = [];
+    if (size) for (let i = rows.length % size; i < rows.length; i += size) { const ch = rows.slice(i, i + size); out.push({ label: `Week of ${ch[0].d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`, short: ch[0].d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), v: aggregate(ch, key) }); }
+    else { const by = new Map(); rows.forEach(x => { const k = `${x.d.getFullYear()}-${x.d.getMonth()}`; if (!by.has(k)) by.set(k, []); by.get(k).push(x); }); [...by.values()].slice(-12).forEach(ch => out.push({ label: ch[0].d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), short: ch[0].d.toLocaleDateString('en-US', { month: 'short' }), v: aggregate(ch, key) })); }
+    return out;
+  };
+  const K = {
+    rev30: periodValue('revenue', 30), revPrev: periodValue('revenue', 30, 30),
+    ontime30: periodValue('ontime', 30), ontimePrev: periodValue('ontime', 30, 30),
+    cycle30: periodValue('cycle', 30), runs30: periodValue('runs', 30), rev84: periodValue('revenue', 84)
+  };
+  const RULE_SHARE = [0.26, 0.41, 0.33];
+  const ruleRuns = RULE_SHARE.map((s, i) => i < 2 ? Math.round(K.runs30 * s) : 0);
+  ruleRuns[2] = K.runs30 - ruleRuns[0] - ruleRuns[1];
+  const pctDelta = (a, b) => (a - b) / b * 100;
+
+  /* ================= smooth scroll + anchors ================= */
+  let lenis = null;
+  if (motion && window.Lenis && finePointer) {
+    const own = '.chat-log, .wfb-log, .pal-box ul, .mnav, .fit-scroll, .app-nav, .int-cats, .an-controls .seg';
+    const canScroll = el => el.scrollHeight > el.clientHeight + 2 || el.scrollWidth > el.clientWidth + 2;
+    lenis = new window.Lenis({ lerp: 0.1, prevent: n => { const el = n.closest?.(own); return !!el && canScroll(el); } });
+    lenis.on('scroll', ST.update);
+    G.ticker.add(t => lenis.raf(t * 1000));
+    G.ticker.lagSmoothing(0);
+  }
+  const goTo = (target, offset = 0) => {
+    const el = typeof target === 'string' ? $(target) : target;
+    if (!el) return;
+    if (typeof target === 'number') { lenis ? lenis.scrollTo(target, { duration: 1.2 }) : scrollTo({ top: target, behavior: motion ? 'smooth' : 'auto' }); return; }
+    if (lenis) lenis.scrollTo(el, { offset, duration: 1.3 });
+    else el.scrollIntoView({ behavior: motion ? 'smooth' : 'auto' });
+  };
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    const id = a.getAttribute('href');
+    const el = id.length > 1 && $(id);
+    if (!el) return;
+    e.preventDefault();
+    closeAllDD(); closeMenu();
+    if (a.dataset.case) selectCase(+a.dataset.case);
+    if (a.dataset.tour) { showTourStep(+a.dataset.tour, true); return; }
+    goTo(el);
+    if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+    el.focus({ preventScroll: true });
   });
-  scrubAfter.innerHTML = scrubAfter.innerHTML.replace(/<span class="sw" aria-hidden="true">one<\/span> <span class="sw" aria-hidden="true">board<\/span>/, '<em><span class="sw" aria-hidden="true">one</span> <span class="sw" aria-hidden="true">board</span></em>');
+
+  /* ================= fitted product fragments ================= */
+  const fits = $$('.fit');
+  fits.forEach(f => f.parentElement.classList.add('fit-box'));
+  function layoutFits() {
+    const phone = innerWidth <= 600;
+    fits.forEach(f => {
+      const box = f.parentElement, narrow = phone && !!f.dataset.wm;
+      const w = narrow ? +f.dataset.wm : +f.dataset.w, h = +f.dataset.h;
+      const cs = getComputedStyle(box);
+      const avail = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      let s = Math.min(1, avail / w);
+      if (f.closest('.connect-stage, .tour-stage') && wide() && motion) s = Math.min(s, Math.max(0.5, (innerHeight - 150) / h));
+      const scroll = !!f.dataset.min && s < +f.dataset.min;
+      if (scroll) s = +f.dataset.min;
+      box.classList.toggle('fit-scroll', scroll);
+      f.style.width = `${w}px`;
+      f.style.height = (narrow || f.dataset.auto) ? 'auto' : `${h}px`;
+      f.style.setProperty('--s', s);
+      box.style.setProperty('--sw', `${w * s}px`);
+      box.style.height = `${f.offsetHeight * s + (scroll ? 14 : 0)}px`;
+    });
+  }
+  layoutFits();
+  let fitT;
+  addEventListener('resize', () => { clearTimeout(fitT); fitT = setTimeout(() => { layoutFits(); placePills(); }, 120); });
+  let stT;
+  if (ST) new ResizeObserver(() => { clearTimeout(stT); stT = setTimeout(() => ST.refresh(), 200); }).observe(document.body);
+
+  /* ================= segmented controls: sliding pill ================= */
+  const segs = $$('.seg');
+  segs.forEach(s => { const p = document.createElement('span'); p.className = 'seg-pill'; p.setAttribute('aria-hidden', 'true'); s.prepend(p); });
+  function placePills() {
+    segs.forEach(s => {
+      const on = $('button.is-on', s), p = $('.seg-pill', s);
+      if (!on || !p) return;
+      p.style.width = `${on.offsetWidth}px`;
+      p.style.transform = `translateX(${on.offsetLeft}px)`;
+    });
+  }
+  const setSeg = (group, btn) => { $$('button', group).forEach(b => { b.classList.toggle('is-on', b === btn); b.setAttribute('aria-pressed', b === btn); }); placePills(); };
+  document.fonts?.ready.then(placePills);
+  placePills();
 
   /* ================= intro + hero entrance ================= */
   const intro = $('.intro');
-  const heroIn = () => {
-    countHeroKpis();
-    drawHeroChart();
-    if (!motion) return;
-    const tl = G.timeline({ defaults: { ease: 'expo.out' } });
-    tl.from('.nav-bar > *', { y: -20, opacity: 0, duration: 0.9, stagger: 0.07 }, 0)
-      .from('.announce', { y: 16, opacity: 0, duration: 0.9 }, 0.05)
-      .from('.hero-title .ln > span', { yPercent: 115, rotate: 2, duration: 1.2, stagger: 0.1 }, 0.1)
-      .from('.hero-sub', { y: 24, opacity: 0, duration: 1 }, 0.45)
-      .from('.hero-actions > *', { y: 20, opacity: 0, duration: 0.9, stagger: 0.08 }, 0.55)
-      .from('.hero-proof li', { y: 12, opacity: 0, duration: 0.8, stagger: 0.06 }, 0.65)
-      .from('#heroVisual', { y: 160, opacity: 0, duration: 1.6, ease: 'expo.out' }, 0.45)
-      .from('.app-side > *', { x: -16, opacity: 0, duration: 0.8, stagger: 0.04 }, 0.9)
-      .from('.kpi', { y: 20, opacity: 0, duration: 0.8, stagger: 0.07 }, 1)
-      .from('.ov-grid .card', { y: 24, opacity: 0, duration: 0.9, stagger: 0.08 }, 1.1)
-      .from('.float', { y: 40, opacity: 0, scale: 0.92, duration: 1, stagger: 0.12, ease: 'back.out(1.4)' }, 1.3);
+  const towerGrid = $('#towerGrid');
+  const buildTower = () => {
+    const rows = Math.ceil((towerGrid.clientHeight || 700) / 42) + 1;
+    towerGrid.innerHTML = '<i></i>'.repeat(rows * 10);
+    const r = seeded(7);
+    $$('i', towerGrid).forEach(c => { const v = r(); if (v > 0.86) c.className = 'a'; else if (v > 0.74) c.className = 'w'; else if (v > 0.71) c.className = 'b'; });
   };
-  if (!motion) {
-    intro?.remove();
-    heroIn();
-  } else {
-    G.set('.hero-title .ln > span', { yPercent: 115 });
-    const num = $('#introNum'), o = { v: 0 };
+  buildTower();
+  const heroIn = () => {
+    fillNumbers();
+    if (!motion) return;
+    const tl = G.timeline({ defaults: { ease: EASE } });
+    tl.from('.nav-bar > *', { y: -16, opacity: 0, duration: 0.9, stagger: 0.06 }, 0)
+      .from('.hero-tag', { y: 14, opacity: 0, duration: 0.8 }, 0.05)
+      // each line rises out of its mask and settles from a slight tilt
+      .from('.hero-title .ln > span', { yPercent: 110, rotate: 4, transformOrigin: '0% 100%', duration: 1.25, stagger: 0.09 }, 0.1)
+      .from('.hero-sub', { y: 22, opacity: 0, duration: 1 }, 0.5)
+      .from('.hero-cta > *', { y: 18, opacity: 0, scale: 0.96, duration: 0.9, stagger: 0.07 }, 0.6)
+      .from('.hero-modules li', { y: 10, opacity: 0, duration: 0.7, stagger: 0.05 }, 0.75)
+      .fromTo('.tower', { clipPath: 'inset(100% 0% 0% 0% round 28px 28px 0px 0px)' }, { clipPath: 'inset(0% 0% 0% 0% round 28px 28px 0px 0px)', duration: 1.4, ease: 'expo.inOut' }, 0.15)
+      // the windows switch on as a wave rising from the bottom corner
+      .from('#towerGrid i', { opacity: 0, scale: 0.6, duration: 0.7, stagger: { grid: 'auto', from: 'end', amount: 0.9 } }, 0.55)
+      .from('#heroWs', { y: 70, opacity: 0, rotateX: 10, transformPerspective: 1400, transformOrigin: '50% 100%', duration: 1.3 }, 0.85)
+      .from('#heroWs .hw-row', { x: -16, opacity: 0, duration: 0.8, stagger: 0.07 }, 1.15)
+      .from('#heroWs .hw-bar i', { scaleX: 0, duration: 1.2, stagger: 0.07 }, 1.2)
+      .from('.hc-flow', { x: 60, y: -10, opacity: 0, scale: 0.94, duration: 1.1 }, 1.25)
+      .from('.hc-chart', { x: -50, y: 20, opacity: 0, scale: 0.94, duration: 1.1 }, 1.35)
+      .from('.hc-ai', { y: 50, opacity: 0, scale: 0.94, duration: 1.1 }, 1.45)
+      .add(() => drawSpark(), 1.4)
+      // once assembled, the floating cards drift gently on their own rhythms (yPercent, so pointer depth stays free)
+      .add(() => ['.hc-flow', '.hc-chart', '.hc-ai'].forEach((s, i) => G.to(s, { yPercent: i % 2 ? 4 : -4, duration: 3.2 + i * 0.7, ease: 'sine.inOut', yoyo: true, repeat: -1 })), 2.4);
+  };
+  if (!motion) { intro?.remove(); heroIn(); drawSpark(); }
+  else {
+    // the grid lights from the centre, the wordmark rises, then the grid itself opens onto the page
+    const ig = $('.intro-grid'), cols = innerWidth > 700 ? 16 : 8, rowsN = Math.ceil(innerHeight / (innerWidth / cols));
+    ig.style.setProperty('--cols', cols);
+    ig.innerHTML = '<i></i>'.repeat(cols * rowsN);
+    const cells = $$('i', ig), rnd = seeded(11), grid = [rowsN, cols];
+    cells.forEach(c => { if (rnd() > 0.78) c.classList.add('lit'); });
+    G.set('.hero-title .ln > span', { yPercent: 110 });
     const tl = G.timeline({ onComplete: () => intro.remove() });
-    // GSAP owns the dots' transform so they grow from their own centre at the tips of the V
-    G.set('.intro-mark circle', { scale: 0, transformOrigin: '50% 50%' });
-    tl.to('.intro-mark path', { strokeDashoffset: 0, duration: 0.55, ease: 'power2.inOut' }, 0)
-      .to('.intro-mark circle', { scale: 1, duration: 0.35, stagger: 0.07, ease: 'back.out(2.5)' }, 0.35)
-      .to(o, { v: 100, duration: 0.85, ease: 'power2.inOut', onUpdate: () => { num.textContent = Math.round(o.v); } }, 0)
-      .to('.intro-mark', { scale: 0.6, opacity: 0, duration: 0.35, ease: 'power2.in' }, 1.05)
-      .fromTo('.intro', { clipPath: 'inset(0% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 100% 0%)', duration: 0.75, ease: 'expo.inOut', onStart: () => { G.set('.hero-title .ln > span', { clearProps: 'yPercent' }); heroIn(); } }, 1.1);
+    tl.from(cells, { opacity: 0, scale: 0.4, duration: 0.5, ease: 'power2.out', stagger: { grid, from: 'center', amount: 0.45 } }, 0)
+      .from('.intro-word span', { yPercent: 70, opacity: 0, filter: 'blur(8px)', duration: 0.7, stagger: 0.05, ease: EASE }, 0.1)
+      .to('.intro-word span', { yPercent: -50, opacity: 0, duration: 0.4, stagger: 0.03, ease: 'power2.in' }, 0.95)
+      // cells turn solid so the page shows only through the grid lines, then they shrink away from the centre
+      .add(() => { intro.style.background = 'transparent'; cells.forEach(c => { c.className = ''; c.style.background = 'var(--ink)'; }); G.set('.hero-title .ln > span', { clearProps: 'yPercent' }); heroIn(); }, 1.2)
+      .to(cells, { scale: 0, borderRadius: '50%', duration: 0.55, ease: 'power3.in', stagger: { grid, from: 'center', amount: 0.5 } }, 1.2);
     setTimeout(() => { if (document.contains(intro)) tl.progress(1); }, 4000);
+  }
+  function fillNumbers() {
+    countTo($('#hwRevenue'), K.rev30, { format: money, dur: 1.6 });
+    $('#hwRevenueDelta').textContent = `${pctDelta(K.rev30, K.revPrev) >= 0 ? '+' : ''}${pctDelta(K.rev30, K.revPrev).toFixed(1)}%`;
+    countTo($('#hwOntime'), K.ontime30, { format: v => `${v.toFixed(1)}%`, dur: 1.6 });
+    const dOn = K.ontime30 - K.ontimePrev;
+    $('#hwOntimeDelta').textContent = `${dOn >= 0 ? '+' : ''}${dOn.toFixed(1)} pts`;
+    $('#hwOntimeDelta').classList.toggle('up', dOn >= 0);
+    countTo($('#hwRuns'), K.runs30, { dur: 1.6 });
+    const vals = { rev30: money(K.rev30), ontime30: `${K.ontime30.toFixed(1)}%`, cycle30: `${K.cycle30.toFixed(1)} d`, runs30: fmt(K.runs30), rev84: money(K.rev84) };
+    $$('[data-kpi]').forEach(el => { el.textContent = vals[el.dataset.kpi]; });
+    $$('.wfr small').forEach((s, i) => { if (i < 3) s.textContent = s.textContent.replace(/ran \d+ times/, `ran ${ruleRuns[i]} times`); });
+  }
+  function drawSpark() {
+    const pts = buckets('revenue', 84).slice(-12).map(b => b.v);
+    const max = Math.max(...pts), min = Math.min(...pts);
+    const xy = pts.map((v, i) => [i / (pts.length - 1) * 220, 64 - (v - min) / (max - min) * 54]);
+    const d = xy.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
+    $('#hcSparkLine').setAttribute('d', d);
+    $('#hcSparkArea').setAttribute('d', `${d} L220 70 L0 70 Z`);
+    if (motion) { const l = $('#hcSparkLine'), len = l.getTotalLength(); G.fromTo(l, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.6, ease: 'power2.inOut' }); G.from('#hcSparkArea', { opacity: 0, duration: 1.2, delay: 0.6 }); }
+  }
+
+  // the tower keeps working: windows switch on and off, a few report what happened
+  const heroVis = visibleFlag($('.hero'));
+  const signals = ['Invoice 2287 paid', 'Kickoff booked', 'QA: 8 of 11', 'Deal won · Acme', 'Forecast updated', 'Owner assigned', 'Reminder sent', 'Timesheet filed'];
+  let sigI = 0;
+  const towerTick = () => {
+    if (!heroVis.on || document.hidden) return;
+    const cells = $$('i', towerGrid);
+    for (let k = 0; k < 4; k++) {
+      const c = cells[Math.floor(Math.random() * cells.length)];
+      const v = Math.random();
+      c.className = v > 0.6 ? 'a' : v > 0.35 ? 'w' : v > 0.28 ? 'b' : '';
+    }
+    if (Math.random() > 0.45) {
+      const lit = cells.filter(c => c.className === 'a');
+      const c = lit[Math.floor(Math.random() * lit.length)];
+      if (!c) return;
+      const tr = $('.tower').getBoundingClientRect(), cr = c.getBoundingClientRect();
+      const s = document.createElement('span');
+      s.className = 'sig';
+      s.textContent = signals[sigI++ % signals.length];
+      s.style.left = `${clamp(cr.left - tr.left, 8, tr.width - 140)}px`;
+      s.style.top = `${cr.top - tr.top - 26}px`;
+      $('#towerSignals').appendChild(s);
+      if (motion) G.timeline({ onComplete: () => s.remove() }).from(s, { y: 8, opacity: 0, duration: 0.5, ease: EASE }).to(s, { opacity: 0, y: -6, duration: 0.5, delay: 1.6 });
+      else setTimeout(() => s.remove(), 2200);
+    }
+  };
+  if (motion) setInterval(towerTick, 900);
+
+  // live automation card cycles through recent runs
+  const flowEvents = [['Deal marked won → onboarding project created, Priya assigned', 4], ['Invoice 2287 paid → milestone closed, Omar notified', 3], ['Task 2 days late → owner’s lead told in chat', 2], ['Kickoff booked → agenda drafted and shared', 3]];
+  let flowI = 0;
+  setInterval(() => {
+    if (!heroVis.on || document.hidden || !motion) return;
+    const [text, n] = flowEvents[++flowI % flowEvents.length];
+    G.timeline().to('#hcFlowText', { opacity: 0, y: -6, duration: 0.25 })
+      .add(() => { $('#hcFlowText').textContent = text; $('#hcFlowTime').textContent = now(); $$('.hc-steps i').forEach((s, i) => s.classList.toggle('on', false)); $('.hc-steps').innerHTML = '<i></i>'.repeat(n); })
+      .fromTo('#hcFlowText', { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.4 })
+      .add(() => $$('.hc-steps i').forEach((s, i) => setTimeout(() => s.classList.add('on'), 180 * i)));
+  }, 5200);
+  $('#hcAiYes').addEventListener('click', () => {
+    $('#hcAiText').textContent = 'Done. Lena will get a reminder the moment Design QA closes (demo: nothing was sent).';
+    $('.hc-act').innerHTML = '<span class="ui-chip">Reminder set</span>';
+    toast('Reminder set for Lena in this demo', 'i-spark');
+  });
+  $('#hcAiNo').addEventListener('click', () => {
+    $('#hcAiText').textContent = 'Dismissed. Copilot will check the launch timeline again tomorrow.';
+    $('.hc-act').innerHTML = '';
+  });
+  // subtle depth: layers shift a few pixels with the pointer
+  if (motion && finePointer) {
+    const layers = $$('#heroStage [data-depth]');
+    $('.hero').addEventListener('mousemove', e => {
+      const nx = e.clientX / innerWidth - 0.5, ny = e.clientY / innerHeight - 0.5;
+      layers.forEach(l => G.to(l, { x: -nx * 6 * l.dataset.depth, y: -ny * 5 * l.dataset.depth, duration: 1, ease: 'power3.out', overwrite: 'auto' }));
+    });
+    G.to('.tower', { yPercent: 6, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
+    G.to('.hero-copy', { yPercent: -10, opacity: 0.4, ease: 'none', scrollTrigger: { trigger: '.hero', start: '30% top', end: 'bottom top', scrub: true } });
   }
 
   /* ================= nav ================= */
-  const nav = $('#nav');
-  const progress = $('.nav-progress span');
-  const ind = $('.nav-ind');
-  const sectionLinks = $$('.nav-link[data-section]');
+  const nav = $('#nav'), progress = $('.progress span'), ind = $('.nav-ind');
   const themed = $$('main > section, footer');
+  const navMap = [['tour', 0], ['workflows', 0], ['copilot', 0], ['analytics', 0], ['solutions', 1], ['integrations', 2], ['faq', 3]];
+  const navItems = [$$('.nav-links > .dd')[0], $$('.nav-links > .dd')[1], $('.nav-links > a.nav-link'), $$('.nav-links > .dd')[2]];
   let lastY = 0;
   const onScroll = () => {
     const y = scrollY;
     nav.classList.toggle('is-scrolled', y > 20);
-    const menuOpen = !$('#mnav').hidden;
-    nav.classList.toggle('is-hidden', y > 800 && y > lastY + 2 && !ddMenu.classList.contains('is-open') && !menuOpen && !nav.contains(document.activeElement));
-    if (y < lastY - 2) nav.classList.remove('is-hidden');
+    const anyOpen = !!$('.dd.is-open') || !$('#mnav').hidden || nav.contains(document.activeElement);
+    if (y > 700 && y > lastY + 4 && !anyOpen) nav.classList.add('is-hidden');
+    else if (y < lastY - 4 || y < 700) nav.classList.remove('is-hidden');
     lastY = y;
     const max = document.documentElement.scrollHeight - innerHeight;
     progress.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
-    const under = themed.find(s => { const r = s.getBoundingClientRect(); return r.top <= 46 && r.bottom > 46; });
-    nav.classList.toggle('is-light', !!under && under.dataset.theme !== 'dark' && !menuOpen);
-    let active = null;
-    sectionLinks.forEach(a => {
-      const r = document.getElementById(a.dataset.section).getBoundingClientRect();
-      const on = r.top < innerHeight * 0.5 && r.bottom > innerHeight * 0.5;
-      a.classList.toggle('is-active', on);
-      if (on) active = a;
-    });
-    if (active && active.offsetParent) {
-      ind.style.opacity = 1;
-      ind.style.width = `${active.offsetWidth - 28}px`;
-      ind.style.transform = `translateX(${active.offsetLeft + 14}px)`;
+    const under = themed.find(s => { const r = s.getBoundingClientRect(); return r.top <= 40 && r.bottom > 40; });
+    nav.classList.toggle('is-dark', !!under && (under.dataset.theme === 'dark' || under.tagName === 'FOOTER') && $('#mnav').hidden);
+    let active = -1;
+    navMap.forEach(([id, i]) => { const r = $('#' + id).getBoundingClientRect(); if (r.top < innerHeight * 0.5 && r.bottom > innerHeight * 0.5) active = i; });
+    const it = navItems[active];
+    if (it && it.offsetParent) {
+      const btn = it.matches('a') ? it : $('.nav-link', it);
+      ind.style.opacity = 1; ind.style.width = `${btn.offsetWidth - 28}px`;
+      ind.style.transform = `translateX(${it.offsetLeft + 14}px)`;
     } else ind.style.opacity = 0;
-    railSections.forEach((s, i) => {
-      const r = s.getBoundingClientRect();
-      railLinks[i].classList.toggle('is-on', r.top < innerHeight * 0.5 && r.bottom > innerHeight * 0.5);
-    });
   };
-
-  // section rail
-  const rail = $('.rail');
-  const railSections = $$('main > section[data-name]');
-  rail.innerHTML = railSections.map(s => `<a href="#${s.id}" aria-label="${s.dataset.name}"><span>${s.dataset.name}</span></a>`).join('');
-  const railLinks = $$('a', rail);
-
-  // product dropdown
-  const ddBtn = $('.dd-btn'), ddMenu = $('#dd-product');
-  const setDD = open => { ddBtn.setAttribute('aria-expanded', open); ddMenu.classList.toggle('is-open', open); };
-  let hoverOpened = 0;
-  ddBtn.addEventListener('click', e => {
-    e.stopPropagation();
-    const open = ddBtn.getAttribute('aria-expanded') === 'true';
-    setDD(!open || performance.now() - hoverOpened < 600);
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  // dropdowns: hover on mouse, tap/click/keyboard everywhere
+  const dds = $$('[data-dd]');
+  function closeAllDD(except) { dds.forEach(d => { if (d !== except) { d.classList.remove('is-open'); $('.nav-link', d).setAttribute('aria-expanded', 'false'); } }); }
+  const openDD = (d, open) => { closeAllDD(open ? d : null); d.classList.toggle('is-open', open); $('.nav-link', d).setAttribute('aria-expanded', open); };
+  dds.forEach(d => {
+    const btn = $('.nav-link', d);
+    let t, hoverAt = 0;
+    btn.addEventListener('click', e => { e.stopPropagation(); const open = d.classList.contains('is-open'); openDD(d, !open || performance.now() - hoverAt < 500); });
+    btn.addEventListener('keydown', e => { if (e.key === 'ArrowDown') { e.preventDefault(); openDD(d, true); $('a, button', $('.dd-panel', d))?.focus(); } });
+    if (finePointer) {
+      d.addEventListener('mouseenter', () => { clearTimeout(t); if (!d.classList.contains('is-open')) hoverAt = performance.now(); openDD(d, true); });
+      d.addEventListener('mouseleave', () => { t = setTimeout(() => openDD(d, false), 180); });
+    }
+    d.addEventListener('focusout', e => { if (!d.contains(e.relatedTarget)) openDD(d, false); });
   });
-  if (finePointer) {
-    let t;
-    $('.dd').addEventListener('mouseenter', () => { clearTimeout(t); if (ddBtn.getAttribute('aria-expanded') !== 'true') hoverOpened = performance.now(); setDD(true); });
-    $('.dd').addEventListener('mouseleave', () => { t = setTimeout(() => setDD(false), 200); });
-  }
-  document.addEventListener('click', e => { if (!e.target.closest('.dd')) setDD(false); });
-  ddMenu.addEventListener('click', e => { if (e.target.closest('a')) setDD(false); });
-
+  document.addEventListener('click', e => { if (!e.target.closest('[data-dd]')) closeAllDD(); });
   // mobile menu
   const burger = $('.burger'), mnav = $('#mnav');
   function closeMenu() {
     if (mnav.hidden) return;
-    mnav.hidden = true; burger.setAttribute('aria-expanded', 'false'); nav.classList.remove('menu-open');
-    burger.innerHTML = icon('i-menu', 22); lenis?.start(); document.body.style.overflow = '';
+    mnav.hidden = true; burger.setAttribute('aria-expanded', 'false'); burger.setAttribute('aria-label', 'Open menu');
+    burger.innerHTML = icon('i-menu', 22); lenis?.start(); document.body.style.overflow = ''; onScroll();
   }
   burger.addEventListener('click', () => {
     if (!mnav.hidden) return closeMenu();
-    mnav.hidden = false; burger.setAttribute('aria-expanded', 'true'); nav.classList.add('menu-open');
-    burger.innerHTML = icon('i-x', 22); lenis?.stop(); document.body.style.overflow = 'hidden';
-    if (motion) G.from('.mnav nav a, .mnav-cta > *', { y: 30, opacity: 0, duration: 0.6, stagger: 0.04, ease: 'expo.out' });
-    onScroll();
+    mnav.hidden = false; burger.setAttribute('aria-expanded', 'true'); burger.setAttribute('aria-label', 'Close menu');
+    burger.innerHTML = icon('i-x', 22); lenis?.stop(); document.body.style.overflow = 'hidden'; onScroll();
+    if (motion) G.from('.mnav nav > *, .mnav > .btn', { y: 24, opacity: 0, duration: 0.6, stagger: 0.05, ease: EASE });
   });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeAllDD(); closeMenu(); if (!$('#palette').hidden) closePal(); } });
 
-  addEventListener('scroll', onScroll, { passive: true });
-  addEventListener('resize', onScroll);
-  onScroll();
-
-  /* ================= magnetic + cursor ================= */
-  if (finePointer && motion) {
-    $$('.magnetic').forEach(el => {
-      const kids = [...el.children];
-      el.addEventListener('mousemove', e => {
-        const r = el.getBoundingClientRect();
-        const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
-        G.to(el, { x: dx * 0.2, y: dy * 0.3, duration: 0.45, ease: 'power3.out', overwrite: 'auto' });
-        G.to(kids, { x: dx * 0.08, y: dy * 0.1, duration: 0.45, ease: 'power3.out', overwrite: 'auto' });
-      });
-      el.addEventListener('mouseleave', () => {
-        G.to(el, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.45)', overwrite: 'auto' });
-        G.to(kids, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.45)', overwrite: 'auto' });
-      });
-    });
-    const c = $('.cursor'), label = $('.cursor-label');
-    let x = -100, y = -100, cx = x, cy = y;
-    addEventListener('mousemove', e => { x = e.clientX; y = e.clientY; c.classList.add('is-on'); }, { passive: true });
-    document.documentElement.addEventListener('mouseleave', () => c.classList.remove('is-on'));
-    $$('.kcard').forEach(k => { k.dataset.cursor = 'Drag'; });
-    document.addEventListener('mouseover', e => {
-      const lab = e.target.closest('[data-cursor]');
-      c.classList.toggle('has-label', !!lab);
-      label.textContent = lab ? lab.dataset.cursor : '';
-      c.classList.toggle('is-link', !lab && !!e.target.closest('a, button, label, input[type="range"], .o-node, [role="tab"]'));
-      c.style.opacity = e.target.closest('input[type="text"], input[type="email"], input[type="search"], textarea') ? '0' : '';
-    });
-    G.ticker.add(() => {
-      cx += (x - cx) * 0.2; cy += (y - cy) * 0.2;
-      c.style.transform = `translate(${cx}px, ${cy}px)`;
+  // magnetic primary buttons (subtle, mouse only)
+  if (motion && finePointer) {
+    $$('[data-magnetic]').forEach(el => {
+      el.addEventListener('mousemove', e => { const r = el.getBoundingClientRect(); G.to(el, { x: (e.clientX - r.left - r.width / 2) * 0.16, y: (e.clientY - r.top - r.height / 2) * 0.24, duration: 0.5, ease: 'power3.out', overwrite: 'auto' }); });
+      el.addEventListener('mouseleave', () => G.to(el, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.5)', overwrite: 'auto' }));
     });
   }
 
-  /* ================= hero: the live product ================= */
-  const app = $('#app');
-  const people = { LK: { i: 'LK', cls: 'av-2' }, PR: { i: 'PR', cls: 'av-3' }, MO: { i: 'MO', cls: 'av-1' }, OA: { i: 'OA', cls: 'av-5' }, JT: { i: 'JT', cls: 'av-4' } };
-  function countHeroKpis() {
-    $$('.kpi b[data-count]').forEach(b => { b._shown = 0; countTo(b, +b.dataset.count, { prefix: b.dataset.prefix || '', suffix: b.dataset.suffix || '', dec: +(b.dataset.dec || 0), dur: 1.6 }); });
-  }
-  // sidebar views
-  const appTitles = { overview: 'Overview', projects: 'Projects · Timeline', inbox: 'Inbox', automations: 'Automations' };
-  $$('.app-nav button').forEach(b => b.addEventListener('click', () => {
-    $$('.app-nav button').forEach(x => { x.classList.toggle('is-on', x === b); x.setAttribute('aria-current', x === b ? 'page' : 'false'); });
-    $$('.app-view', app).forEach(v => v.classList.toggle('is-on', v.dataset.v === b.dataset.app));
-    $('#appTitle').textContent = appTitles[b.dataset.app];
-    if (motion && b.dataset.app === 'projects') G.from('.g-bar', { scaleX: 0, transformOrigin: '0 50%', duration: 0.9, stagger: 0.06, ease: 'expo.out' });
-    if (motion && b.dataset.app === 'inbox') G.from('.inbox li', { x: 20, opacity: 0, duration: 0.5, stagger: 0.05, ease: 'expo.out' });
-  }));
-  // inbox
-  const inboxBadge = $('#inboxBadge');
-  $('#inboxList').addEventListener('click', e => {
-    const b = e.target.closest('[data-done]');
-    if (!b) return;
-    const li = b.closest('li');
-    if (li.classList.contains('is-gone')) return;
-    const wasUnread = li.classList.contains('unread');
-    li.classList.add('is-gone');
-    const next = li.nextElementSibling || li.previousElementSibling;
-    setTimeout(() => {
-      li.remove();
-      if (!$('#inboxList li')) $('#inboxList').innerHTML = '<li class="inbox-empty">Inbox zero. Nothing needs you right now.</li>';
-      (next?.querySelector('[data-done]') || $('[data-app="inbox"]')).focus({ preventScroll: true });
-    }, 400);
-    if (wasUnread) { const n = Math.max(0, +inboxBadge.textContent - 1); inboxBadge.textContent = n; inboxBadge.classList.toggle('is-zero', n === 0); }
-  });
-  // generic switches
-  document.addEventListener('click', e => {
-    const sw = e.target.closest('.switch[role="switch"]');
-    if (!sw) return;
-    const on = !sw.classList.contains('is-on');
-    $$(`.switch[aria-label="${sw.getAttribute('aria-label')}"]`).forEach(s => {
-      s.classList.toggle('is-on', on); s.setAttribute('aria-checked', on);
-      s.closest('li')?.classList.toggle('is-off', !on);
-    });
-    $('#autoActive').textContent = $$('.rules .switch.is-on').length;
-    toast(`${sw.getAttribute('aria-label')} ${on ? 'switched on' : 'paused, history kept'}`, { icon: 'i-zap' });
-  });
-  // small helpers on buttons
-  document.addEventListener('click', e => {
-    const t = e.target.closest('[data-toast]');
-    if (t) { e.preventDefault(); toast(t.dataset.toast, { icon: 'i-spark' }); }
-    if (e.target.closest('[data-copy-link]')) {
-      const url = location.href.split('#')[0] + '#top';
-      (navigator.clipboard?.writeText(url) || Promise.reject()).then(() => toast('Link to this workspace view copied'), () => toast('Share link: ' + url, { icon: 'i-link' }));
-    }
-  });
-
-  // live feed + tasks
-  const autoLog = $('#autoLog');
-  let runs = 18420;
-  const logAuto = (text, ic = 'i-zap', col = 'c-jade', isRun = true) => {
-    const li = document.createElement('li');
-    li.className = 'new';
-    li.innerHTML = `<span class="f-ico ${col}">${icon(ic, 13)}</span><p>${esc(text)}</p><time>${now()}</time>`;
-    autoLog.prepend(li);
-    while (autoLog.children.length > 4) autoLog.lastElementChild.remove();
-    if (motion) G.from(li, { height: 0, opacity: 0, paddingTop: 0, paddingBottom: 0, duration: 0.6, ease: 'expo.out' });
-    setTimeout(() => li.classList.remove('new'), 2000);
-    if (!isRun) return;
-    runs++;
-    $('#runCount').textContent = fmt(runs);
-    $('#kRuns').textContent = fmt(runs); $('#kRuns')._shown = runs;
-  };
-  const tasks = $('#tasks');
-  let copilotStage = 0;
-  const emailBox = $('[data-id="t4"] input', tasks);
-  const copilotIdle = { text: $('#copilotText').textContent, yes: $('#copilotYes').textContent };
-  // the launch email cannot be sent while it waits on Design QA
-  const setEmailBlocked = blocked => {
-    const tag = $('[data-id="t4"] .tag', tasks);
-    tag.textContent = blocked ? 'Waiting on QA' : 'Ready';
-    tag.className = `tag ${blocked ? 'tag-warn' : 'tag-ready'}`;
-    if (blocked) tag.dataset.blocked = ''; else delete tag.dataset.blocked;
-    emailBox.disabled = blocked;
-    emailBox.closest('label').title = blocked ? 'Waiting on Design QA' : '';
-  };
-  setEmailBlocked(true);
-  const rules = {
-    t3: { on: () => {
-      if (!emailBox.checked) setEmailBlocked(false);
-      logAuto('Design QA done → launch email moved to Ready');
-      toast('Lena K. was told the launch email is ready', { av: people.LK });
-      $('#copilotText').textContent = 'Design QA is closed. The launch email is unblocked and can go out Thursday as planned.';
-      $('#copilotYes').textContent = 'Schedule it';
-      copilotStage = 2;
-    }, off: () => {
-      // a sent email stays sent; an unsent one waits on QA again
-      if (!emailBox.checked) { setEmailBlocked(true); logAuto('Design QA reopened → launch email held', 'i-alert', 'c-saffron'); }
-      else logAuto('Design QA reopened', 'i-clock', 'c-saffron', false);
-      $('#copilotText').textContent = copilotIdle.text;
-      $('#copilotYes').textContent = copilotIdle.yes;
-      copilotStage = 0;
-    } },
-    t4: { on: () => { logAuto('Launch email sent → 12,400 queued, tracking opens', 'i-mail', 'c-sky'); toast('Campaign live. Results stream into Analytics', { av: people.LK }); } },
-    t5: { on: () => { logAuto('Forecast filed → shared with Finance', 'i-chart', 'c-sky'); toast('Omar A. shared the Q4 forecast with Finance', { av: people.OA }); } }
-  };
-  const refreshBoard = () => {
-    const all = $$('.task', tasks), done = all.filter(t => t.querySelector('input').checked);
-    const pct = Math.round(done.length / all.length * 100);
-    countTo($('#pct'), pct, { dur: 0.8 });
-    $('#pctBar').style.width = `${pct}%`;
-    $('.app-projects li span').textContent = `${pct}%`;
-    const blocked = $$('[data-blocked]', tasks).length;
-    $('#kBlock').textContent = blocked;
-    $('.kbar.warn i').style.width = `${blocked ? 18 : 0}%`;
-  };
-  tasks.addEventListener('change', e => {
-    const li = e.target.closest('.task');
-    if (!li) return;
-    $$('.task.hint', tasks).forEach(t => t.classList.remove('hint'));
-    const on = e.target.checked;
-    li.classList.toggle('is-done', on);
-    const r = rules[li.dataset.id];
-    if (on) r?.on ? r.on() : logAuto(`${li.querySelector('.t-title').textContent} completed`, 'i-check', 'c-jade', false);
-    else r?.off ? r.off() : logAuto(`${li.querySelector('.t-title').textContent} reopened`, 'i-clock', 'c-saffron', false);
-    refreshBoard();
-  });
-  // copilot float: 0 = suggesting, 1 = reminder set, waiting on QA, 2 = QA closed, ready to schedule
-  $('#copilotYes').addEventListener('click', () => {
-    const qa = $('[data-id="t3"] input', tasks);
-    if (!qa.checked && copilotStage === 0) {
-      toast('Copilot will remind Lena when Design QA closes', { av: people.LK });
-      logAuto('Copilot set a reminder for Lena K.', 'i-spark', 'c-saffron', false);
-      $('#copilotText').textContent = 'Done. I\'ll message Lena the moment Design QA is ticked off. Try ticking it in the checklist.';
-      $('#copilotYes').textContent = 'Got it';
-      copilotStage = 1;
-    } else if (!qa.checked) {
-      toast('Still waiting on Design QA. Lena will hear as soon as it closes', { icon: 'i-clock' });
-    } else if (emailBox.checked) {
-      toast('The launch email has already gone out', { icon: 'i-mail' });
-    } else {
-      toast('Launch email scheduled for Thursday 10:00', { icon: 'i-cal' });
-      $('#copilotText').textContent = 'Scheduled for Thursday at 10:00. I\'ll post open rates in #launch after 24 hours.';
-      G && motion && G.fromTo('.f-copilot', { scale: 0.97 }, { scale: 1, duration: 0.5, ease: 'back.out(2)' });
-    }
-  });
-  $('#copilotNo').addEventListener('click', () => {
-    $('#copilotText').textContent = 'Okay. I\'ll check the launch timeline again at 15:00 and flag anything at risk.';
-    toast('Copilot will check again at 15:00', { icon: 'i-clock' });
-  });
-  // ambient activity while the hero is visible
-  const ambient = [['Overdue check → nothing overdue', 'i-clock', 'c-sky'], ['Kickoff booked → onboarding project opened', 'i-cal', 'c-jade'], ['Stripe payout matched → milestone closed', 'i-card', 'c-saffron'], ['Daily digest sent to 4 people', 'i-mail', 'c-sky']];
-  let ambI = 0, heroVisible = true;
-  new IntersectionObserver(([e]) => { heroVisible = e.isIntersecting; }).observe($('.hero'));
-  setInterval(() => { if (heroVisible && !document.hidden) logAuto(...ambient[ambI++ % ambient.length]); }, 6500);
-
-  // hero chart: draw-in and hover readout
-  function drawHeroChart() {
-    const line = $('.hc-line'), area = $('.hc-area');
-    if (!motion) return;
-    const len = line.getTotalLength();
-    G.fromTo(line, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 2, ease: 'power2.inOut', delay: 0.9 });
-    G.from(area, { opacity: 0, duration: 1.2, delay: 1.6 });
-    G.from('.hc-dot', { opacity: 0, scale: 0.6, transformOrigin: 'center', duration: 0.5, delay: 2.6 });
-    G.from('.hc-tip', { opacity: 0, duration: 0.5, delay: 2.6 });
-  }
-  (() => {
-    const svg = $('#heroChart'), line = $('.hc-line'), dot = $('.hc-dot'), tip = $('.hc-tip'), card = $('.chart-card');
-    const len = line.getTotalLength();
-    const pointAtX = x => { let lo = 0, hi = len; for (let i = 0; i < 18; i++) { const mid = (lo + hi) / 2; if (line.getPointAtLength(mid).x < x) lo = mid; else hi = mid; } return line.getPointAtLength(lo); };
-    const place = x => {
-      const p = pointAtX(clamp(x, 2, 518));
-      dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y);
-      const sr = svg.getBoundingClientRect(), cr = card.getBoundingClientRect(), k = sr.width / cr.width;
-      const sx = (sr.left - cr.left) / (cr.width / card.offsetWidth), sy = (sr.top - cr.top) / (cr.height / card.offsetHeight);
-      const half = tip.offsetWidth / 2 + 6;
-      tip.style.left = `${clamp(sx + p.x / 520 * svg.clientWidth, half, card.offsetWidth - half)}px`;
-      tip.style.top = `${sy + p.y / 200 * svg.clientHeight}px`;
-      const week = Math.min(13, Math.round(p.x / 520 * 12) + 1), val = (28 + (200 - p.y) / 200 * 24).toFixed(1);
-      tip.innerHTML = `<b>$${val}k</b> week ${week}`;
-      return k;
-    };
-    place(460);
-    svg.addEventListener('mousemove', e => { const r = svg.getBoundingClientRect(); place((e.clientX - r.left) / r.width * 520); });
-    svg.addEventListener('mouseleave', () => place(460));
-    addEventListener('resize', () => place(460));
-  })();
-
-  // hero depth: scroll flattens the product, the mouse moves the floating layers
+  /* ================= why: statement lights up as you read ================= */
+  const why = $('#whyStatement');
+  why.setAttribute('aria-label', why.textContent);
+  why.innerHTML = why.textContent.split(' ').map(w => `<span class="sw" aria-hidden="true">${esc(w)}</span>`).join(' ');
   if (motion) {
-    G.fromTo('#heroVisual .fit', { '--rx': '18deg' }, { '--rx': '0deg', ease: 'none', scrollTrigger: { trigger: '#heroVisual', start: 'top 92%', end: 'top 18%', scrub: 0.6 } });
-    G.to('.hero-title', { yPercent: -18, opacity: 0.2, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: '40% top', scrub: true } });
-    G.to('.f-copilot', { yPercent: -30, ease: 'none', scrollTrigger: { trigger: '#heroVisual', start: 'top 60%', end: 'bottom top', scrub: true } });
-    G.to('.f-deal', { yPercent: -150, ease: 'none', scrollTrigger: { trigger: '#heroVisual', start: 'top 60%', end: 'bottom top', scrub: true } });
-    G.to('.f-run', { yPercent: -30, ease: 'none', scrollTrigger: { trigger: '#heroVisual', start: 'top 60%', end: 'bottom top', scrub: true } });
-    G.to('.hero-glow.g1', { yPercent: 30, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
+    G.to('#whyStatement .sw', { opacity: 1, stagger: 0.05, ease: 'none', scrollTrigger: { trigger: '#whyStatement', start: 'top 80%', end: 'bottom 45%', scrub: 0.6 } });
+    G.fromTo('.why-mask', { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', ease: 'expo.inOut', duration: 1.5, scrollTrigger: { trigger: '.why-media', start: 'top 80%', once: true } });
+    G.fromTo('.why-mask img', { scale: 1.18 }, { scale: 1.04, duration: 1.8, ease: 'expo.out', scrollTrigger: { trigger: '.why-media', start: 'top 80%', once: true } });
+    G.fromTo('.why-mask img', { yPercent: -8 }, { yPercent: 4, ease: 'none', scrollTrigger: { trigger: '.why-media', start: 'top bottom', end: 'bottom top', scrub: true } });
+    $$('.glyph').forEach(g => $$('rect, path, circle', g).forEach(p => { const len = p.getTotalLength?.() || 100; p.style.strokeDasharray = len; p.style.strokeDashoffset = len; }));
+    whenSeen($('.why-rail'), () => {
+      G.to('.glyph *', { strokeDashoffset: 0, duration: 1.4, stagger: 0.04, ease: 'power2.inOut' });
+      G.from('.why-rail li', { y: 24, opacity: 0, duration: 1, stagger: 0.08, ease: EASE });
+    }, 0.3);
+  }
+
+  /* ================= SEQUENCE 1: scattered → connected ================= */
+  const TILES = [
+    { ic: 'i-mail', t: 'Email', m: '23 unread', p: 'RE: RE: FW: launch date??', f: 'Launch date confirmed · Nov 20', x: 40, y: 40, r: -4, slot: 0 },
+    { ic: 'i-msg', t: '#launch chat', m: '14 new', p: 'Who owns the vendor contract?', f: 'Vendor contract · owner Maya', x: 380, y: 10, r: 3, slot: 1 },
+    { ic: 'i-sheet', t: 'Tracker_v3.xlsx', m: '5 editors', p: 'Design QA: "Done?"', f: 'Design QA · 8 of 11 screens', x: 740, y: 50, r: 4, slot: 2 },
+    { ic: 'i-cal', t: 'Calendar', m: '4 syncs', p: 'Launch sync (again) 16:30', f: 'Status meeting not needed', x: 20, y: 300, r: 2, slot: 3 },
+    { ic: 'i-users', t: 'Team chat', m: '3 asks', p: 'Is anyone free to review?', f: 'Omar has 18 h free this week', x: 760, y: 300, r: -3, slot: 4 },
+    { ic: 'i-target', t: 'CRM', m: 'stale', p: 'Acme Freight: closed won?', f: 'Acme Freight · onboarding open', x: 150, y: 500, r: -2, slot: 5 },
+    { ic: 'i-card', t: 'Invoices', m: '1 overdue', p: 'Invoice 2291 · 3 days late', f: 'Invoice 2291 · reminder sent', x: 640, y: 510, r: 5, slot: 6 }
+  ];
+  const cx = $('#cx'), cxTiles = $('#cxTiles'), HUB = [490, 310];
+  cxTiles.innerHTML = TILES.map((t, i) => `<div class="cx-tile" data-i="${i}" style="left:${t.x}px;top:${t.y}px"><div class="th"><span class="ti">${icon(t.ic, 13)}</span><b>${t.t}</b><em>${t.m}</em></div><p data-raw="${esc(t.p)}" data-filed="${esc(t.f)}">${esc(t.p)}</p></div>`).join('');
+  const tileEls = $$('.cx-tile', cxTiles);
+  $('#cxPaths').innerHTML = TILES.map(t => { const sx = t.x + 98, sy = t.y + 40, mx = (sx + HUB[0]) / 2 + (sy - HUB[1]) * 0.2, my = (sy + HUB[1]) / 2 - (sx - HUB[0]) * 0.12; return `<path d="M${sx} ${sy} Q${mx} ${my} ${HUB[0]} ${HUB[1]}"/>`; }).join('');
+  $('#cxPulses').innerHTML = TILES.map(() => '<circle r="4" opacity="0"/>').join('');
+  const cxPaths = $$('#cxPaths path'), cxDots = $$('#cxPulses circle');
+  const fileTile = (el, on) => {
+    el.classList.toggle('is-filed', on);
+    const p = $('p', el), em = $('em', el);
+    p.textContent = on ? p.dataset.filed : p.dataset.raw;
+    em.textContent = on ? 'filed' : TILES[+el.dataset.i].m;
+    // the message is rewritten as it is filed: the new text slides in rather than snapping
+    if (motion && !cx.classList.contains('is-static')) G.fromTo([p, em], { opacity: 0, y: 5 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.04, delay: +el.dataset.i * 0.03, ease: EASE, overwrite: 'auto' });
+  };
+  const staticConnect = () => {
+    cx.classList.add('is-static');
+    tileEls.forEach((el, i) => { $(`.cxw-slot[data-slot="${TILES[i].slot}"]`).appendChild(el); fileTile(el, true); });
+    $('#connectStage .fit').dataset.auto = '1';
+    $$('#cxSteps li').forEach(li => li.classList.add('is-on'));
+    layoutFits();
+  };
+  const cxSteps = $$('#cxSteps li');
+  const setCxStep = p => {
+    const n = Math.min(5, Math.floor(p * 6.2));
+    cxSteps.forEach((li, i) => { li.classList.toggle('is-on', i === n); li.classList.toggle('is-done', i < n); });
+    $('#cxMeter').style.transform = `scaleX(${p})`;
+  };
+  const mm = motion ? G.matchMedia() : null;
+  if (!mm) staticConnect();
+  mm?.add('(max-width: 960px)', () => { staticConnect(); });
+  mm?.add('(min-width: 961px)', () => {
+    if (cx.classList.contains('is-static')) { cx.classList.remove('is-static'); tileEls.forEach(el => { cxTiles.appendChild(el); fileTile(el, false); }); delete $('#connectStage .fit').dataset.auto; layoutFits(); }
+    const lens = cxPaths.map(p => p.getTotalLength());
+    cxPaths.forEach((p, i) => { p.style.strokeDasharray = lens[i]; p.style.strokeDashoffset = lens[i]; });
+    // where each tile lands inside the workspace (unscaled coordinates)
+    const target = i => {
+      // layout offsets ignore transforms, so this holds while the workspace is still scaling in
+      const slot = $(`.cxw-slot[data-slot="${TILES[i].slot}"]`), tile = tileEls[i];
+      let x = 0, y = 0;
+      for (let el = slot; el && el !== cx; el = el.offsetParent) { x += el.offsetLeft; y += el.offsetTop; }
+      return [x + (slot.offsetWidth - tile.offsetWidth) / 2 - TILES[i].x, y + (slot.offsetHeight - tile.offsetHeight) / 2 - TILES[i].y];
+    };
+    G.set('#cxWs', { opacity: 0, scale: 0.94, y: 20 });
+    const filed = { v: false };
+    const tl = G.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '#connect', start: 'top top', end: 'bottom bottom', scrub: 0.7, invalidateOnRefresh: true,
+      onUpdate: self => {
+        setCxStep(self.progress);
+        const on = self.progress > 0.56;
+        if (on !== filed.v) { filed.v = on; tileEls.forEach(el => fileTile(el, on)); }
+        // pulses travel the lines while the rules are running
+        const k = (self.progress - 0.3) / 0.22;
+        cxDots.forEach((d, i) => {
+          if (k <= 0 || k >= 1) { d.setAttribute('opacity', 0); return; }
+          const q = (k * 2.4 + i * 0.13) % 1, pt = cxPaths[i].getPointAtLength(lens[i] * q);
+          d.setAttribute('cx', pt.x); d.setAttribute('cy', pt.y); d.setAttribute('opacity', 1);
+        });
+      } } });
+    tl.fromTo(tileEls, { opacity: 0, scale: 0.85, rotation: (i) => TILES[i].r * 2 }, { opacity: 1, scale: 1, rotation: (i) => TILES[i].r, duration: 0.12, stagger: 0.012 }, 0)
+      .fromTo('#cxHub', { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.08 }, 0.16)
+      .to(cxPaths, { strokeDashoffset: 0, duration: 0.14, stagger: 0.01 }, 0.16)
+      .to(tileEls, { y: (i) => (i % 2 ? -10 : 10), duration: 0.2 }, 0.3)
+      .to('#cxWs', { opacity: 1, scale: 1, y: 0, duration: 0.12 }, 0.5)
+      .to(tileEls, { x: i => target(i)[0], y: i => target(i)[1], rotation: 0, duration: 0.16, stagger: 0.012, ease: 'power2.inOut' }, 0.52)
+      .to(cxPaths, { opacity: 0, duration: 0.06 }, 0.56)
+      .to('#cxHub', { opacity: 0, scale: 0.7, duration: 0.06 }, 0.58)
+      .from('#cxFoot > span', { y: 10, opacity: 0, duration: 0.06, stagger: 0.015 }, 0.78)
+      .to({}, { duration: 0.12 }, 0.88);
+    return () => { cxDots.forEach(d => d.setAttribute('opacity', 0)); };
+  });
+
+  /* ================= SEQUENCE 2: product tour ================= */
+  const app = $('#app'), tourArts = $$('#tourSteps article'), VIEWS = tourArts.map(a => a.dataset.v);
+  const dots = $('.tour-dots');
+  dots.innerHTML = VIEWS.map((v, i) => `<button type="button" aria-label="Show ${tourArts[i].querySelector('b').textContent}"></button>`).join('');
+  let tourIdx = -1, tourST = null, tourChartDrawn = false;
+  function setView(idx) {
+    if (idx === tourIdx) return;
+    tourIdx = idx;
+    const v = VIEWS[idx], shown = v === 'all' ? 'all' : v;
+    tourArts.forEach((a, i) => a.classList.toggle('is-on', i === idx));
+    $$('button', dots).forEach((b, i) => b.classList.toggle('is-on', i === idx));
+    $$('.app-nav button').forEach(b => { const on = b.dataset.v === v; b.classList.toggle('is-on', on); b.setAttribute('aria-current', on ? 'page' : 'false'); b.classList.toggle('lit', v === 'all'); });
+    $$('.views .v').forEach(el => el.classList.toggle('is-on', el.dataset.v === shown));
+    $('#appCrumb').textContent = v === 'all' ? 'Everything' : tourArts[idx].querySelector('b').textContent;
+    const cur = $(`.views .v[data-v="${shown}"]`);
+    allvStop();
+    if (v === 'all') allvIn();
+    else if (motion) G.fromTo($$(':scope > * > *', cur).filter(el => !el.matches('.anm-tip')).slice(0, 12), { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.04, ease: EASE, overwrite: 'auto' });
+    if (v === 'analytics' && !tourChartDrawn) { tourChartDrawn = true; drawTourChart(); }
+  }
+  // "All of it, connected": lines are measured from where the cards really sit, then signals run along them
+  let allvTweens = [];
+  function allvStop() { allvTweens.forEach(t => t.kill()); allvTweens = []; }
+  function allvIn() {
+    const box = $('.allv'), svg = $('.allv-lines', box), cards = $$('.allc', box), core = $('.allv-core', box);
+    const W = box.clientWidth, H = box.clientHeight, hx = W / 2, hy = H / 2;
+    const ends = cards.map(c => [c.offsetLeft + c.offsetWidth / 2, c.offsetTop + c.offsetHeight / 2]);
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.innerHTML = ends.map(([x, y]) => { const mx = (x + hx) / 2 + (y - hy) * 0.12, my = (y + hy) / 2 - (x - hx) * 0.08; return `<path d="M${x} ${y} Q${mx} ${my} ${hx} ${hy}"/>`; }).join('') + ends.map(() => '<circle r="3.5" opacity="0"/>').join('');
+    const paths = $$('path', svg), dots = $$('circle', svg);
+    cards.forEach((c, i) => { c.onmouseenter = c.onfocus = () => paths[i].classList.add('hot'); c.onmouseleave = c.onblur = () => paths[i].classList.remove('hot'); });
+    if (!motion) return;
+    const lens = paths.map(p => p.getTotalLength());
+    const tl = G.timeline();
+    tl.fromTo(core, { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: 'back.out(1.8)' }, 0)
+      .fromTo(paths, { strokeDasharray: (i) => lens[i], strokeDashoffset: (i) => -lens[i] }, { strokeDashoffset: 0, duration: 0.8, stagger: 0.05, ease: 'power2.inOut' }, 0.15)
+      .fromTo(cards, { x: (i) => hx - ends[i][0], y: (i) => hy - ends[i][1], scale: 0.5, opacity: 0 }, { x: 0, y: 0, scale: 1, opacity: 1, duration: 0.9, stagger: 0.05, ease: 'expo.out' }, 0.2)
+      .add(() => paths.forEach(p => { p.style.strokeDasharray = ''; }));
+    allvTweens.push(tl);
+    // a signal leaves each card for the hub in turn, and the hub answers with a soft pulse
+    dots.forEach((d, i) => {
+      const o = { k: 0 };
+      allvTweens.push(G.to(o, { k: 1, duration: 1.4, ease: 'power1.inOut', repeat: -1, repeatDelay: 1.6, delay: 1.1 + i * 0.5,
+        onUpdate: () => { const pt = paths[i].getPointAtLength(lens[i] * o.k); d.setAttribute('cx', pt.x); d.setAttribute('cy', pt.y); d.setAttribute('opacity', o.k < 0.06 ? o.k / 0.06 : o.k > 0.92 ? (1 - o.k) / 0.08 : 1); },
+        onRepeat: () => G.fromTo(core, { boxShadow: '0 0 0 10px rgba(53,87,245,.22)' }, { boxShadow: '0 0 0 10px rgba(228,233,255,1)', duration: 0.8, ease: 'power2.out' }) }));
+    });
+  }
+  function showTourStep(idx, scroll) {
+    if (tourST && scroll) {
+      const y = tourST.start + (idx + 0.5) / VIEWS.length * (tourST.end - tourST.start);
+      goTo(y);
+    } else { setView(idx); if (scroll) goTo('#tour'); }
+  }
+  $$('.app-nav button').forEach(b => b.addEventListener('click', () => showTourStep(VIEWS.indexOf(b.dataset.v), !!tourST)));
+  $$('button', dots).forEach((b, i) => b.addEventListener('click', () => showTourStep(i, !!tourST)));
+  $$('.allc').forEach(c => c.addEventListener('click', () => showTourStep(VIEWS.indexOf(c.dataset.go), !!tourST)));
+  setView(0);
+  mm?.add('(min-width: 961px)', () => {
+    tourST = ST.create({ trigger: '#tour', start: 'top top', end: 'bottom bottom', onUpdate: s => setView(Math.min(VIEWS.length - 1, Math.floor(s.progress * VIEWS.length))) });
     if (finePointer) {
-      const floats = $$('.float');
-      G.set(floats, { z: 60 });
-      $('.hero').addEventListener('mousemove', e => {
-        const nx = e.clientX / innerWidth - 0.5, ny = e.clientY / innerHeight - 0.5;
-        floats.forEach(f => G.to(f, { xPercent: -nx * f.dataset.depth / 3, rotateY: nx * 6, rotateX: -ny * 6, duration: 1.2, ease: 'power3.out', overwrite: 'auto' }));
-      });
+      const stage = $('#tourStage');
+      const mv = e => { const r = stage.getBoundingClientRect(); G.to(app, { rotateY: ((e.clientX - r.left) / r.width - 0.5) * 4, rotateX: -((e.clientY - r.top) / r.height - 0.5) * 3, duration: 0.8, ease: 'power3.out', overwrite: 'auto' }); };
+      const lv = () => G.to(app, { rotateY: 0, rotateX: 0, duration: 1, ease: 'power3.out', overwrite: 'auto' });
+      stage.addEventListener('mousemove', mv); stage.addEventListener('mouseleave', lv);
+      return () => { tourST = null; stage.removeEventListener('mousemove', mv); stage.removeEventListener('mouseleave', lv); };
+    }
+    return () => { tourST = null; };
+  });
+  function drawTourChart() {
+    // drawn at the box's real size so it fills the view instead of floating inside it
+    const svg = $('#tourChart'), W = svg.clientWidth || 640, H = svg.clientHeight || 300;
+    const cur = buckets('revenue', 84).slice(-12), prev = buckets('revenue', 84, 84).slice(-12);
+    const pad = { l: 44, r: 14, t: 16, b: 26 }, iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+    const all = [...cur, ...prev].map(c => c.v), unit = 5000;
+    const lo = Math.floor(Math.min(...all) * 0.9 / unit) * unit, hi = Math.ceil(Math.max(...all) * 1.05 / unit) * unit;
+    const x = i => pad.l + i / (cur.length - 1) * iw, y = v => pad.t + ih - (v - lo) / (hi - lo) * ih;
+    const line = a => a.map((c, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(c.v).toFixed(1)}`).join(' ');
+    const ticks = [0, 1, 2, 3].map(k => lo + (hi - lo) * k / 3), n = cur.length - 1;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.innerHTML = '<defs><linearGradient id="tcFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3557F5" stop-opacity=".2"/><stop offset="1" stop-color="#3557F5" stop-opacity="0"/></linearGradient></defs>'
+      + ticks.map(t => `<line class="gl" x1="${pad.l}" x2="${W - pad.r}" y1="${y(t)}" y2="${y(t)}"/><text class="lb" x="${pad.l - 8}" y="${y(t) + 4}" text-anchor="end">$${Math.round(t / 1000)}k</text>`).join('')
+      + cur.map((c, i) => i % 2 === 1 || i === n ? `<text class="lb" x="${x(i)}" y="${H - 6}" text-anchor="${i === n ? 'end' : 'middle'}">${c.short}</text>` : '').join('')
+      + `<path class="pv" d="${line(prev)}"/><path class="ar" fill="url(#tcFill)" d="${line(cur)} L${x(n)} ${pad.t + ih} L${x(0)} ${pad.t + ih} Z"/><path class="ln" d="${line(cur)}"/>`
+      + `<line class="vl" y1="${pad.t}" y2="${pad.t + ih}" opacity="0"/><circle class="end-ring" cx="${x(n)}" cy="${y(cur[n].v)}" r="9"/><circle class="end" cx="${x(n)}" cy="${y(cur[n].v)}" r="4.5"/>`
+      + `<rect class="hit" x="${pad.l}" y="${pad.t}" width="${iw}" height="${ih}" fill="transparent"/>`;
+    // three figures from the same 12 weeks fill the space under the chart
+    const box = svg.parentElement, best = cur.reduce((a, c) => c.v > a.v ? c : a, cur[0]);
+    const tot = cur.reduce((s, c) => s + c.v, 0), dl = pctDelta(tot, prev.reduce((s, c) => s + c.v, 0));
+    let foot = $('.anm-foot', box), tip = $('.anm-tip', box);
+    if (!foot) { foot = document.createElement('div'); foot.className = 'anm-foot'; box.appendChild(foot); tip = document.createElement('div'); tip.className = 'anm-tip'; box.appendChild(tip); }
+    foot.innerHTML = `<div><span>Best week</span><b>${money(best.v)}</b><small>${best.label}</small></div><div><span>Average week</span><b>${money(tot / cur.length)}</b><small>12-week mean</small></div><div><span>vs previous 12 weeks</span><b class="${dl >= 0 ? 'up' : 'down'}">${dl >= 0 ? '+' : ''}${dl.toFixed(1)}%</b><small>dashed line</small></div>`;
+    // hover: crosshair snaps to the nearest week and the dot follows it
+    const vl = $('.vl', svg), dot = $('.end', svg), ring = $('.end-ring', svg);
+    const at = i => { dot.setAttribute('cx', x(i)); dot.setAttribute('cy', y(cur[i].v)); ring.setAttribute('cx', x(i)); ring.setAttribute('cy', y(cur[i].v)); };
+    $('.hit', svg).addEventListener('mousemove', e => {
+      const r = svg.getBoundingClientRect(), i = clamp(Math.round(((e.clientX - r.left) / r.width * W - pad.l) / iw * n), 0, n);
+      at(i); vl.setAttribute('x1', x(i)); vl.setAttribute('x2', x(i)); vl.setAttribute('opacity', 1);
+      tip.innerHTML = `<b>${money(cur[i].v)}</b><small>${cur[i].label} · previous ${money(prev[i].v)}</small>`;
+      // SVG has no offsetTop, so measure against the box and undo the fitted scale
+      const br = box.getBoundingClientRect(), k = br.width / box.offsetWidth || 1;
+      tip.style.left = `${(r.left - br.left) / k + clamp(x(i) / W * r.width / k, 90, r.width / k - 90)}px`;
+      tip.style.top = `${(r.top - br.top) / k + y(cur[i].v) / H * r.height / k}px`; tip.style.opacity = 1;
+    });
+    $('.hit', svg).addEventListener('mouseleave', () => { at(n); vl.setAttribute('opacity', 0); tip.style.opacity = 0; });
+    if (motion) {
+      const l = $('.ln', svg), len = l.getTotalLength();
+      G.fromTo(l, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.3, ease: 'power2.inOut' });
+      G.fromTo($('.ar', svg), { clipPath: 'inset(0% 100% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.3, ease: 'power2.inOut' });
+      G.from($('.pv', svg), { opacity: 0, duration: 0.8, delay: 0.5 });
+      G.from([dot, ring], { scale: 0, transformOrigin: '50% 50%', duration: 0.6, delay: 1.2, ease: 'back.out(2.5)' });
+      G.from($$('div', foot), { y: 12, opacity: 0, duration: 0.7, stagger: 0.08, delay: 0.4, ease: EASE });
     }
   }
 
-  /* ================= problem → solution (pinned scrub) ================= */
-  const psTools = $('#psTools'), psMeet = $('#psMeet'), psHours = $('#psHours'), problem = $('#problem');
-  const setStats = k => {
-    psTools.textContent = Math.round(lerp(6, 1, k));
-    psMeet.textContent = Math.round(lerp(9, 2, k));
-    psHours.textContent = lerp(9.5, 1.2, k).toFixed(1);
-    problem.classList.toggle('is-solved', k > 0.6);
+  /* ================= WORKFLOW BUILDER ================= */
+  const WF = {
+    onboard: { name: 'Client onboarding', input: 'Deal: Acme Freight · value $48,000',
+      nodes: [
+        { id: 't', k: 'Trigger', ic: 'i-target', c: 'ic-blue', t: 'Deal marked won', x: 20, y: 170, f: { App: 'CRM', Event: 'Deal stage → Won', Filter: 'Pipeline = New business' }, n: 'Starts the rule whenever a deal moves to Won in the CRM.' },
+        { id: 'c', k: 'Condition', ic: 'i-branch', c: 'ic-amber', t: 'Deal value over $10k?', x: 255, y: 170, f: { Field: 'deal.value', Rule: 'greater than 10,000' }, n: 'Large deals get the full onboarding template; small ones a light checklist.' },
+        { id: 'a1', k: 'Action', ic: 'i-folder', c: 'ic-blue', t: 'Create project from template', x: 540, y: 30, f: { Template: 'Onboarding · 14 tasks', Name: '{deal.company} onboarding' } },
+        { id: 'a2', k: 'Action', ic: 'i-users', c: 'ic-green', t: 'Assign owner: Priya R.', x: 540, y: 125, f: { Rule: 'Ops lead with most capacity', Fallback: 'Priya R.' } },
+        { id: 'a3', k: 'Action', ic: 'i-msg', c: 'ic', t: 'Post in #wins channel', x: 540, y: 220, f: { App: 'Chat', Message: 'New client: {deal.company} 🎉' } },
+        { id: 'e', k: 'Else', ic: 'i-doc', c: 'ic', t: 'Light-touch checklist', x: 540, y: 330, f: { Template: 'Small client · 4 tasks' }, n: 'Used when the deal is under $10k.' }
+      ],
+      edges: [['t', 'c'], ['c', 'a1', 'yes'], ['c', 'a2', 'yes'], ['c', 'a3', 'yes'], ['c', 'e', 'no']],
+      run: [['t', 'Deal “Acme Freight” moved to Won'], ['c', 'Value $48,000 → over $10k'], ['a1', 'Project “Acme Freight onboarding” created, 14 tasks'], ['a2', 'Priya R. assigned as owner'], ['a3', 'Posted in #wins']], skip: ['e'] },
+    invoice: { name: 'Invoice follow-up', input: 'Invoice 2291 · $6,400 · 3 days overdue',
+      nodes: [
+        { id: 't', k: 'Trigger', ic: 'i-card', c: 'ic-blue', t: 'Invoice 3 days overdue', x: 20, y: 70, f: { App: 'Billing', Event: 'invoice.overdue', After: '3 days' } },
+        { id: 'a1', k: 'Action', ic: 'i-mail', c: 'ic', t: 'Send a polite reminder', x: 290, y: 70, f: { To: '{invoice.contact}', Template: 'Friendly reminder' } },
+        { id: 'w', k: 'Wait', ic: 'i-clock', c: 'ic-amber', t: 'Wait 4 days', x: 560, y: 70, f: { Duration: '4 days', 'Skip if': 'invoice paid' } },
+        { id: 'c', k: 'Condition', ic: 'i-branch', c: 'ic-amber', t: 'Still unpaid?', x: 560, y: 200, f: { Field: 'invoice.status', Rule: 'is not Paid' } },
+        { id: 'a2', k: 'Action', ic: 'i-users', c: 'ic-green', t: 'Task for Omar A. to call', x: 290, y: 330, f: { Assignee: 'Omar A.', Due: 'Next business day' } },
+        { id: 'e', k: 'Else', ic: 'i-check', c: 'ic-green', t: 'Close the follow-up', x: 560, y: 330, f: { Action: 'Mark resolved' } }
+      ],
+      edges: [['t', 'a1'], ['a1', 'w'], ['w', 'c'], ['c', 'a2', 'yes'], ['c', 'e', 'no']],
+      run: [['t', 'Invoice 2291 is 3 days overdue'], ['a1', 'Reminder emailed to the client contact'], ['w', 'Waited 4 days (skipped ahead in this demo)'], ['c', 'Invoice still unpaid'], ['a2', 'Task created for Omar A., due tomorrow']], skip: ['e'] },
+    hire: { name: 'New hire setup', input: 'Offer signed · Sam W. · Support, starts Monday',
+      nodes: [
+        { id: 't', k: 'Trigger', ic: 'i-doc', c: 'ic-blue', t: 'Offer signed', x: 20, y: 170, f: { App: 'Hiring', Event: 'offer.signed' } },
+        { id: 'a1', k: 'Action', ic: 'i-folder', c: 'ic-blue', t: 'First-week checklist', x: 270, y: 70, f: { Template: 'New hire · 9 tasks', Owner: 'Hiring manager' } },
+        { id: 'a2', k: 'Action', ic: 'i-cal', c: 'ic', t: 'Book laptop setup', x: 270, y: 270, f: { App: 'Calendar', When: 'Day 1, 09:30' } },
+        { id: 'a3', k: 'Action', ic: 'i-msg', c: 'ic', t: 'Add to team channels', x: 540, y: 170, f: { Channels: '#support, #team' } },
+        { id: 'a4', k: 'Action', ic: 'i-clock', c: 'ic-amber', t: 'Remind manager on day 3', x: 540, y: 320, f: { Message: 'Check in with {hire.name}' } }
+      ],
+      edges: [['t', 'a1'], ['t', 'a2'], ['a1', 'a3'], ['a2', 'a3'], ['a3', 'a4']],
+      run: [['t', 'Offer signed by Sam W.'], ['a1', 'Checklist created, 9 tasks'], ['a2', 'Laptop setup booked for Monday 09:30'], ['a3', 'Added to #support and #team'], ['a4', 'Reminder scheduled for Wednesday']], skip: [] }
   };
-  // the pinned scenes are built per breakpoint, so resizing across 960px rebuilds or removes them cleanly
-  const mm = motion ? G.matchMedia() : null;
-  const wideMQ = '(min-width: 961px)', narrowMQ = '(max-width: 960px)';
-  if (!mm) setStats(1);
-  mm?.add(narrowMQ, () => setStats(1));
-  mm?.add(wideMQ, () => {
-    const words = $$('.sw', scrubText), after = $$('.sw', scrubAfter);
-    const cards = $$('.chaos .m');
-    G.set(after, { opacity: 0, y: 14 });
-    const tl = G.timeline({ scrollTrigger: { trigger: problem, start: 'top top', end: 'bottom bottom', scrub: 0.8 } });
-    tl.to(words, { opacity: 1, stagger: 0.02, duration: 0.1, ease: 'none' }, 0)
-      .fromTo(cards, { y: (i) => [30, -20, 40, -30, 20][i] }, { y: (i) => [-30, 20, -40, 30, -20][i], duration: 0.4, ease: 'none' }, 0)
-      .to(cards, {
-        x: (i, el) => 380 - (el.offsetLeft + el.offsetWidth / 2),
-        y: (i, el) => 300 - (el.offsetTop + el.offsetHeight / 2),
-        rotation: 0, scale: 0.35, opacity: 0, duration: 0.3, stagger: 0.03, ease: 'power2.in'
-      }, 0.42)
-      .to(scrubText, { opacity: 0, y: -24, duration: 0.08 }, 0.52)
-      .set(scrubAfter, { opacity: 1 }, 0.55)
-      .to(after, { opacity: 1, y: 0, stagger: 0.01, duration: 0.06 }, 0.55)
-      .to('.order', { opacity: 1, scale: 1, y: 0, duration: 0.18, ease: 'power3.out' }, 0.52)
-      .from('.o-row', { x: 30, opacity: 0, stagger: 0.025, duration: 0.1 }, 0.58)
-      .to({ k: 0 }, { k: 1, duration: 0.3, ease: 'none', onUpdate() { setStats(this.targets()[0].k); } }, 0.45)
-      .to({}, { duration: 0.25 }, 0.75);
-    return () => setStats(1);
+  let wfKey = 'onboard', wfRunning = false, wfSel = null;
+  const wfNodesEl = $('#wfbNodes'), wfEdges = $('#wfbEdges'), wfLog = $('#wfbLog'), wfState = $('#wfbState');
+  const NW = 170, NH = 58;
+  const edgeD = (a, b) => {
+    const sx = a.x + NW, sy = a.y + NH / 2, tx = b.x, ty = b.y + NH / 2;
+    if (tx < sx) return `M${a.x + NW / 2} ${a.y + (b.y > a.y ? NH : 0)} C${a.x + NW / 2} ${(a.y + b.y + NH) / 2}, ${b.x + NW / 2} ${(a.y + b.y + NH) / 2}, ${b.x + NW / 2} ${b.y + (b.y > a.y ? 0 : NH)}`;
+    const dx = Math.max(30, (tx - sx) / 2);
+    return `M${sx} ${sy} C${sx + dx} ${sy}, ${tx - dx} ${ty}, ${tx} ${ty}`;
+  };
+  function renderWF(animate) {
+    const wf = WF[wfKey];
+    $('#wfbName').textContent = wf.name;
+    const byId = Object.fromEntries(wf.nodes.map(n => [n.id, n]));
+    wfNodesEl.innerHTML = wf.nodes.map(n => `<button type="button" class="wn" data-id="${n.id}" style="left:${n.x}px;top:${n.y}px" aria-pressed="false"><span class="ic ${n.c}">${icon(n.ic, 13)}</span><small>${n.k}</small><b>${esc(n.t)}</b></button>`).join('');
+    wfEdges.innerHTML = wf.edges.map(([a, b, l], i) => { const d = edgeD(byId[a], byId[b]); const lab = l ? `<text x="${byId[b].x - 10}" y="${byId[b].y + NH / 2 - 7}" text-anchor="end">${l}</text>` : ''; return `<path id="we-${i}" data-a="${a}" data-b="${b}" d="${d}"/>${lab}`; }).join('') + '<circle class="dot" r="5" opacity="0"/>';
+    $$('.wn', wfNodesEl).forEach(b => b.addEventListener('click', () => selectNode(b.dataset.id)));
+    selectNode(wf.nodes[0].id);
+    resetRun();
+    if (animate && motion) {
+      G.from($$('.wn', wfNodesEl), { y: 14, opacity: 0, duration: 0.6, stagger: 0.05, ease: EASE });
+      $$('path', wfEdges).forEach(p => { const len = p.getTotalLength(); G.fromTo(p, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 0.8, delay: 0.25, ease: 'power2.inOut', onComplete: () => { p.style.strokeDasharray = ''; } }); });
+    }
+  }
+  function selectNode(id) {
+    wfSel = id;
+    const n = WF[wfKey].nodes.find(x => x.id === id);
+    $$('.wn', wfNodesEl).forEach(b => { const on = b.dataset.id === id; b.classList.toggle('is-sel', on); b.setAttribute('aria-pressed', on); });
+    $('#wfbInspector').innerHTML = `<div class="wi-h"><span class="ic ${n.c}">${icon(n.ic, 14)}</span><div><b>${esc(n.t)}</b><small>${n.k.toUpperCase()}</small></div></div>
+      <div class="wi-fields">${Object.entries(n.f).map(([k, v]) => `<div class="wi-f"><span>${esc(k)}</span><code>${esc(v)}</code></div>`).join('')}</div>
+      ${n.n ? `<p class="wi-note">${esc(n.n)}</p>` : ''}<p class="wi-note" style="background:var(--paper)">Sample input: ${esc(WF[wfKey].input)}</p>`;
+    if (motion) G.from('#wfbInspector > *', { y: 8, opacity: 0, duration: 0.4, stagger: 0.04, ease: EASE, overwrite: 'auto' });
+  }
+  function resetRun() {
+    wfRunning = false;
+    $$('.wn', wfNodesEl).forEach(b => b.classList.remove('is-run', 'is-done', 'is-skip'));
+    $$('path', wfEdges).forEach(p => p.classList.remove('is-hot', 'is-done', 'is-skip'));
+    wfLog.innerHTML = '<p class="wl-empty">Run the sample to see each step execute here.</p>';
+    wfState.textContent = 'Ready'; wfState.className = 'ui-chip';
+    $('#wfbRun').disabled = false;
+  }
+  const travelEdge = (p, dur) => new Promise(res => {
+    const dot = $('.dot', wfEdges), len = p.getTotalLength(), t0 = performance.now();
+    p.classList.add('is-hot');
+    if (!motion) { p.classList.replace('is-hot', 'is-done'); return res(); }
+    const tick = t => { const k = Math.min(1, (t - t0) / dur), pt = p.getPointAtLength(len * (k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2)); dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y); dot.setAttribute('opacity', 1); if (k < 1) requestAnimationFrame(tick); else { dot.setAttribute('opacity', 0); p.classList.remove('is-hot'); p.classList.add('is-done'); res(); } };
+    requestAnimationFrame(tick);
   });
-
-  /* ================= playground: note → tasks ================= */
-  const roster = {
-    maya: { i: 'MO', cls: 'av-1', n: 'Maya O.' }, omar: { i: 'OA', cls: 'av-5', n: 'Omar A.' },
-    lena: { i: 'LK', cls: 'av-2', n: 'Lena K.' }, priya: { i: 'PR', cls: 'av-3', n: 'Priya R.' },
-    jonas: { i: 'JT', cls: 'av-4', n: 'Jonas T.' }
+  const logLine = (cls, text, ms) => {
+    if ($('.wl-empty', wfLog)) wfLog.innerHTML = '';
+    const d = document.createElement('div');
+    d.className = `wl ${cls}`;
+    d.innerHTML = `<time>${now()}</time><i></i><span>${esc(text)}</span><em>${ms}</em>`;
+    wfLog.appendChild(d); wfLog.scrollTop = wfLog.scrollHeight;
+    if (motion) G.from(d, { x: -8, opacity: 0, duration: 0.35, ease: EASE });
   };
-  const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-  const tagsFor = [
-    [/contract|vendor|legal|office/i, 'Operations', 'tag-jade'], [/forecast|invoice|finance|budget|payroll/i, 'Finance', 'tag-saffron'],
-    [/hire|hiring|onboarding|interview|agents?/i, 'People', 'tag-coral'], [/email|launch|campaign|copy|post|homepage/i, 'Marketing', 'tag-sky'],
-    [/design|qa|bug|release|build|kickoff/i, 'Client work', 'tag-jade']
-  ];
-  const dueRe = /\b(?:by|on|due)?\s*(today|tonight|tomorrow|eow|end of (?:the )?week|(next\s+)?(mon|tue|wed|thu|fri|sat|sun)(?:day|s|sday|nesday|rsday|r|rs|urday)?)\b/i;
+  async function runWF() {
+    if (wfRunning) return;
+    resetRun();
+    wfRunning = true;
+    const key = wfKey, wf = WF[key];
+    $('#wfbRun').disabled = true;
+    wfState.textContent = 'Running · simulated'; wfState.className = 'ui-chip run';
+    logLine('info', `Started with sample input: ${wf.input}`, '');
+    wf.skip.forEach(id => { $(`.wn[data-id="${id}"]`, wfNodesEl)?.classList.add('is-skip'); $$(`path[data-b="${id}"]`, wfEdges).forEach(p => p.classList.add('is-skip')); });
+    let total = 0;
+    for (const [id, text] of wf.run) {
+      if (key !== wfKey || !wfRunning) return;
+      const into = $$(`path[data-b="${id}"]`, wfEdges).filter(p => !p.classList.contains('is-skip') && !p.classList.contains('is-done'));
+      await Promise.all(into.map(p => travelEdge(p, 420)));
+      const b = $(`.wn[data-id="${id}"]`, wfNodesEl);
+      b.classList.add('is-run'); selectNode(id);
+      const ms = 180 + Math.round(Math.random() * 420); total += ms;
+      await sleep(motion ? 520 : 0);
+      if (key !== wfKey || !wfRunning) return;
+      b.classList.replace('is-run', 'is-done');
+      if (motion) G.fromTo(b, { scale: 1.07 }, { scale: 1, duration: 0.6, ease: 'back.out(3)' });
+      logLine('', text, `${ms} ms`);
+    }
+    wf.skip.forEach(id => logLine('skip', `Skipped: ${WF[key].nodes.find(n => n.id === id).t}`, ''));
+    wfState.textContent = `Completed in ${(total / 1000).toFixed(1)} s · simulated`; wfState.className = 'ui-chip done';
+    $('#wfbRun').disabled = false; wfRunning = false;
+  }
+  $('#wfbRun').addEventListener('click', runWF);
+  $('#wfbReset').addEventListener('click', () => { resetRun(); selectNode(WF[wfKey].nodes[0].id); });
+  $$('#wfbTabs button').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.wf === wfKey) return;
+    wfKey = b.dataset.wf; wfRunning = false;
+    $$('#wfbTabs button').forEach(x => { x.classList.toggle('is-on', x === b); x.setAttribute('aria-selected', x === b); });
+    renderWF(true);
+  }));
+  renderWF(false);
+  whenSeen($('.wfb-app'), () => renderWF(true), 0.3);
+
+  /* ================= COPILOT ================= */
+  const roster = { maya: ['MO', 'av-1', 'Maya O.'], omar: ['OA', 'av-5', 'Omar A.'], lena: ['LK', 'av-2', 'Lena K.'], priya: ['PR', 'av-3', 'Priya R.'], jonas: ['JT', 'av-4', 'Jonas T.'] };
+  const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  const dueRe = /\b(?:by|on|due)?\s*(today|tonight|tomorrow|(next\s+)?(mon|tue|wed|thu|fri|sat|sun)(?:day|s|sday|nesday|rsday|r|rs|urday)?)\b/i;
   const dueOf = m => {
     if (!m) return null;
-    const today = new Date(); today.setHours(0, 0, 0, 0);
     const w = m[1].toLowerCase();
-    let add = 0;
-    if (w === 'tomorrow') add = 1;
-    else if (w === 'today' || w === 'tonight') add = 0;
-    else if (w.startsWith('eow') || w.startsWith('end')) add = (5 - today.getDay() + 7) % 7;
-    else { add = (days.indexOf(m[3].toLowerCase()) - today.getDay() + 7) % 7; if (m[2]) add += 7; }
+    let add = w === 'tomorrow' ? 1 : (w === 'today' || w === 'tonight') ? 0 : (dayNames.indexOf(m[3].toLowerCase()) - today.getDay() + 7) % 7 + (m[2] ? 7 : 0);
     const d = new Date(today); d.setDate(d.getDate() + add);
-    const label = add === 0 ? 'Today' : add === 1 ? 'Tomorrow' : d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    return { label, soon: add <= 2 };
+    return { label: add === 0 ? 'Today' : add === 1 ? 'Tomorrow' : d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }), soon: add <= 2 };
   };
-  const parseLine = raw => {
+  const parseTask = raw => {
     let s = raw.replace(/^[\s\-*•]+/, '').trim();
     if (!s) return null;
     let owner = null;
-    for (const k of Object.keys(roster)) {
-      const re = new RegExp(`(^${k}\\s*(?::|to|will|-)?\\s+|,?\\s*\\b${k}\\b,?)`, 'i');
-      if (re.test(s)) { owner = roster[k]; s = s.replace(re, ' '); break; }
-    }
-    const dm = s.match(dueRe);
-    const due = dueOf(dm);
+    for (const k of Object.keys(roster)) { const re = new RegExp(`(^${k}\\s*(?::|to|will|-)?\\s+|,?\\s*\\b${k}\\b,?)`, 'i'); if (re.test(s)) { owner = roster[k]; s = s.replace(re, ' '); break; } }
+    const dm = s.match(dueRe), due = dueOf(dm);
     if (dm) s = s.replace(dm[0], ' ');
     const hi = /!!|urgent|asap|overdue/i.test(s);
-    s = s.replace(/!+/g, ' ').replace(/\b(asap|urgent)\b/ig, ' ').replace(/^\s*(need(s)?|todo|to)\s+/i, '');
-    s = s.replace(/\s{2,}/g, ' ').replace(/[\s,;:.]+$/, '').replace(/^[\s,;:]+/, '').trim();
+    s = s.replace(/!+/g, ' ').replace(/\b(asap|urgent)\b/ig, ' ').replace(/^\s*(need(s)?|todo|to)\s+/i, '').replace(/\s{2,}/g, ' ').replace(/[\s,;:.]+$/, '').replace(/^[\s,;:]+/, '').trim();
     if (s.split(' ').length < 2) return null;
-    s = s.charAt(0).toUpperCase() + s.slice(1);
-    const tag = tagsFor.find(([re]) => re.test(raw)) || [null, 'General', 'tag-sky'];
-    return { title: s, owner, due, hi, tag };
+    return { title: s[0].toUpperCase() + s.slice(1), owner, due, hi };
   };
-  const noteIn = $('#noteInput'), parsedList = $('#parsedList'), spark = $('.pb-spark');
-  let lastSig = '';
-  const renderParsed = () => {
-    spark.classList.remove('is-busy');
-    const lines = noteIn.value.split('\n');
-    const header = lines.length && /sync|meeting|standup|notes|retro/i.test(lines[0]) && lines[0].split(' ').length <= 5;
-    const items = (header ? lines.slice(1) : lines).map(parseLine).filter(Boolean);
-    const sig = JSON.stringify(items);
-    if (sig === lastSig) return;
-    lastSig = sig;
-    parsedList.innerHTML = items.map(it => `<li>
-      <span class="p-t"><i class="flag${it.hi ? ' hi' : ''}" title="${it.hi ? 'High priority' : 'Normal priority'}"></i><span>${esc(it.title)}</span></span>
-      <span class="tag ${it.tag[2]}">${it.tag[1]}</span>
-      ${it.owner ? `<span class="av av-s ${it.owner.cls}" title="${it.owner.n}">${it.owner.i}</span>` : '<span class="av av-s av-none" title="No owner yet">?</span>'}
-      <span class="p-due${it.due?.soon ? ' soon' : ''}">${it.due ? it.due.label : 'No date'}</span>
-    </li>`).join('') || '<li class="empty">Type a note on the left. Each line becomes a task.</li>';
-    const owners = new Set(items.filter(i => i.owner).map(i => i.owner.i));
-    $('#parsedCount').textContent = `${items.length} task${items.length === 1 ? '' : 's'}`;
-    $('#parsedLive').textContent = `Copilot found ${items.length} task${items.length === 1 ? '' : 's'} with ${owners.size} owner${owners.size === 1 ? '' : 's'}.`;
-    $('#parsedMeta').textContent = `${owners.size} owner${owners.size === 1 ? '' : 's'} notified on save`;
-    if (header) $('.po-title').textContent = lines[0].replace(/[—–-].*$/, '').trim().replace(/^./, c => c.toUpperCase()) || 'Meeting';
-    if (motion) G.from(parsedList.children, { opacity: 0, x: 16, duration: 0.45, stagger: 0.04, ease: 'expo.out' });
+  const last7 = { rev: periodValue('revenue', 7), revPrev: periodValue('revenue', 7, 7), runs: periodValue('runs', 7), ontime: periodValue('ontime', 7) };
+  const ANSWERS = {
+    risk: () => ({ text: 'Two of the four projects need attention this week. <b>Q4 product launch</b> is at risk: Design QA has 3 screens left and the launch email waits on it. <b>Support hiring</b> is behind, with interviews booked past the target date.', card: `<div class="card">${[['Q4 product launch', 62, 'var(--amber)', 'At risk'], ['Support hiring', 30, 'var(--red)', 'Behind'], ['Website relaunch', 42, 'var(--green)', 'On track'], ['Acme Freight onboarding', 88, 'var(--green)', 'On track']].map(r => `<div class="card-row"><span>${r[0]}</span><span class="bar" style="--c:${r[2]}"><i style="width:${r[1]}%"></i></span><small>${r[3]}</small></div>`).join('')}</div>`, src: ['Design QA task', 'Launch timeline', 'Hiring board'] }),
+    load: () => ({ text: '<b>Priya R.</b> is booked for 37 hours across 3 projects, about 92% of capacity. <b>Omar A.</b> has the most room at 18 hours. Moving “Pricing page build” from Priya to Omar would bring her to roughly 78%.', card: `<div class="card">${[['Priya R.', 92, 'var(--amber)', '37 h'], ['Lena K.', 70, 'var(--blue)', '28 h'], ['Maya O.', 58, 'var(--blue)', '23 h'], ['Jonas T.', 50, 'var(--blue)', '20 h'], ['Omar A.', 45, 'var(--green)', '18 h']].map(r => `<div class="card-row"><span>${r[0]}</span><span class="bar" style="--c:${r[2]}"><i style="width:${r[1]}%"></i></span><small>${r[3]}</small></div>`).join('')}<div class="card-act"><button class="ui-btn ui-btn-primary" type="button" data-cp-act="Reassignment drafted in this demo. Nothing changed for real.">Draft the move</button><button class="ui-btn" type="button" data-cp-act="Kept as is.">Keep as is</button></div></div>`, src: ['Calendars', 'Task estimates'] }),
+    week: () => { const d = pctDelta(last7.rev, last7.revPrev); return { text: `In the last 7 days the workspace recognised <b>${money(last7.rev)}</b> in revenue, ${d >= 0 ? 'up' : 'down'} ${Math.abs(d).toFixed(1)}% on the week before. On-time delivery averaged <b>${last7.ontime.toFixed(1)}%</b> and automations ran <b>${fmt(last7.runs)}</b> times. One blocker remains: Design QA on the launch.`, card: '', src: ['Analytics', 'Automation log', 'Q4 launch'] }; },
+    auto: q => {
+      const m = q.match(/when (.+?),\s*(.+)$/i);
+      const trig = m ? m[1] : 'an invoice is 3 days overdue';
+      const acts = (m ? m[2] : 'remind the client and tell Omar').split(/\s*(?:,| and | then )\s*/i).filter(Boolean);
+      return { text: 'Here is a draft rule. Check it reads the way you meant before turning it on.', card: `<div class="card"><div class="rule-card"><div class="rc"><span>When</span><b>${esc(trig)}</b></div>${acts.map((a, i) => `<div class="rc"><span>${i ? 'Then' : 'Do'}</span><span style="text-transform:none;font-family:var(--f);color:var(--text)">${esc(a[0].toUpperCase() + a.slice(1))}</span></div>`).join('')}</div><div class="card-act"><button class="ui-btn ui-btn-primary" type="button" data-cp-act="Draft saved in this demo only. In the product it would wait for approval.">Save as draft</button><button class="ui-btn" type="button" data-go-wf>Open in builder</button></div></div>`, src: ['Automation templates'] };
+    },
+    notes: q => {
+      const body = q.replace(/^.*?(tasks?|notes?)\s*[:\-]?\s*/i, '');
+      const lines = body.split(/\n|;/).map(parseTask).filter(Boolean);
+      if (!lines.length) return null;
+      const owners = new Set(lines.filter(l => l.owner).map(l => l.owner[0]));
+      return { text: `I found <b>${lines.length} task${lines.length > 1 ? 's' : ''}</b> with ${owners.size} owner${owners.size === 1 ? '' : 's'}. Items marked urgent are flagged.`, card: `<div class="card">${lines.map(l => `<div class="task-row"><span class="t"><i class="flag${l.hi ? ' hi' : ''}"></i><span>${esc(l.title)}</span></span>${l.owner ? `<span class="av ${l.owner[1]}" title="${l.owner[2]}">${l.owner[0]}</span>` : '<span class="av av-none" title="No owner">?</span>'}<span class="due${l.due?.soon ? ' soon' : ''}">${l.due ? l.due.label : 'No date'}</span></div>`).join('')}<div class="card-act"><button class="ui-btn ui-btn-primary" type="button" data-cp-act="Tasks added to the demo board only.">Add to Q4 launch</button></div></div>`, src: ['Your notes'] };
+    },
+    fallback: () => ({ text: 'This demo answers a fixed set of questions about the sample workspace, so I can’t answer that one. Try asking which projects are at risk, who is overloaded, to summarise the week, to turn notes into tasks, or to draft an automation starting with “when…”.', card: '', src: [] })
   };
-  let nt;
-  noteIn.addEventListener('input', () => { spark.classList.add('is-busy'); clearTimeout(nt); nt = setTimeout(renderParsed, 350); });
-  renderParsed();
-  $$('.pi-chips [data-add]').forEach(b => b.addEventListener('click', () => {
-    noteIn.value = noteIn.value.replace(/\s+$/, '') + '\n' + b.dataset.add;
-    noteIn.dispatchEvent(new Event('input'));
-    noteIn.scrollTop = noteIn.scrollHeight;
-  }));
-  $('#parsedSave').addEventListener('click', e => {
-    const n = parsedList.querySelectorAll('li:not(.empty)').length;
-    if (!n) return;
-    toast(`${n} tasks added to Q4 launch. ${$('#parsedMeta').textContent.split(' ')[0]} owners notified (demo)`, { av: people.MO });
-    e.currentTarget.textContent = 'Added';
-    setTimeout(() => { $('#parsedSave').textContent = 'Add to Q4 launch'; }, 2200);
-  });
-
-  /* ================= workflow canvas ================= */
-  const canvas = $('#canvas');
-  const ruleText = $('#ruleText');
-  const ruleFull = 'When a deal closes in HubSpot, open an onboarding project, give it to Priya, invoice the kickoff and tell #wins.';
-  let step = -1, typeTimer;
-  const typeRule = on => {
-    clearInterval(typeTimer);
-    if (!on) { ruleText.textContent = ''; return; }
-    if (!motion) { ruleText.textContent = ruleFull; return; }
-    let i = ruleText.textContent.length;
-    typeTimer = setInterval(() => {
-      ruleText.textContent = ruleFull.slice(0, ++i);
-      if (i >= ruleFull.length) clearInterval(typeTimer);
-    }, 20);
+  const route = q => {
+    const s = q.toLowerCase();
+    if (/\bwhen\b.+,/.test(s) || /automat|create a rule|draft a rule/.test(s)) return ANSWERS.auto(q);
+    if (/(tasks?|notes?)\s*[:\-]|\n/.test(q) || Object.keys(roster).some(k => new RegExp(`\\b${k}\\b`, 'i').test(s) && dueRe.test(s))) { const r = ANSWERS.notes(q); if (r) return r; }
+    if (/risk|late|behind|slip|block/.test(s)) return ANSWERS.risk();
+    if (/overload|workload|capacity|busy|who has room|free/.test(s)) return ANSWERS.load();
+    if (/summar|week|happened|update|last 7/.test(s)) return ANSWERS.week();
+    return ANSWERS.fallback();
   };
-  const setStep = s => {
-    if (s === step) return;
-    step = s;
-    canvas.dataset.step = s;
-    $$('.flow-steps li').forEach((li, i) => li.classList.toggle('is-on', i === s));
-    $('#canvasState').textContent = ['Connecting', 'Draft', 'Live'][s];
-    $$('.n-src .n-c', canvas).forEach((c, i) => {
-      c.textContent = s === 0 ? 'Connecting…' : 'Connected';
-      if (s === 0) setTimeout(() => { if (step === 0) c.textContent = 'Connected'; }, 700 + i * 500);
-    });
-    typeRule(s >= 1);
-    if (s === 2) startRuns(); else stopRuns();
-  };
-  const clients = ['Holloway Dental', 'Brightline Tours', 'Kessler & Ode', 'Fjord Coffee', 'Marlow Legal', 'Acme Freight', 'Tessera'];
-  let runN = 1284, runTimer = null, running = false;
-  const pathEl = id => $(`#${id}`, canvas);
-  const travel = (pulse, id, dur) => new Promise(res => {
-    const p = pathEl(id), len = p.getTotalLength();
-    const graph = $('#graph'), sx = graph.clientWidth / 720, sy = graph.clientHeight / 336;
-    p.classList.add('is-hot');
-    const t0 = performance.now();
-    pulse.style.opacity = 1;
-    const tick = t => {
-      const k = Math.min((t - t0) / dur, 1), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-      const pt = p.getPointAtLength(e * len);
-      pulse.style.transform = `translate(${pt.x * sx}px, ${pt.y * sy}px)`;
-      if (k < 1) requestAnimationFrame(tick);
-      else { pulse.style.opacity = 0; p.classList.remove('is-hot'); res(); }
-    };
-    requestAnimationFrame(tick);
-  });
-  const flash = n => { n.classList.add('is-hot'); setTimeout(() => n.classList.remove('is-hot'), 650); };
-  const runOnce = async () => {
-    if (running) return;
-    running = true;
-    const src = Math.random() > 0.35 ? 0 : 1;
-    flash($$('.n-src', canvas)[src]);
-    await travel($('.p1', canvas), src ? 'e2' : 'e1', motion ? 700 : 1);
-    flash($('.n-core', canvas));
-    await Promise.all([travel($('.p1', canvas), 'e3', motion ? 650 : 1), travel($('.p2', canvas), 'e4', motion ? 650 : 1), travel($('.p3', canvas), 'e5', motion ? 650 : 1)]);
-    $$('.n-act', canvas).forEach(flash);
-    runN++;
-    const row = document.createElement('div');
-    row.className = 'run-row new';
-    row.innerHTML = `<span class="ok">${icon('i-check', 10)}</span><b>Run ${fmt(runN)}</b><span>${clients[runN % clients.length]}</span><span class="muted">3 actions</span><span class="muted">${(1.6 + Math.random() * 1.2).toFixed(1)} s</span>`;
-    $('#runLog').prepend(row);
-    while ($('#runLog').children.length > 3) $('#runLog').lastElementChild.remove();
-    if (motion) G.from(row, { y: -12, opacity: 0, duration: 0.5, ease: 'expo.out' });
-    setTimeout(() => row.classList.remove('new'), 1200);
-    running = false;
-  };
-  const startRuns = () => { if (runTimer) return; runOnce(); runTimer = setInterval(() => { if (!document.hidden) runOnce(); }, 2800); };
-  const stopRuns = () => { clearInterval(runTimer); runTimer = null; };
-  // on wide screens the scroll position owns the step, so jump to where the rule is live instead of forcing it
-  let flowST = null;
-  function showLiveRule() {
-    if (flowST) {
-      const y = flowST.start + 0.82 * (flowST.end - flowST.start);
-      if (lenis) lenis.scrollTo(y, { duration: 1.2 }); else scrollTo({ top: y, behavior: motion ? 'smooth' : 'auto' });
-      setTimeout(runOnce, 1400);
-    } else { goTo('#workflows'); setStep(2); setTimeout(runOnce, 600); }
+  const chatLog = $('#chatLog'), chatIn = $('#chatIn'), sendBtn = $('.send');
+  let chatBusy = false;
+  const greet = () => { chatLog.innerHTML = `<div class="msg ai"><span class="ic ic-amber">${icon('i-spark', 12)}</span><div class="bubble"><p>Hi Priya. I can see 4 projects, 5 people and 3 active rules in the Northbeam sample workspace. Ask me something, or pick a suggestion below.</p></div></div>`; };
+  greet();
+  const scrollChat = () => { chatLog.scrollTop = chatLog.scrollHeight; };
+  async function ask(q) {
+    q = q.trim();
+    if (!q || chatBusy) return;
+    chatBusy = true; sendBtn.disabled = true; chatLog.setAttribute('aria-busy', 'true');
+    $$('#chatSugg button').forEach(b => { b.disabled = true; });
+    const me = document.createElement('div');
+    me.className = 'msg me';
+    me.innerHTML = `<div class="bubble">${esc(q)}</div>`;
+    chatLog.appendChild(me); scrollChat();
+    const ai = document.createElement('div');
+    ai.className = 'msg ai';
+    ai.innerHTML = `<span class="ic ic-amber">${icon('i-spark', 12)}</span><div class="bubble"><span class="thinking" aria-label="Copilot is thinking"><i></i><i></i><i></i></span><p class="status-line">Reading the sample workspace…</p></div>`;
+    chatLog.appendChild(ai); scrollChat();
+    await sleep(motion ? 800 + Math.random() * 500 : 50);
+    const a = route(q), bubble = $('.bubble', ai);
+    bubble.innerHTML = '<p class="ans"></p>';
+    const p = $('.ans', bubble), plain = a.text.replace(/<[^>]+>/g, '');
+    if (motion) { p.classList.add('typing'); for (let i = 0; i < plain.length; i += 4) { p.textContent = plain.slice(0, i); if (i % 40 === 0) scrollChat(); await sleep(14); } p.classList.remove('typing'); }
+    p.innerHTML = a.text;
+    if (a.card) { bubble.insertAdjacentHTML('beforeend', a.card); if (motion) G.from($('.card', bubble), { y: 10, opacity: 0, duration: 0.5, ease: EASE }); }
+    if (a.src.length) bubble.insertAdjacentHTML('beforeend', `<div class="sources">${a.src.map(s => `<span>${esc(s)}</span>`).join('')}</div>`);
+    $$('.card-row .bar i', bubble).forEach(el => { const w = el.style.width; if (motion) { el.style.width = '0'; requestAnimationFrame(() => { el.style.transition = 'width 1s cubic-bezier(.22,1,.36,1)'; el.style.width = w; }); } });
+    scrollChat();
+    chatBusy = false; chatLog.setAttribute('aria-busy', 'false');
+    sendBtn.disabled = !chatIn.value.trim();
+    $$('#chatSugg button').forEach(b => { b.disabled = false; });
   }
-  $('#runTest').addEventListener('click', () => { if (step < 2) showLiveRule(); else runOnce(); });
-  $$('.node', canvas).forEach(n => {
-    n.addEventListener('mouseenter', () => { n.dataset.links.split(' ').forEach(id => pathEl(id).classList.add('is-hot')); n.classList.add('is-hot'); });
-    n.addEventListener('mouseleave', () => { n.dataset.links.split(' ').forEach(id => pathEl(id).classList.remove('is-hot')); n.classList.remove('is-hot'); });
-  });
-  // narrow screens and reduced motion: the rule simply runs while the canvas is on screen
-  const runWhileVisible = () => {
-    const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setStep(2); startRuns(); } else stopRuns(); }, { threshold: 0.3 });
-    o.observe(canvas);
-    return () => { o.disconnect(); stopRuns(); };
-  };
-  if (!mm) runWhileVisible();
-  mm?.add(narrowMQ, runWhileVisible);
-  mm?.add(wideMQ, () => {
-    const bars = $$('.fs-bar i');
-    const resume = () => { if (step === 2) startRuns(); };
-    flowST = ST.create({
-      trigger: '.flow', start: 'top top', end: 'bottom bottom',
-      onUpdate: self => {
-        const p = self.progress * 3;
-        bars.forEach((b, i) => b.style.setProperty('--p', clamp(p - i, 0, 1)));
-        setStep(Math.min(2, Math.floor(p)));
-      },
-      onEnter: resume, onEnterBack: resume,
-      onLeave: stopRuns, onLeaveBack: () => { setStep(0); stopRuns(); }
-    });
-    G.from('.canvas', { rotateY: -14, rotateX: 6, scale: 0.92, opacity: 0, transformPerspective: 1600, ease: 'expo.out', duration: 1.4, scrollTrigger: { trigger: '.flow', start: 'top 70%', once: true } });
-    return () => { flowST = null; stopRuns(); bars.forEach(b => b.style.removeProperty('--p')); };
-  });
-  setStep(0);
-
-  /* ================= cinematic image ================= */
-  mm?.add(wideMQ, () => {
-    const tl = G.timeline({ scrollTrigger: { trigger: '.cine', start: 'top top', end: 'bottom bottom', scrub: 0.8 } });
-    tl.fromTo('.cine-media', { clipPath: 'inset(22% 30% 22% 30% round 28px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'power2.inOut', duration: 0.55 }, 0)
-      .to('.cine-media img', { scale: 1, ease: 'none', duration: 1 }, 0)
-      .to('.cine-scrim', { opacity: 1, duration: 0.3 }, 0.35)
-      .from('.cine-h .ln > span', { yPercent: 110, stagger: 0.08, duration: 0.25, ease: 'power3.out' }, 0.5)
-      .from('.cine-copy p', { y: 30, opacity: 0, duration: 0.2 }, 0.62);
-  });
-  mm?.add(narrowMQ, () => {
-    G.from('.cine-h .ln > span', { yPercent: 110, stagger: 0.1, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: '.cine', start: 'top 70%', once: true } });
+  const autosize = () => { chatIn.style.height = 'auto'; chatIn.style.height = `${Math.min(120, chatIn.scrollHeight)}px`; };
+  chatIn.addEventListener('input', () => { sendBtn.disabled = !chatIn.value.trim() || chatBusy; autosize(); });
+  chatIn.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('#chatForm').requestSubmit(); } });
+  $('#chatForm').addEventListener('submit', e => { e.preventDefault(); const q = chatIn.value; if (!q.trim() || chatBusy) return; chatIn.value = ''; autosize(); ask(q); });
+  $$('#chatSugg button').forEach(b => b.addEventListener('click', () => ask(b.dataset.prompt)));
+  $('#chatClear').addEventListener('click', () => { if (chatBusy) return; greet(); chatIn.focus(); });
+  chatLog.addEventListener('click', e => {
+    const b = e.target.closest('[data-cp-act]');
+    if (b) { toast(b.dataset.cpAct, 'i-spark'); b.closest('.card-act').innerHTML = `<span class="ui-chip">${esc(b.textContent)}</span>`; }
+    if (e.target.closest('[data-go-wf]')) { $('[data-wf="invoice"]').click(); goTo('#workflows'); }
   });
 
-  /* ================= feature explorer ================= */
-  const panel = $('#panel-ex');
-  const exTabs = $$('.ex-tabs button');
-  let autoplay = true, exTween = null;
-  function selectFeature(f, user = false) {
-    if (user) autoplay = false;
-    exTabs.forEach(b => { const on = b.dataset.feature === f; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on); if (on) panel.setAttribute('aria-labelledby', b.id); });
-    const row = $('.ex-tabs'), cur = exTabs.find(b => b.dataset.feature === f);
-    if (row.scrollWidth > row.clientWidth + 4) row.scrollTo({ left: cur.offsetLeft - 20, behavior: motion ? 'smooth' : 'auto' });
-    $$('.view', panel).forEach(v => v.classList.toggle('is-on', v.dataset.view === f));
-    if (f === 'monitor' && motion) G.fromTo('.load-row i', { scaleX: 0 }, { scaleX: 1, duration: 1, stagger: 0.08, ease: 'expo.out' });
-    if (f === 'copilot') askCopilot($('.cp-q .is-on').dataset.q);
-    if (motion) G.fromTo(panel, { rotateY: -3, transformPerspective: 1800 }, { rotateY: 0, duration: 0.9, ease: 'expo.out', overwrite: 'auto' });
-    runExProgress();
-  }
-  const runExProgress = () => {
-    exTween?.kill();
-    $$('.ex-prog').forEach(p => { p.style.transform = 'scaleX(0)'; });
-    if (!motion || !autoplay) return;
-    const cur = $('.ex-tabs .is-on .ex-prog');
-    exTween = G.fromTo(cur, { scaleX: 0 }, { scaleX: 1, duration: 7, ease: 'none', paused: !exVisible, onComplete: () => {
-      const i = exTabs.findIndex(b => b.classList.contains('is-on'));
-      selectFeature(exTabs[(i + 1) % exTabs.length].dataset.feature);
-    } });
-  };
-  let exVisible = false;
-  new IntersectionObserver(([e]) => { exVisible = e.isIntersecting; if (exTween) exVisible ? exTween.play() : exTween.pause(); }, { threshold: 0.4 }).observe($('.explorer'));
-  exTabs.forEach(b => b.addEventListener('click', () => selectFeature(b.dataset.feature, true)));
-  runExProgress();
-  const rovingTabs = list => {
-    const tabs = $$('[role="tab"]', list);
-    const sync = () => tabs.forEach(t => { t.tabIndex = t.getAttribute('aria-selected') === 'true' ? 0 : -1; });
-    sync();
-    new MutationObserver(sync).observe(list, { subtree: true, attributes: true, attributeFilter: ['aria-selected'] });
-    if (list.classList.contains('ex-tabs')) return;
-    list.addEventListener('keydown', e => {
-      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) return;
-      const i = tabs.indexOf(document.activeElement);
-      const n = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : (i + (/Right|Down/.test(e.key) ? 1 : -1) + tabs.length) % tabs.length;
-      tabs[n].focus(); tabs[n].click(); e.preventDefault();
-    });
-  };
-  $$('[role="tablist"]').forEach(rovingTabs);
-  $('.ex-stage').addEventListener('mouseenter', () => exTween?.pause());
-  $('.ex-stage').addEventListener('mouseleave', () => exVisible && exTween?.play());
-  $('.ex-tabs').addEventListener('keydown', e => {
-    if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
-    const i = exTabs.indexOf(document.activeElement);
-    const n = exTabs[(i + (/Down|Right/.test(e.key) ? 1 : -1) + exTabs.length) % exTabs.length];
-    n.focus(); n.click(); e.preventDefault();
-  });
-  $$('[data-goto-feature]').forEach(b => b.addEventListener('click', () => selectFeature(b.dataset.gotoFeature, true)));
-  if (finePointer) {
-    $('.ex-stage').addEventListener('mousemove', e => {
-      const r = panel.getBoundingClientRect();
-      panel.style.setProperty('--mx', `${e.clientX - r.left}px`);
-      panel.style.setProperty('--my', `${e.clientY - r.top}px`);
+  /* ================= ANALYTICS ================= */
+  const an = { m: 'revenue', r: 30, t: 'line' };
+  const anChart = $('#anChart'), anTip = $('#anTip');
+  const PROJ = [['Q4 product launch', 'var(--blue)'], ['Website relaunch', 'var(--amber)'], ['Acme Freight onboarding', 'var(--green)'], ['Support and retainers', '#4D5468']];
+  const SHARE = { revenue: [0.31, 0.22, 0.29, 0.18], runs: [0.26, 0.41, 0.33, 0] };
+  const OFFSET = { ontime: [-6.5, 1.8, 3.4, 1.1], cycle: [1.4, -0.3, -0.9, -0.2] };
+  function renderKpis() {
+    $('#anKpis').innerHTML = Object.entries(METRICS).map(([k, M]) => {
+      const v = periodValue(k, an.r), pv = periodValue(k, an.r, an.r);
+      const d = M.agg === 'sum' || k === 'revenue' ? pctDelta(v, pv) : v - pv;
+      const good = M.better === 'up' ? d >= 0 : d <= 0;
+      const dTxt = k === 'ontime' ? `${d >= 0 ? '+' : ''}${d.toFixed(1)} pts` : k === 'cycle' ? `${d >= 0 ? '+' : ''}${d.toFixed(1)} d` : `${d >= 0 ? '+' : ''}${d.toFixed(1)}%`;
+      return `<div data-k="${k}"><span>${M.label}</span><b data-v="${v}">${M.format(v)}</b><em class="${good ? 'up' : 'down'}">${dTxt} vs previous ${an.r === 365 ? '12 months' : an.r + ' days'}</em></div>`;
+    }).join('');
+    // figures count from their previous value to the new one, so a range change reads as a change
+    $$('#anKpis b').forEach(b => {
+      const k = b.parentElement.dataset.k, to = +b.dataset.v;
+      if (motion && kpiWas[k] !== undefined && kpiWas[k] !== to) { b._shown = kpiWas[k]; countTo(b, to, { format: METRICS[k].format, dur: 0.9 }); }
+      kpiWas[k] = to;
     });
   }
-  // kanban: drag and drop, arrow keys move a card between columns
-  let dragging = null;
-  const cols = $$('.col', panel);
-  const refreshCols = moved => {
-    cols.forEach(c => { c.querySelector('.col-h span').textContent = c.querySelectorAll('.kcard').length; });
-    if (!moved) return;
-    const col = moved.closest('.col');
-    moved.classList.toggle('is-done', col.dataset.col === 'done');
-    $('#kanMeta').textContent = `Moved "${moved.querySelector('b').textContent}" to ${col.querySelector('.col-h').childNodes[1].textContent.trim()}`;
-    if (motion) G.fromTo(moved, { scale: 0.95 }, { scale: 1, duration: 0.5, ease: 'back.out(2)' });
-  };
-  $$('.kcard', panel).forEach(k => {
-    k.addEventListener('dragstart', e => { autoplay = false; exTween?.kill(); dragging = k; k._from = [k.parentElement, k.nextElementSibling]; k.classList.add('is-drag'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', ''); });
-    k.addEventListener('dragend', e => {
-      k.classList.remove('is-drag'); cols.forEach(c => c.classList.remove('is-over')); dragging = null;
-      const [col, next] = k._from;
-      if (e.dataTransfer.dropEffect === 'none') { col.insertBefore(k, next && next.parentElement === col ? next : null); refreshCols(); return; }
-      refreshCols(k.parentElement === col ? null : k);
-    });
-    k.addEventListener('keydown', e => {
-      if (!['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
-      const i = cols.indexOf(k.closest('.col')) + (e.key === 'ArrowRight' ? 1 : -1);
-      if (i < 0 || i >= cols.length) return;
-      cols[i].appendChild(k); k.focus(); refreshCols(k); e.preventDefault();
-    });
-  });
-  cols.forEach(c => {
-    c.addEventListener('dragover', e => {
-      if (!dragging) return;
-      e.preventDefault(); c.classList.add('is-over');
-      const after = [...c.querySelectorAll('.kcard:not(.is-drag)')].find(el => e.clientY < el.getBoundingClientRect().top + el.offsetHeight / 2);
-      after ? c.insertBefore(dragging, after) : c.appendChild(dragging);
-    });
-    c.addEventListener('dragleave', e => { if (!c.contains(e.relatedTarget)) c.classList.remove('is-over'); });
-    c.addEventListener('drop', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
-  });
-  $$('.rules li').forEach(li => li.classList.toggle('is-off', !li.querySelector('.switch').classList.contains('is-on')));
-  // copilot answers (scripted demo answers built from the sample workspace)
-  const answers = {
-    risk: { text: 'Two projects need attention. <b>Q4 launch</b> depends on Design QA, which is 3 screens from done, so the launch email may slip a day. <b>Hiring · Support</b> is 30% complete with interviews booked past the target date.', rows: [['Q4 launch', 50, 'c-saffron', 'At risk'], ['Hiring · Support', 30, 'c-coral', 'Behind'], ['Website relaunch', 42, 'c-jade', 'On track'], ['Client onboarding', 88, 'c-jade', 'On track']], src: ['Design QA thread', 'Q4 launch timeline', 'Greenhouse'] },
-    load: { text: '<b>Priya</b> is booked for 37 hours across 3 projects this week, 92% of capacity. Moving “Migrate blog redirects” to <b>Omar</b>, who has 18 hours booked, would bring her to 78%.', rows: [['Priya R.', 92, 'c-coral', '37 h'], ['Lena K.', 70, 'c-sky', '28 h'], ['Maya O.', 58, 'c-sky', '23 h'], ['Omar A.', 44, 'c-jade', '18 h']], src: ['Calendars', 'Task estimates', 'Time off'] },
-    week: { text: 'This week the team closed <b>34 tasks</b>, 9 more than last week. Revenue recognised reached <b>$48.2k</b>, up 12.4%. 4,310 automation runs saved roughly <b>41 hours</b>. One blocker remains: Design QA.', rows: [['Tasks closed', 85, 'c-jade', '34'], ['Revenue', 74, 'c-sky', '$48.2k'], ['Hours saved', 68, 'c-saffron', '41 h'], ['Blockers', 12, 'c-coral', '1']], src: ['All projects', 'Stripe', 'Automation log'] }
-  };
-  let cpTimer;
-  function askCopilot(q) {
-    const a = answers[q], box = $('#cpAnswer');
-    clearInterval(cpTimer);
-    box.innerHTML = `<div class="cp-head"><span class="fc-spark">${icon('i-spark', 14)}</span>Copilot<span class="typing"><i></i><i></i><i></i></span></div><p class="cp-text"></p>
-      <div class="cp-viz">${a.rows.map(r => `<div class="cp-row ${r[2]}"><span>${r[0]}</span><em><i style="width:0%" data-w="${r[1]}"></i></em><b>${r[3]}</b></div>`).join('')}</div>
-      <div class="cp-src">Sources ${a.src.map(s => `<span>${s}</span>`).join('')}</div>`;
-    box.setAttribute('aria-busy', 'true');
-    const p = $('.cp-text', box), plain = a.text.replace(/<[^>]+>/g, '');
-    let i = 0;
-    const finish = () => {
-      clearInterval(cpTimer);
-      p.innerHTML = a.text;
-      box.setAttribute('aria-busy', 'false');
-      $('.typing', box)?.remove();
-      $('.cp-viz', box).classList.add('is-on');
-      $$('.cp-viz i', box).forEach(el => { requestAnimationFrame(() => { el.style.transition = 'width 1s cubic-bezier(.16,1,.3,1)'; el.style.width = el.dataset.w + '%'; }); });
-    };
-    if (!motion) return finish();
-    cpTimer = setInterval(() => { i += 3; p.textContent = plain.slice(0, i); if (i >= plain.length) finish(); }, 16);
+  const kpiWas = {};
+  function renderSide() {
+    const M = METRICS[an.m], v = periodValue(an.m, an.r);
+    let rows;
+    if (SHARE[an.m]) rows = PROJ.map((p, i) => [p[0], p[1], v * SHARE[an.m][i], SHARE[an.m][i]]).filter(r => r[3] > 0);
+    else rows = PROJ.map((p, i) => [p[0], p[1], v + OFFSET[an.m][i], (v + OFFSET[an.m][i]) / (an.m === 'ontime' ? 100 : 8)]);
+    const b = buckets(an.m, an.r), best = b.reduce((a, x) => (M.better === 'up' ? x.v > a.v : x.v < a.v) ? x : a, b[0]);
+    const unit = an.r <= 30 ? 'day' : an.r === 90 ? 'week' : 'month';
+    $('#anSide').innerHTML = `<h3>By project</h3>${rows.map(r => `<div class="bd"><i class="pd" style="background:${r[1]}"></i><span>${r[0]}</span><b>${M.format(r[2])}</b><span class="bd-bar"><i style="background:${r[1]};transform:scaleX(${clamp(r[3], 0.04, 1)})"></i></span></div>`).join('')}<div class="an-insight"><b>${icon('i-spark', 13)}Insight</b>Best ${unit} in this range: ${best.label} at ${M.format(best.v)}.</div>`;
+    if (motion) G.from('#anSide .bd-bar i', { scaleX: 0, duration: 0.9, stagger: 0.06, ease: EASE });
   }
-  $$('.cp-q button').forEach(b => b.addEventListener('click', () => {
-    autoplay = false; exTween?.kill();
-    $$('.cp-q button').forEach(x => { x.classList.toggle('is-on', x === b); x.setAttribute('aria-pressed', x === b); });
-    askCopilot(b.dataset.q);
-  }));
-  // collaboration thread
-  $('#compose').addEventListener('submit', e => {
-    e.preventDefault();
-    autoplay = false; exTween?.kill();
-    const inp = $('#composeIn'), v = inp.value.trim();
-    if (!v) { inp.focus(); return; }
-    const thread = $('#thread');
-    const add = (av, cls, name, html) => {
-      const m = document.createElement('div');
-      m.className = 'msg new';
-      m.innerHTML = `<span class="av av-s ${cls}">${av}</span><div><b>${name}</b><time>${now()}</time><p>${html}</p></div>`;
-      thread.appendChild(m); thread.scrollTop = 1e6;
-      return m;
-    };
-    add('YO', 'av-5', 'You', esc(v));
-    inp.value = '';
-    const typing = add('PR', 'av-3', 'Priya R.', '<span class="typing"><i></i><i></i><i></i></span>');
-    setTimeout(() => { $('p', typing).textContent = 'Got it. Adding that to the QA checklist now.'; }, 1400);
-  });
-
-  /* ================= analytics dashboard ================= */
-  const dashChart = $('#dashChart'), dashSum = $('#dashSum'), dashSide = $('#dashSide'), dashCtl = $('#dashCtl');
-  const seeded = seed => () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
-  let dash = 'revenue', range = 30, metric = 'hours';
-  const workload = { people: ['Priya R.', 'Lena K.', 'Maya O.', 'Omar A.', 'Jonas T.', 'Sam W.'], days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'], h: [] };
-  const rnd0 = seeded(41);
-  workload.h = workload.people.map((p, i) => workload.days.map(() => Math.round(clamp([8.6, 6.4, 5.6, 4.2, 6.8, 5.2][i] + (rnd0() - 0.5) * 3, 1, 11) * 2) / 2));
-  const series = (n, total, seed, trend = 0.35) => {
-    const r = seeded(seed);
-    const raw = Array.from({ length: n }, (_, i) => 0.85 + r() * 0.28 + Math.sin(i / n * 6.3) * 0.06 + i / n * trend);
-    const sum = raw.reduce((a, b) => a + b, 0);
-    return raw.map(v => Math.round(v / sum * total));
-  };
-  const tipEl = () => $('.ch-tip', dashChart) || dashChart.appendChild(Object.assign(document.createElement('div'), { className: 'ch-tip' }));
-  const showTip = (x, y, html) => { const t = tipEl(); t.style.left = `${x}px`; t.style.top = `${y}px`; t.innerHTML = html; t.style.opacity = 1; };
-  const hideTip = () => { const t = $('.ch-tip', dashChart); if (t) t.style.opacity = 0; };
-  const seg = (items, cur, attr) => `<div class="seg seg-dark" role="group" aria-label="${attr === 'range' ? 'Date range' : 'Metric'}">${items.map(([v, l]) => `<button type="button" class="${String(v) === String(cur) ? 'is-on' : ''}" aria-pressed="${String(v) === String(cur)}" data-${attr}="${v}">${l}</button>`).join('')}</div>`;
-  const smooth = p => p.reduce((s, pt, i, a) => { if (!i) return `M${pt[0].toFixed(1)} ${pt[1].toFixed(1)}`; const p0 = a[i - 2] || a[i - 1], p1 = a[i - 1], p3 = a[i + 1] || pt; const c1 = [p1[0] + (pt[0] - p0[0]) / 6, p1[1] + (pt[1] - p0[1]) / 6], c2 = [pt[0] - (p3[0] - p1[0]) / 6, pt[1] - (p3[1] - p1[1]) / 6]; return s + ` C${c1[0].toFixed(1)} ${c1[1].toFixed(1)}, ${c2[0].toFixed(1)} ${c2[1].toFixed(1)}, ${pt[0].toFixed(1)} ${pt[1].toFixed(1)}`; }, '');
-  const sums = list => list.map(([l, v, cls]) => `<div><span>${l}</span><b class="${cls || ''}">${v}</b></div>`).join('');
-
-  const renderDash = () => {
-    const W = dashChart.clientWidth, H = dashChart.clientHeight;
+  let lastShape = null;
+  function renderChart(animate = true) {
+    const W = anChart.clientWidth, H = anChart.clientHeight;
     if (!W) return;
-    hideTip();
-    if (dash === 'revenue') {
-      const cfg = { 7: [48210, 12.4, 9], 30: [196400, 8.1, 31], 90: [571900, 17.6, 84] }[range];
-      const n = range === 90 ? 13 : range, cur = series(n, cfg[0], range * 7 + 3), prev = series(n, cfg[0] / (1 + cfg[1] / 100), range * 11 + 5, 0.15);
-      dashCtl.innerHTML = seg([[7, '7 days'], [30, '30 days'], [90, '90 days']], range, 'range');
-      dashSum.innerHTML = sums([['Revenue recognised', '$' + fmt(cfg[0])], ['vs previous period', '+' + cfg[1] + '%', 'up'], ['Projects billed', cfg[2]]]);
-      const pad = { l: 46, r: 10, t: 10, b: 26 }, iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
-      const max = Math.max(...cur, ...prev) * 1.15;
-      const pts = a => a.map((v, i) => [pad.l + i / (a.length - 1) * iw, pad.t + ih - v / max * ih]);
-      const d = a => smooth(pts(a));
-      const cp = pts(cur);
-      const ticks = [0.25, 0.5, 0.75, 1].map(k => `<line x1="${pad.l}" x2="${W - pad.r}" y1="${pad.t + ih - k * ih}" y2="${pad.t + ih - k * ih}"/>`).join('');
-      const labs = [0.25, 0.5, 0.75, 1].map(k => `<text class="ch-lab" x="${pad.l - 10}" y="${pad.t + ih - k * ih + 4}" text-anchor="end">$${Math.round(max * k / 1000)}k</text>`).join('');
-      const today = new Date();
-      const xl = Array.from({ length: 5 }, (_, i) => { const dt = new Date(today); dt.setDate(dt.getDate() - Math.round((4 - i) / 4 * (range - 1))); return `<text class="ch-lab" x="${pad.l + i / 4 * iw}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === 4 ? 'end' : 'middle'}">${dt.toLocaleDateString('en-US', range === 7 ? { weekday: 'short' } : { month: 'short', day: 'numeric' })}</text>`; }).join('');
-      dashChart.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Revenue over the last ${range} days"><g class="ch-grid">${ticks}</g>${labs}${xl}<path class="ch-area" d="${d(cur)} L${pad.l + iw} ${pad.t + ih} L${pad.l} ${pad.t + ih} Z"/><path class="ch-prev" d="${d(prev)}"/><path class="ch-line" d="${d(cur)}"/><line class="ch-vline" y1="${pad.t}" y2="${pad.t + ih}" opacity="0"/><circle class="ch-hov" r="5" opacity="0"/><rect x="${pad.l}" y="0" width="${iw}" height="${H}" fill="transparent" class="ch-hit"/></svg>`;
-      const svg = $('svg', dashChart), line = $('.ch-line', svg);
-      if (motion) { const len = line.getTotalLength(); G.fromTo(line, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.3, ease: 'expo.out' }); G.from('.ch-area', { opacity: 0, duration: 0.9 }); }
-      $('.ch-hit', svg).addEventListener('mousemove', e => {
-        const r = svg.getBoundingClientRect(), i = clamp(Math.round((e.clientX - r.left - pad.l) / iw * (cur.length - 1)), 0, cur.length - 1);
-        const [x, y] = cp[i];
-        $('.ch-hov', svg).setAttribute('cx', x); $('.ch-hov', svg).setAttribute('cy', y); $('.ch-hov', svg).setAttribute('opacity', 1);
-        const v = $('.ch-vline', svg); v.setAttribute('x1', x); v.setAttribute('x2', x); v.setAttribute('opacity', 1);
-        const dt = new Date(); dt.setDate(dt.getDate() - (cur.length - 1 - i) * (range === 90 ? 7 : 1));
-        showTip(x, y, `<b>$${fmt(cur[i])}</b> · ${range === 90 ? 'week of ' : ''}${dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`);
-      });
-      $('.ch-hit', svg).addEventListener('mouseleave', () => { hideTip(); $('.ch-hov', svg).setAttribute('opacity', 0); $('.ch-vline', svg).setAttribute('opacity', 0); });
-      const split = [['Client onboarding', 0.41, 'c-jade'], ['Retainers', 0.27, 'c-sky'], ['Website relaunch', 0.19, 'c-saffron'], ['Workshops', 0.13, 'c-coral']];
-      dashSide.innerHTML = `<h3>By project</h3>${split.map(([n, k, c]) => `<div class="ds-item ${c}"><i></i><span>${n}</span><b>$${fmt(Math.round(cfg[0] * k))}</b></div>`).join('')}<div class="ds-note"><b>${icon('i-spark')}Copilot insight</b>Onboarding revenue grows fastest when kickoff happens within 3 days of the deal closing. Your rule currently averages 1.4 days.</div>`;
+    const M = METRICS[an.m], cur = buckets(an.m, an.r), prev = buckets(an.m, an.r, an.r).slice(-cur.length);
+    const pad = { l: 52, r: 8, t: 12, b: 28 }, iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+    const all = [...cur, ...prev].map(x => x.v);
+    // round axis steps (1, 2 or 5 times a power of ten) so every gridline gets a distinct, readable label
+    const lo0 = an.m === 'revenue' || an.m === 'runs' ? 0 : Math.min(...all) * 0.97, raw = (Math.max(...all) * 1.04 - lo0) / 4;
+    const p10 = Math.pow(10, Math.floor(Math.log10(raw))), stepV = Math.max(an.m === 'runs' ? 1 : 0, [1, 2, 5, 10].map(m => m * p10).find(s => s >= raw));
+    let min = Math.floor(lo0 / stepV) * stepV, max = min + stepV * 4;
+    if (max < Math.max(...all)) max += stepV;
+    if (an.m === 'ontime' && max > 100) max = 100; // a percentage can't pass 100
+    const y = v => pad.t + ih - (v - min) / (max - min) * ih;
+    const n = cur.length, step = iw / n;
+    const x = i => an.t === 'bar' ? pad.l + step * (i + 0.5) : pad.l + (n === 1 ? iw / 2 : i / (n - 1) * iw);
+    const ticks = Array.from({ length: Math.round((max - min) / stepV) + 1 }, (_, k) => min + stepV * k);
+    const every = Math.ceil(n / 7);
+    let svg = ticks.map(t => `<line class="gl" x1="${pad.l}" x2="${W - pad.r}" y1="${y(t)}" y2="${y(t)}"/><text class="lb" x="${pad.l - 8}" y="${y(t) + 4}" text-anchor="end">${M.axis(t)}</text>`).join('');
+    svg += cur.map((c, i) => i % every === 0 || i === n - 1 ? `<text class="lb" x="${x(i)}" y="${H - 8}" text-anchor="middle">${c.short}</text>` : '').join('');
+    if (an.t === 'line') {
+      const d = a => a.map((c, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(c.v).toFixed(1)}`).join(' ');
+      svg += `<path class="pv" d="${d(prev)}"/><path class="ar" d="${d(cur)} L${x(n - 1)} ${pad.t + ih} L${x(0)} ${pad.t + ih} Z"/><path class="ln" d="${d(cur)}"/><line class="vl" y1="${pad.t}" y2="${pad.t + ih}" opacity="0"/><circle class="hd" r="5" opacity="0"/>`;
+    } else {
+      // previous period sits beside the current one, thinner and muted
+      const bw = Math.max(3, step * 0.7), pw = bw * 0.38, cw = bw * 0.56, rx = Math.min(3, cw / 3);
+      svg += cur.map((c, i) => { const l = x(i) - bw / 2, pv = prev[i]?.v ?? min; return `<rect class="br pv" x="${l}" y="${y(pv)}" width="${pw}" height="${pad.t + ih - y(pv)}" rx="${rx}"/><rect class="br" data-i="${i}" x="${l + bw - cw}" y="${y(c.v)}" width="${cw}" height="${pad.t + ih - y(c.v)}" rx="${rx}"/>`; }).join('');
     }
-    if (dash === 'delivery') {
-      const months = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
-      const M = { hours: { v: [6, 9, 14, 18, 22, 25, 27, 31, 34, 36, 38, 41], f: v => `${v} h`, l: 'Hours saved per week' }, ontime: { v: [61, 64, 68, 71, 75, 79, 82, 84, 87, 89, 91, 93], f: v => `${v}%`, l: 'Projects on time' }, meetings: { v: [9, 9, 8, 7, 6, 5, 4, 4, 3, 2, 2, 2], f: v => `${v}`, l: 'Status meetings a week' } }[metric];
-      dashCtl.innerHTML = seg([['hours', 'Hours saved'], ['ontime', 'On time'], ['meetings', 'Meetings']], metric, 'metric');
-      dashSum.innerHTML = sums([[M.l + ', now', M.f(M.v[11])], ['Twelve months ago', M.f(M.v[0])], ['Change', (metric === 'meetings' ? '−' : '+') + Math.abs(M.v[11] - M.v[0]) + (metric === 'ontime' ? ' pts' : metric === 'hours' ? ' h' : ''), 'up']]);
-      const pad = { l: 10, r: 10, t: 28, b: 26 }, iw = W - pad.l - pad.r, ih = H - pad.t - pad.b, bw = iw / 12 * 0.62, max = Math.max(...M.v);
-      dashChart.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${M.l} by month">${M.v.map((v, i) => { const x = pad.l + (i + 0.5) * iw / 12, h = v / max * ih; return `<rect class="ch-bar${i === 11 ? ' key' : ''}" data-i="${i}" x="${x - bw / 2}" y="${pad.t + ih - h}" width="${bw}" height="${h}" rx="6"/><text class="ch-lab" x="${x}" y="${H - 6}" text-anchor="middle">${months[i]}</text>${[0, 6, 11].includes(i) ? `<text class="ch-lab" x="${x}" y="${pad.t + ih - h - 8}" text-anchor="middle" style="fill:var(--on-ink);font-size:12px">${M.f(v)}</text>` : ''}`; }).join('')}</svg>`;
-      const svg = $('svg', dashChart);
-      if (motion) G.from($$('.ch-bar', svg), { scaleY: 0, transformOrigin: '50% 100%', duration: 0.9, stagger: 0.04, ease: 'expo.out' });
-      $$('.ch-bar', svg).forEach(b => {
-        b.addEventListener('mouseenter', () => { const i = +b.dataset.i; showTip(+b.getAttribute('x') + bw / 2, +b.getAttribute('y'), `<b>${M.f(M.v[i])}</b> · ${months[i]}`); });
-        b.addEventListener('mouseleave', hideTip);
-      });
-      dashSide.innerHTML = `<h3>What moved it</h3>${[['Onboarding rule', 'c-jade', '14 h'], ['Weekly summary', 'c-sky', '9 h'], ['Invoice matching', 'c-saffron', '11 h'], ['Overdue nudges', 'c-coral', '7 h']].map(([n, c, v]) => `<div class="ds-item ${c}"><i></i><span>${n}</span><b>${v}</b></div>`).join('')}<div class="ds-note"><b>${icon('i-spark')}Copilot insight</b>The biggest jump came in March, when status updates moved from a weekly meeting to the board.</div>`;
+    svg += `<rect x="${pad.l}" y="${pad.t}" width="${iw}" height="${ih}" fill="transparent" class="hit"/>`;
+    anTip.style.opacity = 0;
+    anChart.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${M.label}, ${an.r === 365 ? 'last 12 months' : 'last ' + an.r + ' days'}">${svg}</svg>`;
+    anChart.appendChild(anTip);
+    const s = $('svg', anChart);
+    // same chart type and point count as before: reshape from the old values instead of redrawing
+    const shape = an.t === 'line' ? { t: 'line', n, W, H, d: ['ln', 'ar', 'pv'].map(c => $('.' + c, s).getAttribute('d')) } : { t: 'bar', n, W, H, bars: $$('.br', s).map(b => [b.getAttribute('y'), b.getAttribute('height')]) };
+    const morph = animate && motion && lastShape && lastShape.t === shape.t && lastShape.n === n && lastShape.W === W && lastShape.H === H;
+    if (morph && shape.t === 'line') ['ln', 'ar', 'pv'].forEach((c, k) => G.from($('.' + c, s), { attr: { d: lastShape.d[k] }, duration: 0.85, ease: 'power3.inOut' }));
+    else if (morph) $$('.br', s).forEach((b, k) => G.from(b, { attr: { y: lastShape.bars[k][0], height: lastShape.bars[k][1] }, duration: 0.75, delay: k * Math.min(0.012, 0.3 / n), ease: 'power3.inOut' }));
+    else if (animate && motion) {
+      if (an.t === 'line') { const l = $('.ln', s), len = l.getTotalLength(); G.fromTo(l, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut' }); G.from($('.ar', s), { opacity: 0, duration: 0.8 }); G.from($('.pv', s), { opacity: 0, duration: 0.8, delay: 0.3 }); }
+      else G.from($$('.br:not(.pv)', s), { scaleY: 0, transformOrigin: '50% 100%', duration: 0.8, stagger: Math.min(0.03, 0.6 / n), ease: EASE });
     }
-    if (dash === 'workload') {
-      dashCtl.innerHTML = `<button class="app-btn app-btn-primary" type="button" id="rebalance">${icon('i-spark', 12)}Rebalance with Copilot</button>`;
-      const all = workload.h.flat(), over = all.filter(h => h > 9).length, avg = all.reduce((a, b) => a + b, 0) / all.length;
-      dashSum.innerHTML = sums([['Average day', avg.toFixed(1) + ' h'], ['Days over 9 h', over, over ? '' : 'up'], ['Free capacity', Math.round(all.reduce((a, h) => a + Math.max(0, 8 - h), 0)) + ' h', 'up']]);
-      const pad = { l: 82, r: 6, t: 6, b: 26 }, iw = W - pad.l - pad.r, ih = H - pad.t - pad.b, cw = iw / 10, ch = ih / 6;
-      const colour = h => h > 9 ? '#EE6B4D' : h > 7.5 ? '#F2B04A' : `rgba(106,166,224,${0.18 + h / 9 * 0.6})`;
-      dashChart.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Team workload heatmap">${workload.people.map((p, r) => `<text class="ch-lab" x="0" y="${pad.t + r * ch + ch / 2 + 4}" style="font-size:12px">${p}</text>${workload.h[r].map((h, c) => `<rect class="ch-cell" data-r="${r}" data-c="${c}" x="${pad.l + c * cw + 2}" y="${pad.t + r * ch + 2}" width="${cw - 4}" height="${ch - 4}" rx="6" fill="${colour(h)}"/>`).join('')}`).join('')}${workload.days.map((d, c) => `<text class="ch-lab" x="${pad.l + c * cw + cw / 2}" y="${H - 6}" text-anchor="middle">${d}</text>`).join('')}</svg>`;
-      const svg = $('svg', dashChart);
-      if (motion) G.from($$('.ch-cell', svg), { opacity: 0, scale: 0.6, transformOrigin: 'center', duration: 0.5, stagger: { each: 0.008, from: 'start' }, ease: 'back.out(2)' });
-      $$('.ch-cell', svg).forEach(cell => {
-        cell.addEventListener('mouseenter', () => { const r = +cell.dataset.r, c = +cell.dataset.c; showTip(+cell.getAttribute('x') + cw / 2, +cell.getAttribute('y'), `<b>${workload.people[r]}</b> · ${workload.days[c]} · ${workload.h[r][c]} h`); });
-        cell.addEventListener('mouseleave', hideTip);
-      });
-      $('#rebalance').addEventListener('click', () => {
-        // move hours from anyone over 8 h to whoever has the most room that day; nothing is lost
-        let moved = 0;
-        workload.h.forEach((row, r) => row.forEach((h, c) => {
-          let extra = Math.max(0, h - 7.5);
-          if (h <= 8) return;
-          while (extra > 0.01) {
-            const col = workload.h.map((x, k) => (k === r ? Infinity : x[c]));
-            const low = col.indexOf(Math.min(...col)), room = 8 - workload.h[low][c];
-            if (room <= 0.01) break;
-            const give = Math.min(extra, room);
-            workload.h[low][c] = Math.round((workload.h[low][c] + give) * 2) / 2; row[c] = Math.round((row[c] - give) * 2) / 2;
-            extra -= give; moved += give;
-          }
-        }));
-        toast(moved ? `Copilot moved ${moved.toFixed(1)} h of tasks to teammates with room (demo).` : 'Everyone is already at 8 hours a day or less', { icon: 'i-spark' });
-        renderDash();
-        $('#rebalance')?.focus({ preventScroll: true });
-      });
-      dashSide.innerHTML = `<h3>Scale</h3>${[['Light, under 5 h', 'c-sky'], ['Full, 7.5 to 9 h', 'c-saffron'], ['Over capacity, 9 h+', 'c-coral']].map(([n, c]) => `<div class="ds-item ${c}"><i></i><span>${n}</span><b></b></div>`).join('')}<div class="ds-note"><b>${icon('i-spark')}Copilot insight</b>${over ? `Priya is over 9 hours on ${workload.h[0].filter(h => h > 9).length} days. Rebalancing moves review tasks to people with room.` : 'Workload is balanced. No one is booked past 9 hours.'}</div>`;
-    }
-    if (dash === 'pipeline') {
-      const stages = [['Lead', 412000, 'var(--on-ink-3)'], ['Qualified', 286000, '#6AA6E0'], ['Proposal', 174000, '#F2B04A'], ['Negotiation', 96000, '#EE6B4D'], ['Won this quarter', 228000, '#1DB386']];
-      const tot = stages.reduce((a, s) => a + s[1], 0);
-      dashCtl.innerHTML = '<span class="muted" style="font-size:12.5px">Synced from HubSpot 2 min ago</span>';
-      dashSum.innerHTML = sums([['Open pipeline', '$' + fmt(tot - 228000)], ['Weighted forecast', '$' + fmt(318400)], ['Win rate', '31%', 'up']]);
-      const R = Math.min(W * 0.45, H) / 2 - 6, cx = Math.min(W / 2, R + 20), cy = H / 2, r0 = R * 0.62;
-      let a0 = -Math.PI / 2;
-      const arcs = stages.map(([n, v, c], i) => {
-        const a1 = a0 + v / tot * Math.PI * 2, large = a1 - a0 > Math.PI ? 1 : 0;
-        const p = (a, r) => `${cx + Math.cos(a) * r} ${cy + Math.sin(a) * r}`;
-        const d = `M${p(a0, R)} A${R} ${R} 0 ${large} 1 ${p(a1, R)} L${p(a1, r0)} A${r0} ${r0} 0 ${large} 0 ${p(a0, r0)} Z`;
-        const mid = (a0 + a1) / 2; a0 = a1;
-        return `<path class="ch-cell" data-i="${i}" d="${d}" fill="${c}" data-mx="${cx + Math.cos(mid) * R}" data-my="${cy + Math.sin(mid) * R}"/>`;
-      }).join('');
-      const legend = stages.map(([n, v, c], i) => `<g transform="translate(${cx + R + 40}, ${cy - stages.length * 17 + i * 34})"><rect width="12" height="12" rx="3" fill="${c}"/><text class="ch-lab" x="22" y="10" style="font-size:13px;fill:var(--on-ink-2)">${n}</text><text class="ch-lab" x="${Math.max(170, W - (cx + R + 40) - 10)}" y="10" text-anchor="end" style="font-size:13px;fill:var(--on-ink)">$${Math.round(v / 1000)}k</text></g>`).join('');
-      dashChart.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Pipeline by stage">${arcs}<text x="${cx}" y="${cy - 4}" text-anchor="middle" style="fill:var(--on-ink);font:500 26px Geist">$${(tot / 1e6).toFixed(2)}M</text><text class="ch-lab" x="${cx}" y="${cy + 18}" text-anchor="middle">pipeline and won, this quarter</text>${W > 520 ? legend : ''}</svg>`;
-      const svg = $('svg', dashChart);
-      if (motion) G.from($$('.ch-cell', svg), { opacity: 0, scale: 0.85, transformOrigin: `${cx}px ${cy}px`, duration: 0.8, stagger: 0.08, ease: 'expo.out' });
-      $$('.ch-cell', svg).forEach(s => {
-        s.addEventListener('mouseenter', () => { const st = stages[+s.dataset.i]; showTip(+s.dataset.mx, +s.dataset.my, `<b>${st[0]}</b> · $${fmt(st[1])} · ${Math.round(st[1] / tot * 100)}%`); });
-        s.addEventListener('mouseleave', hideTip);
-      });
-      dashSide.innerHTML = (W > 520 ? '' : `<h3>By stage</h3>${stages.map(([n, v, c]) => `<div class="ds-item" style="--c:${c}"><i></i><span>${n}</span><b>$${Math.round(v / 1000)}k</b></div>`).join('')}`) + `<h3>Deals closing this month</h3>${[['Acme Freight, expansion', 'c-jade', '$48k'], ['Tessera retainer', 'c-saffron', '$32k'], ['Marlow Legal', 'c-sky', '$21k'], ['Fjord Coffee rebrand', 'c-coral', '$14k']].map(([n, c, v]) => `<div class="ds-item ${c}"><i></i><span>${n}</span><b>${v}</b></div>`).join('')}<div class="ds-note"><b>${icon('i-spark')}Copilot insight</b>When a deal closes, the onboarding rule opens its project automatically, so delivery can staff it the same day.</div>`;
-    }
-    if (motion) G.from([...dashSum.children, ...dashSide.children], { y: 12, opacity: 0, duration: 0.6, stagger: 0.04, ease: 'expo.out' });
-  };
-  $('#dashTabs').addEventListener('click', e => {
-    const b = e.target.closest('[data-dash]');
-    if (!b) return;
-    dash = b.dataset.dash;
-    $$('#dashTabs button').forEach(x => { x.classList.toggle('is-on', x === b); x.setAttribute('aria-selected', x === b); });
-    renderDash();
-  });
-  dashCtl.addEventListener('click', e => {
-    const r = e.target.closest('[data-range]'), m = e.target.closest('[data-metric]');
-    // the controls are re-rendered, so hand focus to the new copy of the pressed button
-    if (r) { range = +r.dataset.range; renderDash(); $(`[data-range="${range}"]`, dashCtl)?.focus({ preventScroll: true }); }
-    if (m) { metric = m.dataset.metric; renderDash(); $(`[data-metric="${metric}"]`, dashCtl)?.focus({ preventScroll: true }); }
-  });
-  let dashDrawn = false;
-  new IntersectionObserver(([e], o) => { if (e.isIntersecting) { dashDrawn = true; renderDash(); o.disconnect(); } }, { threshold: 0.2 }).observe($('.dash'));
-  let rz, lastW = 0, lastH = 0;
-  new ResizeObserver(() => { const w = dashChart.clientWidth, h = dashChart.clientHeight; if (Math.abs(w - lastW) < 4 && Math.abs(h - lastH) < 4) return; lastW = w; lastH = h; clearTimeout(rz); rz = setTimeout(() => dashDrawn && renderDash(), 120); }).observe(dashChart);
-  // big counters
-  $$('.cnt').forEach(el => {
-    new IntersectionObserver(([e], o) => { if (e.isIntersecting) { el._shown = 0; countTo(el, +el.dataset.to, { dec: +(el.dataset.dec || 0), dur: 1.8 }); o.disconnect(); } }, { threshold: 0.6 }).observe(el);
-  });
-
-  /* ================= integrations: orbit + directory ================= */
-  const apps = [
-    ['Slack', 'chat', 'Post updates and create tasks from messages', 1, '#4A154B'], ['Microsoft Teams', 'chat', 'Channel updates and approvals', 0, '#4B53BC'],
-    ['Zoom', 'chat', 'Meeting notes become tasks', 0, '#2D8CFF'], ['Gmail', 'chat', 'Turn an email into a task', 0, '#C5221F'],
-    ['HubSpot', 'sales', 'Deals open projects when they close', 1, '#E8603C'], ['Salesforce', 'sales', 'Opportunities, accounts and owners', 0, '#0B8ACF'],
-    ['Pipedrive', 'sales', 'Pipeline stages trigger rules', 0, '#1A1A1A'], ['Intercom', 'sales', 'Escalate conversations to the board', 0, '#1F8DED'],
-    ['Stripe', 'finance', 'Payments close milestones', 1, '#635BFF'], ['QuickBooks', 'finance', 'Invoices drafted from projects', 1, '#2CA01C'],
-    ['Xero', 'finance', 'Bills, invoices and budgets', 0, '#13B5EA'], ['Brex', 'finance', 'Spend tracked per project', 0, '#3B3B3B'],
-    ['GitHub', 'dev', 'Pull requests linked to tasks', 1, '#24292F'], ['GitLab', 'dev', 'Merge requests and pipelines', 0, '#E2432A'],
-    ['Jira', 'dev', 'Two-way issue sync', 0, '#2684FF'], ['Linear', 'dev', 'Issues and cycles in one view', 0, '#5E6AD2'],
-    ['Sentry', 'dev', 'Errors open tasks for the owner', 0, '#362D59'], ['Google Drive', 'all', 'Files attached where the work is', 1, '#1E8E3E'],
-    ['Google Calendar', 'all', 'Deadlines and kickoffs on your calendar', 0, '#1A73E8'], ['Notion', 'all', 'Docs linked to projects', 0, '#1F1F1F'],
-    ['Figma', 'all', 'Frames attached to design tasks', 0, '#A259FF'], ['Greenhouse', 'all', 'New hires get a checklist', 0, '#24A47F'],
-    ['Typeform', 'all', 'Responses become requests', 0, '#262627'], ['Zapier', 'all', '6,000 more apps, no code', 0, '#FF4F00']
-  ];
-  const initials = n => n.split(' ').map(w => w[0]).join('').slice(0, 2);
-  const orbitApps = [0, 4, 8, 12, 17, 9, 1, 5, 14, 18, 20, 23];
-  const orbitNodes = $('#orbitNodes'), orbitLines = $('#orbitLines');
-  orbitNodes.innerHTML = orbitApps.map(i => `<button class="o-node${apps[i][3] ? ' is-on' : ''}" type="button" data-app="${i}" style="--nc:${apps[i][4]}" aria-label="${apps[i][0]}, ${apps[i][3] ? 'connected' : 'not connected'}. Toggle connection">${initials(apps[i][0])}<span class="o-tip">${apps[i][0]} · ${apps[i][3] ? 'Connected' : 'Click to connect'}</span></button>`).join('');
-  orbitLines.innerHTML = orbitApps.map(() => '<line x1="300" y1="300" x2="300" y2="300"/>').join('') + '<circle class="o-pulse" r="4" cx="300" cy="300" opacity="0"/>';
-  const oNodes = $$('.o-node', orbitNodes), oLines = $$('line', orbitLines);
-  let orbitAngle = 0, orbitPaused = false, orbitSeen = false;
-  new IntersectionObserver(([e]) => { orbitSeen = e.isIntersecting; }).observe($('#orbit'));
-  const placeOrbit = () => {
-    oNodes.forEach((n, k) => {
-      const inner = k < 5, count = inner ? 5 : 7, idx = inner ? k : k - 5, r = inner ? 140 : 230;
-      const a = (idx / count) * Math.PI * 2 + (inner ? orbitAngle : -orbitAngle * 0.7) + (inner ? 0 : 0.3);
-      const x = 300 + Math.cos(a) * r, y = 300 + Math.sin(a) * r;
-      n.style.left = `${x / 6}%`; n.style.top = `${y / 6}%`;
-      n.dataset.side = x < 170 ? 'l' : x > 430 ? 'r' : '';
-      oLines[k].setAttribute('x2', x); oLines[k].setAttribute('y2', y);
-      oLines[k].classList.toggle('is-hot', !!apps[orbitApps[k]][3] && n.matches(':hover, :focus-visible'));
-    });
-  };
-  placeOrbit();
-  if (motion) {
-    G.ticker.add(() => { if (!orbitPaused && orbitSeen && !document.hidden) { orbitAngle += 0.0016; placeOrbit(); } });
-    const pulse = $('.o-pulse', orbitLines);
-    const shoot = () => {
-      const on = oNodes.map((n, k) => k).filter(k => apps[orbitApps[k]][3]);
-      if (!on.length) return;
-      const k = on[Math.floor(Math.random() * on.length)], l = oLines[k];
-      const o = { t: 0 };
-      G.to(o, { t: 1, duration: 0.9, ease: 'power2.inOut', onStart: () => pulse.setAttribute('opacity', 1), onUpdate: () => { pulse.setAttribute('cx', lerp(+l.getAttribute('x2'), 300, o.t)); pulse.setAttribute('cy', lerp(+l.getAttribute('y2'), 300, o.t)); }, onComplete: () => pulse.setAttribute('opacity', 0) });
+    lastShape = shape;
+    const hit = $('.hit', s);
+    const show = e => {
+      const r = s.getBoundingClientRect(), mx = e.clientX - r.left;
+      const i = clamp(Math.round(an.t === 'bar' ? (mx - pad.l) / step - 0.5 : (mx - pad.l) / iw * (n - 1)), 0, n - 1);
+      const c = cur[i], pv = prev[i];
+      if (an.t === 'line') { const vl = $('.vl', s), hd = $('.hd', s); vl.setAttribute('x1', x(i)); vl.setAttribute('x2', x(i)); vl.setAttribute('opacity', 1); hd.setAttribute('cx', x(i)); hd.setAttribute('cy', y(c.v)); hd.setAttribute('opacity', 1); }
+      else $$('.br:not(.pv)', s).forEach((b, k) => b.classList.toggle('hl', k === i));
+      anTip.innerHTML = `<b>${M.format(c.v)}</b><small>${c.label}${pv ? ` · previous ${M.format(pv.v)}` : ''}</small>`;
+      anTip.style.left = `${clamp(x(i), 90, W - 90)}px`; anTip.style.top = `${y(c.v)}px`; anTip.style.opacity = 1;
     };
-    setInterval(() => orbitSeen && !document.hidden && shoot(), 1400);
-    const nodesIn = G.from(oNodes, { scale: 0, opacity: 0, duration: 0.8, stagger: 0.05, ease: 'back.out(2)', paused: true });
-    const coreIn = G.from('.orbit-core', { scale: 0.5, opacity: 0, rotate: -30, duration: 1, ease: 'expo.out', paused: true });
-    whenSeen($('#orbit'), () => { nodesIn.play(); coreIn.play(); }, 0.25);
+    hit.addEventListener('mousemove', show);
+    hit.addEventListener('mouseleave', () => { anTip.style.opacity = 0; $('.vl', s)?.setAttribute('opacity', 0); $('.hd', s)?.setAttribute('opacity', 0); $$('.br', s).forEach(b => b.classList.remove('hl')); });
   }
-  $('#orbit').addEventListener('mouseenter', () => { orbitPaused = true; });
-  $('#orbit').addEventListener('mouseleave', () => { orbitPaused = false; });
-  const toggleApp = i => {
-    const a = apps[i];
-    a[3] = a[3] ? 0 : 1;
-    countTo($('#connCount'), apps.filter(x => x[3]).length, { dur: 0.5 });
-    oNodes.forEach(n => { if (+n.dataset.app === i) { n.classList.toggle('is-on', !!a[3]); n.setAttribute('aria-label', `${a[0]}, ${a[3] ? 'connected' : 'not connected'}. Toggle connection`); n.querySelector('.o-tip').textContent = `${a[0]} · ${a[3] ? 'Connected' : 'Click to connect'}`; } });
-    $$(`.conn[data-i="${i}"]`).forEach(b => { b.classList.toggle('is-on', !!a[3]); b.textContent = a[3] ? 'Connected' : 'Connect'; b.setAttribute('aria-pressed', !!a[3]); b.setAttribute('aria-label', `${a[0]} connection`); });
-    toast(a[3] ? `${a[0]} connected. First sync takes about a minute (demo)` : `${a[0]} disconnected`, { icon: 'i-link' });
-    placeOrbit();
-  };
-  orbitNodes.addEventListener('click', e => { const n = e.target.closest('.o-node'); if (n) toggleApp(+n.dataset.app); });
-  let cat = 'all';
-  const dirList = $('#dirList');
-  const renderDir = () => {
-    const q = $('#dirQ').value.trim().toLowerCase();
-    const list = apps.map((a, i) => [a, i]).filter(([a]) => (cat === 'all' || a[1] === cat) && (!q || a[0].toLowerCase().includes(q) || a[2].toLowerCase().includes(q)));
-    dirList.innerHTML = list.map(([a, i]) => `<li><span class="ico" style="background:${a[4]}">${initials(a[0])}</span><div><b>${a[0]}</b><span>${a[2]}</span></div><button class="conn${a[3] ? ' is-on' : ''}" type="button" data-i="${i}" aria-pressed="${!!a[3]}" aria-label="${a[0]} connection">${a[3] ? 'Connected' : 'Connect'}</button></li>`).join('');
-    $('#dirEmpty').hidden = list.length > 0;
-    $('#dirShown').textContent = list.length;
-    if (motion) G.from(dirList.children, { opacity: 0, y: 8, duration: 0.35, stagger: 0.012, ease: 'power2.out' });
-  };
-  dirList.addEventListener('click', e => { const b = e.target.closest('.conn'); if (b) toggleApp(+b.dataset.i); });
-  $('#dirQ').addEventListener('input', renderDir);
-  $$('#dirCats button').forEach(b => b.addEventListener('click', () => { cat = b.dataset.cat; $$('#dirCats button').forEach(x => { x.classList.toggle('is-on', x === b); x.setAttribute('aria-pressed', x === b); }); renderDir(); }));
-  renderDir();
+  const renderAn = (animate = true) => { renderKpis(); renderSide(); renderChart(animate); $$('#anKpis > div').forEach(d => d.classList.toggle('is-on', d.dataset.k === an.m)); };
+  $$('#anMetric button').forEach(b => b.addEventListener('click', () => { an.m = b.dataset.m; setSeg($('#anMetric'), b); renderAn(); }));
+  $$('#anRange button').forEach(b => b.addEventListener('click', () => { an.r = +b.dataset.r; setSeg($('#anRange'), b); renderAn(); }));
+  $$('#anType button').forEach(b => b.addEventListener('click', () => { an.t = b.dataset.t; setSeg($('#anType'), b); renderChart(); }));
+  let anDrawn = false, anW = 0;
+  whenSeen($('.an'), () => { anDrawn = true; renderAn(); }, 0.15);
+  new ResizeObserver(() => { if (anDrawn && Math.abs(anChart.clientWidth - anW) > 4) { anW = anChart.clientWidth; renderChart(false); } }).observe(anChart);
 
-  /* ================= customer stories ================= */
-  const stories = [
-    { q: 'We cancelled our Monday status meeting in week three and nobody asked for it back. I open one tab in the morning and I know which two things need me.', n: 'Priya Raman', r: 'COO, Northbeam Studio', av: ['PR', 'av-3'], img: 'assets/img/windows.jpg', alt: 'Silhouetted people at tall windows overlooking a city, in black and white', s: [['Hours saved a week', '41'], ['Projects on time', '93%'], ['Status meetings', '−7']] },
-    { q: 'Every closed deal used to start with a chain of emails. Now the onboarding project is open, staffed and invoiced before the sales rep has hung up the phone.', n: 'Daniel Okafor', r: 'Head of Operations, Acme Freight', av: ['DO', 'av-1'], img: 'assets/img/bridge.jpg', alt: 'White arched bridge over grey water, in black and white', s: [['Kickoff after close', '1.4 days'], ['Automation runs a month', '18k'], ['Manual handoffs', '−82%']] },
-    { q: 'Nine clinics, one board. When a supplier is late or a room is double-booked, the right manager hears about it first, not the patient.', n: 'Helena Brandt', r: 'Group Operations Lead, Holloway Dental', av: ['HB', 'av-4'], img: 'assets/img/lattice.jpg', alt: 'Curving glass and steel lattice roof, in black and white', s: [['Clinics connected', '9'], ['Issues caught early', '3.2×'], ['Admin hours saved', '120/mo']] }
+  /* ================= SOLUTIONS ================= */
+  const CASES = [
+    { t: 'Studios and agencies', p: 'Client projects, approvals and billing usually live in three tools. In VELTRIX a project carries its tasks, its approvals and the invoices it produces.', w: ['Project boards per client with approval steps', 'Time and budget tracked against each phase', 'Invoices drafted when a milestone is approved'], r: '<b>When</b> a client approves a phase, <b>then</b> draft the phase invoice and open the next phase’s tasks.', m: ['Projects', 'Automations', 'Analytics'] },
+    { t: 'Client services', p: 'Onboarding, requests and renewals follow the same steps every time, which makes them ideal for rules instead of reminders.', w: ['Onboarding projects opened from the CRM', 'Requests routed to whoever has capacity', 'Renewal tasks created ahead of the date'], r: '<b>When</b> a deal is won, <b>then</b> open the onboarding project, assign an owner and book the kickoff.', m: ['Automations', 'Team', 'Integrations'] },
+    { t: 'Operations teams', p: 'Recurring operational work, from month-end to vendor reviews, runs on checklists that somebody has to remember. VELTRIX runs them on a schedule and reports back.', w: ['Recurring checklists on a schedule', 'Escalations when steps are late', 'A weekly summary written from what changed'], r: '<b>Every</b> month-end, <b>then</b> create the close checklist and tell finance which items are blocked.', m: ['Automations', 'Copilot', 'Analytics'] },
+    { t: 'Field and logistics', p: 'Jobs, crews and invoices move fast and change often. One workspace keeps the schedule, the people and the billing in step.', w: ['Jobs scheduled against crew availability', 'Status updates from the field into one board', 'Invoices raised the day a job closes'], r: '<b>When</b> a job is marked complete, <b>then</b> raise the invoice and update the customer.', m: ['Projects', 'Team', 'Automations'] }
   ];
-  let storyI = 0, storyTween = null, storyHover = false;
-  const storyTabs = $$('.story-tabs button');
-  const showStory = (i, user) => {
-    storyI = i;
-    const s = stories[i];
-    storyTabs.forEach((b, k) => { b.classList.toggle('is-on', k === i); b.setAttribute('aria-selected', k === i); });
-    const swap = () => {
-      $('#storyQuote').textContent = s.q; $('#storyName').textContent = s.n; $('#storyRole').textContent = s.r;
-      $('#storyAv').textContent = s.av[0]; $('#storyAv').className = `av ${s.av[1]}`;
-      const img = $('.story-pic img'); img.src = s.img; img.alt = s.alt;
-      $('#storyStats').innerHTML = s.s.map(([l, v]) => `<div><dt>${l}</dt><dd>${v}</dd></div>`).join('');
-    };
+  let caseIdx = -1;
+  function selectCase(i) {
+    if (i === caseIdx) return;
+    const prev = caseIdx; caseIdx = i;
+    $$('#casesList button').forEach((b, k) => { b.classList.toggle('is-on', k === i); b.setAttribute('aria-selected', k === i); b.tabIndex = k === i ? 0 : -1; });
+    const imgs = $$('#casePics img');
+    imgs.forEach((im, k) => { im.classList.toggle('is-on', k === i); im.classList.toggle('is-out', k === prev); });
+    setTimeout(() => imgs[prev]?.classList.remove('is-out'), 950);
+    const c = CASES[i], body = $('#caseBody');
+    const fill = () => { body.innerHTML = `<h3>${c.t}</h3><p>${c.p}</p><div class="case-block"><h4>What it organises</h4><ul class="case-list">${c.w.map(x => `<li>${x}</li>`).join('')}</ul></div><div class="case-block"><h4>Example automation</h4><p class="case-rule">${c.r}</p></div><div class="case-mods">${c.m.map(x => `<span class="tg tg-blue">${x}</span>`).join('')}</div>`; };
+    if (prev < 0 || !motion) return fill();
+    body.classList.add('is-swap');
+    setTimeout(() => { fill(); requestAnimationFrame(() => body.classList.remove('is-swap')); }, 260);
+  }
+  $$('#casesList button').forEach((b, k) => b.addEventListener('click', () => selectCase(k)));
+  $('#casesList').addEventListener('keydown', e => {
+    if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+    e.preventDefault();
+    const n = (caseIdx + (/Down|Right/.test(e.key) ? 1 : -1) + CASES.length) % CASES.length;
+    selectCase(n); $$('#casesList button')[n].focus();
+  });
+  selectCase(0);
+
+  /* ================= INTEGRATIONS ================= */
+  const CATS = { all: 'All', comms: 'Communication', sales: 'CRM and sales', finance: 'Finance', eng: 'Engineering', docs: 'Docs and files', people: 'People' };
+  const APPS = [
+    // [name, category, official brand colour, sync examples, logo file in assets/logos (Simple Icons, CC0)]
+    ['Slack', 'comms', '#4A154B', ['New tasks from messages', 'Rule notifications in channels', 'Status updates posted to threads'], 'slack'],
+    ['Google Meet', 'comms', '#00897B', ['Meeting notes into tasks', 'Calls added to project timelines'], 'googlemeet'],
+    ['Gmail', 'comms', '#EA4335', ['Turn an email into a task', 'Send templated replies from rules'], 'gmail'],
+    ['Zoom', 'comms', '#0B5CFF', ['Meeting notes into tasks', 'Kickoff calls booked by rules'], 'zoom'],
+    ['HubSpot', 'sales', '#FF7A59', ['Deal stages trigger rules', 'Company and contact sync', 'Projects linked to deals'], 'hubspot'],
+    ['Salesforce', 'sales', '#00A1E0', ['Opportunities and accounts', 'Owner mapping'], 'salesforce'],
+    ['Zoho CRM', 'sales', '#E42527', ['Pipeline stages trigger rules'], 'zoho'],
+    ['Stripe', 'finance', '#635BFF', ['Payments close milestones', 'Revenue for analytics'], 'stripe'],
+    ['QuickBooks', 'finance', '#2CA01C', ['Invoices drafted from projects', 'Payment status sync'], 'quickbooks'],
+    ['Xero', 'finance', '#13B5EA', ['Invoices and bills', 'Budget tracking'], 'xero'],
+    ['GitHub', 'eng', '#181717', ['Pull requests linked to tasks', 'Deploys update project status'], 'github'],
+    ['Jira', 'eng', '#0052CC', ['Two-way issue sync', 'Sprint dates on timelines'], 'jira'],
+    ['Linear', 'eng', '#5E6AD2', ['Issues and cycles in one view'], 'linear'],
+    ['Google Drive', 'docs', '#4285F4', ['Files attached to tasks', 'Folders created per project'], 'googledrive'],
+    ['Notion', 'docs', '#000000', ['Docs linked to projects'], 'notion'],
+    ['Figma', 'docs', '#F24E1E', ['Frames attached to design tasks'], 'figma'],
+    ['Google Calendar', 'people', '#4285F4', ['Deadlines on calendars', 'Availability for workload'], 'googlecalendar'],
+    ['Greenhouse', 'people', '#24A47F', ['Offers trigger onboarding rules'], 'greenhouse']
+  ];
+  let intCat = 'all', intSel = 0;
+  const logo = a => `<span class="int-logo" aria-hidden="true"><i class="${['zoom', 'zoho'].includes(a[4]) ? 'wide' : ''}" style="--c:${a[2]};--logo:url('assets/logos/${a[4]}.svg')"></i></span>`;
+  $('#intCats').innerHTML = Object.entries(CATS).map(([k, l]) => `<button type="button" data-cat="${k}" aria-pressed="${k === 'all'}" class="${k === 'all' ? 'is-on' : ''}">${l}<span>${k === 'all' ? APPS.length : APPS.filter(a => a[1] === k).length}</span></button>`).join('');
+  function renderInt(animate = true) {
+    const q = $('#intQ').value.trim().toLowerCase();
+    const list = APPS.map((a, i) => [a, i]).filter(([a]) => (intCat === 'all' || a[1] === intCat) && (!q || a[0].toLowerCase().includes(q) || a[3].join(' ').toLowerCase().includes(q)));
+    $('#intTiles').innerHTML = list.map(([a, i]) => `<li><button type="button" data-i="${i}" aria-pressed="${i === intSel}">${logo(a)}<span><b>${a[0]}</b><small>${CATS[a[1]]}</small></span></button></li>`).join('');
+    $('#intEmpty').hidden = list.length > 0;
+    if (list.length && !list.some(([, i]) => i === intSel)) showInt(list[0][1]);
+    if (animate && motion) G.from('#intTiles li', { y: 14, opacity: 0, duration: 0.5, stagger: 0.025, ease: EASE });
+  }
+  function showInt(i) {
+    intSel = i;
+    const a = APPS[i];
+    $$('#intTiles button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.i === i));
+    $('#intDetail').innerHTML = `<div class="id-h">${logo(a)}<div><b>${a[0]}</b><small>${CATS[a[1]]} · example connector</small></div></div><ul class="id-sync">${a[3].map(s => `<li>${icon('i-check', 13)}<span>${s}</span></li>`).join('')}</ul><p class="id-note">Shown to illustrate how VELTRIX connects to tools like ${a[0]}. Connector availability is to be confirmed.</p>`;
     if (motion) {
-      G.timeline().to(['#storyBody > *', '.story-pic img'], { opacity: 0, y: 12, duration: 0.25, ease: 'power2.in' })
-        .add(swap).to(['#storyBody > *', '.story-pic img'], { opacity: 1, y: 0, duration: 0.6, stagger: 0.06, ease: 'expo.out' });
-    } else swap();
-    storyTween?.kill();
-    $$('.story-tabs i').forEach(x => { x.style.transform = 'scaleX(0)'; });
-    if (motion && !user) {
-      storyTween = G.fromTo(storyTabs[i].querySelector('i'), { scaleX: 0 }, { scaleX: 1, duration: 8, ease: 'none', paused: storyHover, onComplete: () => showStory((storyI + 1) % stories.length) });
+      G.from('#intDetail > *', { y: 8, opacity: 0, duration: 0.4, stagger: 0.05, ease: EASE, overwrite: 'auto' });
+      G.from('#intDetail .int-logo', { scale: 0.6, rotate: -12, duration: 0.7, ease: 'back.out(2.2)' });
+      G.from('#intDetail .id-sync li', { x: -10, opacity: 0, duration: 0.45, stagger: 0.06, delay: 0.1, ease: EASE });
     }
-  };
-  storyTabs.forEach((b, i) => b.addEventListener('click', () => showStory(i, true)));
-  $('.story-card').addEventListener('mouseenter', () => { storyHover = true; storyTween?.pause(); });
-  $('.story-card').addEventListener('mouseleave', () => { storyHover = false; if (storyVisible) storyTween?.play(); });
-  $('#storyStats').innerHTML = stories[0].s.map(([l, v]) => `<div><dt>${l}</dt><dd>${v}</dd></div>`).join('');
-  let storyStarted = false, storyVisible = false;
-  new IntersectionObserver(([e]) => {
-    storyVisible = e.isIntersecting;
-    if (storyVisible && !storyStarted) { storyStarted = true; showStory(0); }
-    else if (storyTween) storyVisible && !storyHover ? storyTween.play() : storyTween.pause();
-  }, { threshold: 0.3 }).observe($('.story'));
-
-  /* ================= pricing ================= */
-  let yearly = true, estPlan = 'team';
-  const prices = { starter: { y: 10, m: 12, n: 'Starter' }, team: { y: 18, m: 22, n: 'Team' }, scale: { y: 32, m: 38, n: 'Scale' } };
-  const billBtns = $$('[data-bill]'), pill = $('.bt-pill'), seats = $('#seats');
-  const placePill = () => { const b = billBtns.find(x => x.classList.contains('is-on')); pill.style.width = `${b.offsetWidth}px`; pill.style.transform = `translateX(${b.offsetLeft}px)`; };
-  const renderPrices = () => {
-    $$('.plan .num').forEach(n => countTo(n, +(yearly ? n.dataset.y : n.dataset.m), { dur: 0.6 }));
-    const p = prices[estPlan], each = yearly ? p.y : p.m, n = +seats.value;
-    $('#seatOut').textContent = n;
-    seats.style.setProperty('--fill', `${(n - seats.min) / (seats.max - seats.min) * 100}%`);
-    $('#estPlan').textContent = `${p.n}, billed ${yearly ? 'yearly' : 'monthly'}`;
-    countTo($('#invTotal'), each * n, { prefix: '$', dur: 0.4 });
-    $('#invSave').textContent = yearly ? `Saves $${fmt((p.m - p.y) * n * 12)} a year` : `Save $${fmt((p.m - p.y) * n * 12)} a year with yearly billing`;
-  };
-  const setYearly = v => { yearly = v; billBtns.forEach(b => { const on = (b.dataset.bill === 'yearly') === v; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on); }); placePill(); renderPrices(); };
-  billBtns.forEach(b => b.addEventListener('click', () => setYearly(b.dataset.bill === 'yearly')));
-  $$('#estPlans button').forEach(b => b.addEventListener('click', () => { estPlan = b.dataset.p; $$('#estPlans button').forEach(x => { x.classList.toggle('is-on', x === b); x.setAttribute('aria-pressed', x === b); }); renderPrices(); }));
-  seats.addEventListener('input', renderPrices);
-  addEventListener('resize', placePill);
-  document.fonts?.ready.then(placePill);
-  placePill(); renderPrices();
-  $$('[data-plan-cta]').forEach(a => a.addEventListener('click', () => { setTimeout(() => { $('#ctaEmail').focus({ preventScroll: true }); $('#ctaMsg').textContent = `${a.dataset.planCta} plan selected. 14 days free, no card.`; }, 900); }));
-  if (finePointer && motion) {
-    $$('.plan').forEach(el => {
-      el.addEventListener('mousemove', e => {
-        const r = el.getBoundingClientRect(), nx = (e.clientX - r.left) / r.width - 0.5, ny = (e.clientY - r.top) / r.height - 0.5;
-        if (!el._arrived) return;
-        G.to(el, { rotateY: nx * 6, rotateX: -ny * 6, y: -6, transformPerspective: 1200, duration: 0.6, ease: 'power3.out', overwrite: 'auto' });
-      });
-      el.addEventListener('mouseleave', () => { if (el._arrived) G.to(el, { rotateY: 0, rotateX: 0, y: 0, duration: 0.9, ease: 'power3.out', overwrite: 'auto' }); });
-    });
   }
+  $('#intTiles').addEventListener('click', e => { const b = e.target.closest('button[data-i]'); if (b) showInt(+b.dataset.i); });
+  $('#intCats').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; intCat = b.dataset.cat; $$('#intCats button').forEach(x => { x.classList.toggle('is-on', x === b); x.setAttribute('aria-pressed', x === b); }); renderInt(); });
+  $('#intQ').addEventListener('input', () => renderInt(false));
+  renderInt(false); showInt(0);
 
-  /* ================= faq ================= */
-  $$('.faq details').forEach((d, i) => {
-    const s = d.querySelector('summary'), a = d.querySelector('.faq-a');
-    if (i === 0) d.open = true;
+  /* ================= FAQ ================= */
+  $$('.faq details').forEach(d => {
+    const s = $('summary', d), a = $('.faq-a', d);
     s.addEventListener('click', e => {
       if (!motion) return;
       e.preventDefault();
       if (d.open) G.to(a, { height: 0, duration: 0.45, ease: 'power3.inOut', overwrite: true, onComplete: () => { d.open = false; a.style.height = ''; } });
-      else { d.open = true; G.fromTo(a, { height: 0 }, { height: a.scrollHeight, duration: 0.6, ease: 'expo.out', overwrite: true, onComplete: () => { a.style.height = ''; } }); }
+      else { d.open = true; G.fromTo(a, { height: 0 }, { height: a.scrollHeight, duration: 0.6, ease: EASE, overwrite: true, onComplete: () => { a.style.height = ''; } }); }
     });
   });
 
-  /* ================= forms ================= */
+  /* ================= DEMO REQUEST FORM (honest, no backend) ================= */
+  const form = $('#demoForm'), state = $('#formState');
   const emailOk = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
-  const shake = el => motion && G.fromTo(el, { x: -8 }, { x: 0, duration: 0.6, ease: 'elastic.out(1, 0.3)' });
-  const ctaForm = $('#ctaForm'), ctaEmail = $('#ctaEmail'), ctaMsg = $('#ctaMsg');
-  ctaForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const v = ctaEmail.value.trim(), ok = emailOk(v);
-    ctaForm.classList.toggle('is-bad', !ok);
-    ctaEmail.setAttribute('aria-invalid', !ok);
-    ctaMsg.className = `cta-msg ${ok ? 'is-ok' : 'is-bad'}`;
-    if (!v) ctaMsg.textContent = 'Enter your work email to start the trial.';
-    else if (!ok) ctaMsg.textContent = 'That address is missing something. Try name@company.com.';
-    else { ctaMsg.textContent = `Trial reserved for ${v}. This page is a demo, so no account was created and no email was sent.`; ctaEmail.value = ''; }
-    if (!ok) { ctaEmail.focus(); shake(ctaForm); }
-  });
-  ctaEmail.addEventListener('input', () => { if (ctaForm.classList.contains('is-bad')) { ctaForm.classList.remove('is-bad'); ctaMsg.className = 'cta-msg'; ctaMsg.textContent = '14 days free. No card. Cancel in two clicks.'; } });
-  $('#newsForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const inp = $('#newsEmail'), msg = $('#newsMsg'), ok = emailOk(inp.value.trim());
-    msg.className = ok ? 'is-ok' : 'is-bad';
-    msg.textContent = ok ? 'Subscribed in this demo. No email was stored.' : 'Enter a valid email address.';
-    if (ok) inp.value = ''; else shake($('.news-f'));
-  });
-
-  /* ================= demo modal ================= */
-  const modal = $('#demoModal'), demoForm = $('#demoForm'), done = $('.modal-done');
-  let modalReturn = null;
-  const openModal = () => {
-    modalReturn = document.activeElement;
-    modal.hidden = false; lenis?.stop(); document.body.style.overflow = 'hidden';
-    demoForm.hidden = false; done.hidden = true;
-    $$('.field', demoForm).forEach(f => { const inp = f.querySelector('input, .select-btn'); if (inp) setErr(inp, ''); });
-    setTimeout(() => $('#dName').focus(), 50);
+  const setErr = (el, msg) => {
+    const f = el.closest('.field'), err = $('.err', f);
+    f.classList.toggle('is-bad', !!msg); f.classList.toggle('is-ok', !msg && el.matches('input') && !!el.value.trim());
+    err.textContent = msg || ''; el.setAttribute('aria-invalid', !!msg);
+    if (msg) el.setAttribute('aria-describedby', err.id); else el.removeAttribute('aria-describedby');
   };
-  const closeModal = () => { modal.hidden = true; lenis?.start(); document.body.style.overflow = ''; closeSelect(); modalReturn?.focus?.(); };
-  document.addEventListener('click', e => {
-    if (e.target.closest('[data-open-demo]')) { e.preventDefault(); closeMenu(); openModal(); }
-    if (e.target.closest('[data-close-modal]') || e.target === modal) closeModal();
-  });
-  modal.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { if ($('#sizeSelect').classList.contains('is-open')) closeSelect(true); else closeModal(); }
-    if (e.key === 'Tab') {
-      const f = $$('button, input, [tabindex="0"]', modal).filter(el => el.offsetParent && !el.closest('[hidden]'));
-      const first = f[0], last = f[f.length - 1];
-      if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
-      else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
-    }
-  });
+  const checks = {
+    fName: v => v.trim().length < 2 ? 'Enter your full name.' : '',
+    fEmail: v => !v.trim() ? 'Enter your work email.' : !emailOk(v.trim()) ? 'That email looks incomplete, for example name@company.com.' : '',
+    fCompany: v => !v.trim() ? 'Enter your company name.' : ''
+  };
+  Object.keys(checks).forEach(id => { const el = $('#' + id); el.addEventListener('blur', () => { if (el.value) setErr(el, checks[id](el.value)); }); el.addEventListener('input', () => { if (el.closest('.field').classList.contains('is-bad')) setErr(el, checks[id](el.value)); }); });
+  $('#fMsg').addEventListener('input', e => { $('#fMsgCount').textContent = `${e.target.value.length} / 500`; });
+  $$('.chips button', form).forEach(b => b.addEventListener('click', () => b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') !== 'true')));
   // custom select
-  const sel = $('#sizeSelect'), selBtn = $('.select-btn', sel), opts = $$('[role="option"]', sel);
+  const sel = $('#sizeSelect'), selBtn = $('#sizeBtn'), opts = $$('[role="option"]', sel);
   let selVal = '', act = -1;
-  selBtn.classList.add('is-empty');
-  const openSelect = () => { sel.classList.add('is-open'); selBtn.setAttribute('aria-expanded', 'true'); act = Math.max(0, opts.findIndex(o => o.dataset.v === selVal)); markAct(); };
-  function closeSelect(focus) { sel.classList.remove('is-open'); selBtn.setAttribute('aria-expanded', 'false'); selBtn.removeAttribute('aria-activedescendant'); if (focus) selBtn.focus(); }
-  opts.forEach((o, i) => { o.id = `size-opt-${i}`; });
   const markAct = () => { opts.forEach((o, i) => o.classList.toggle('is-act', i === act)); if (opts[act]) selBtn.setAttribute('aria-activedescendant', opts[act].id); };
-  selBtn.addEventListener('blur', () => setTimeout(() => { if (!sel.contains(document.activeElement)) closeSelect(); }, 120));
-  const choose = i => {
-    selVal = opts[i].dataset.v;
-    opts.forEach((o, k) => o.setAttribute('aria-selected', k === i));
-    $('#sizeVal').textContent = opts[i].textContent; selBtn.classList.remove('is-empty');
-    sel.closest('.field').classList.remove('is-bad'); sel.closest('.field').querySelector('.err').textContent = '';
-    closeSelect(true);
-  };
-  selBtn.addEventListener('click', () => sel.classList.contains('is-open') ? closeSelect() : openSelect());
+  const openSel = () => { sel.classList.add('is-open'); selBtn.setAttribute('aria-expanded', 'true'); act = Math.max(0, opts.findIndex(o => o.dataset.v === selVal)); markAct(); };
+  const closeSel = focus => { sel.classList.remove('is-open'); selBtn.setAttribute('aria-expanded', 'false'); selBtn.removeAttribute('aria-activedescendant'); if (focus) selBtn.focus(); };
+  const choose = i => { selVal = opts[i].dataset.v; opts.forEach((o, k) => o.setAttribute('aria-selected', k === i)); $('#sizeVal').textContent = opts[i].textContent; selBtn.classList.remove('is-empty'); setErr(selBtn, ''); closeSel(true); };
+  selBtn.addEventListener('click', () => sel.classList.contains('is-open') ? closeSel() : openSel());
   selBtn.addEventListener('keydown', e => {
-    if (['ArrowDown', 'ArrowUp'].includes(e.key)) { e.preventDefault(); if (!sel.classList.contains('is-open')) openSelect(); else { act = clamp(act + (e.key === 'ArrowDown' ? 1 : -1), 0, opts.length - 1); markAct(); } }
+    if (['ArrowDown', 'ArrowUp'].includes(e.key)) { e.preventDefault(); if (!sel.classList.contains('is-open')) openSel(); else { act = clamp(act + (e.key === 'ArrowDown' ? 1 : -1), 0, opts.length - 1); markAct(); } }
     if ((e.key === 'Enter' || e.key === ' ') && sel.classList.contains('is-open')) { e.preventDefault(); choose(act); }
+    if (e.key === 'Escape' && sel.classList.contains('is-open')) { e.stopPropagation(); closeSel(true); }
+    if (e.key === 'Tab') closeSel();
   });
   opts.forEach((o, i) => o.addEventListener('click', () => choose(i)));
-  document.addEventListener('click', e => { if (!e.target.closest('#sizeSelect')) closeSelect(); });
-  $$('.chips button', modal).forEach(b => b.addEventListener('click', () => b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') !== 'true')));
-  const setErr = (input, msg) => {
-    const f = input.closest('.field'), err = f.querySelector('.err');
-    if (!err.id) err.id = `err-${input.id || 'size'}`;
-    f.classList.toggle('is-bad', !!msg); err.textContent = msg || '';
-    input.setAttribute('aria-invalid', !!msg);
-    if (msg) input.setAttribute('aria-describedby', err.id); else input.removeAttribute('aria-describedby');
-  };
-  demoForm.addEventListener('submit', e => {
+  document.addEventListener('click', e => { if (!e.target.closest('#sizeSelect')) closeSel(); });
+  form.addEventListener('submit', async e => {
     e.preventDefault();
-    const name = $('#dName').value.trim(), mail = $('#dEmail').value.trim();
-    const errs = [[$('#dName'), name.length < 2 ? 'Tell us your name.' : ''], [$('#dEmail'), !mail ? 'A work email is required.' : !emailOk(mail) ? 'That email looks incomplete.' : ''], [selBtn, selVal ? '' : 'Choose a team size.']];
-    errs.forEach(([el, m]) => setErr(el, m));
+    const errs = Object.entries(checks).map(([id, fn]) => { const el = $('#' + id), m = fn(el.value); setErr(el, m); return [el, m]; });
+    setErr(selBtn, selVal ? '' : 'Choose a team size.'); errs.push([selBtn, selVal ? '' : 'x']);
     const bad = errs.find(([, m]) => m);
-    if (bad) { bad[0].focus(); shake(demoForm); return; }
-    const interests = $$('.chips [aria-pressed="true"]', modal).map(b => b.textContent);
-    $('#demoDoneText').textContent = `Thanks, ${name.split(' ')[0]}. In a live deployment a product specialist would email ${mail} within one business day to book a 20-minute walkthrough for a ${selVal}-person team${interests.length ? ` focused on ${interests.join(', ').toLowerCase()}` : ''}. This is a demo page, so nothing was sent.`;
-    demoForm.hidden = true; done.hidden = false;
-    $('.modal-done .btn').focus();
-    if (motion) G.from('.modal-done > *', { y: 16, opacity: 0, duration: 0.6, stagger: 0.06, ease: 'expo.out' });
-    demoForm.reset(); selVal = ''; $('#sizeVal').textContent = 'Choose a size'; selBtn.classList.add('is-empty'); opts.forEach(o => o.setAttribute('aria-selected', 'false'));
-    $$('.chips button', modal).forEach(b => b.setAttribute('aria-pressed', 'false'));
+    if (bad) { bad[0].focus(); state.hidden = false; state.className = 'form-state is-bad'; state.textContent = 'Please fix the highlighted fields.'; if (motion) G.fromTo(form, { x: -6 }, { x: 0, duration: 0.6, ease: 'elastic.out(1, 0.3)' }); return; }
+    const btn = $('#demoSubmit');
+    btn.disabled = true; btn.querySelector('span').textContent = 'Checking…';
+    state.hidden = false; state.className = 'form-state is-pending'; state.textContent = 'Checking your details…';
+    await sleep(700);
+    const interests = $$('.chips [aria-pressed="true"]', form).map(b => b.textContent);
+    const rows = [['Name', $('#fName').value], ['Work email', $('#fEmail').value], ['Company', $('#fCompany').value], ['Team size', selVal], ['Interests', interests.join(', ') || 'None selected'], ['Notes', $('#fMsg').value || 'None']];
+    state.className = 'form-state is-unsent';
+    state.innerHTML = `<b>Not sent. This form isn't connected to a backend yet.</b>Your entries are valid. Once a form service is connected, this is what would be submitted:<dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>`;
+    btn.disabled = false; btn.querySelector('span').textContent = 'Request a demo';
+    state.focus?.();
   });
 
-  /* ================= footer ================= */
-  const clock = $('#clock');
-  const tickClock = () => { clock.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' }); };
-  tickClock(); setInterval(tickClock, 15000);
-  new IntersectionObserver(([e]) => $('.foot-word').classList.toggle('is-lit', e.isIntersecting), { threshold: 0.6 }).observe($('.foot-word'));
+  /* ================= footer grid ================= */
+  const fg = $('#footGrid');
+  const fgN = () => (innerWidth <= 600 ? 16 : innerWidth <= 960 ? 24 : 48) * 4;
+  fg.innerHTML = '<i></i>'.repeat(fgN());
+  const fgVis = visibleFlag(fg);
+  if (motion) setInterval(() => { if (!fgVis.on || document.hidden) return; const c = $$('i', fg); for (let k = 0; k < 3; k++) { const el = c[Math.floor(Math.random() * c.length)]; el.className = Math.random() > 0.3 ? 'on' : 'on-b'; setTimeout(() => { el.className = ''; }, 1400 + Math.random() * 1800); } }, 400);
+  fg.addEventListener('mouseover', e => { if (e.target.tagName === 'I') { e.target.className = 'on'; setTimeout(() => { e.target.className = ''; }, 900); } });
 
   /* ================= command palette ================= */
   const pal = $('#palette'), palQ = $('#palQ'), palList = $('#palList');
   const cmds = [
-    ...railSections.map(s => ({ t: s.dataset.name, k: 'Go to section', run: () => goTo(s) })),
-    { t: 'Book a demo', k: 'Action', run: openModal },
-    { t: 'Run a workflow test', k: 'Action', run: showLiveRule },
-    { t: 'Ask Copilot what is at risk', k: 'Action', run: () => { $$('.cp-q button').forEach(x => { x.classList.toggle('is-on', x.dataset.q === 'risk'); x.setAttribute('aria-pressed', x.dataset.q === 'risk'); }); goTo('#product'); selectFeature('copilot', true); } },
-    { t: 'Switch billing to monthly', k: 'Action', run: () => { setYearly(false); goTo('#pricing'); } },
-    { t: 'Switch billing to yearly', k: 'Action', run: () => { setYearly(true); goTo('#pricing'); } },
-    { t: 'Email the VELTRIX team', k: 'Contact', run: () => { location.href = 'mailto:hello@veltrix.io?subject=VELTRIX%20question'; } }
+    ...$$('main > section[data-name]').map(s => ({ t: s.dataset.name, k: 'Go to section', run: () => goTo(s) })),
+    { t: 'Run the onboarding automation', k: 'Demo', run: () => { $('[data-wf="onboard"]').click(); goTo('#workflows'); setTimeout(runWF, 1300); } },
+    { t: 'Ask Copilot what is at risk', k: 'Demo', run: () => { goTo('#copilot'); setTimeout(() => ask('Which projects are at risk this week?'), 1100); } },
+    { t: 'Show 12 months of revenue', k: 'Demo', run: () => { an.m = 'revenue'; an.r = 365; setSeg($('#anMetric'), $('[data-m="revenue"]')); setSeg($('#anRange'), $('[data-r="365"]')); goTo('#analytics'); anDrawn = true; renderAn(); } },
+    { t: 'Request a demo', k: 'Action', run: () => { goTo('#demo'); setTimeout(() => $('#fName').focus({ preventScroll: true }), 1200); } }
   ];
-  let palSel = 0, palItems = cmds, lastFocus;
+  let palSel = 0, palItems = cmds, palReturn;
   const renderPal = () => {
     const q = palQ.value.trim().toLowerCase();
     palItems = cmds.filter(c => c.t.toLowerCase().includes(q));
     palSel = Math.min(palSel, Math.max(0, palItems.length - 1));
-    palList.innerHTML = palItems.map((c, i) => `<li role="option" id="pal-opt-${i}" aria-selected="${i === palSel}" data-i="${i}">${c.t}<span>${c.k}</span></li>`).join('') || '<li aria-disabled="true">Nothing matches</li>';
-    if (palItems.length) palQ.setAttribute('aria-activedescendant', `pal-opt-${palSel}`); else palQ.removeAttribute('aria-activedescendant');
-    $('#pal-opt-' + palSel)?.scrollIntoView({ block: 'nearest' });
+    palList.innerHTML = palItems.map((c, i) => `<li role="option" id="po-${i}" aria-selected="${i === palSel}" data-i="${i}">${c.t}<span>${c.k}</span></li>`).join('') || '<li aria-disabled="true">Nothing matches</li>';
+    if (palItems.length) palQ.setAttribute('aria-activedescendant', `po-${palSel}`); else palQ.removeAttribute('aria-activedescendant');
+    $('#po-' + palSel)?.scrollIntoView({ block: 'nearest' });
   };
-  const openPal = () => { lastFocus = document.activeElement; pal.hidden = false; palQ.value = ''; palSel = 0; renderPal(); palQ.focus(); lenis?.stop(); };
-  const closePal = () => { pal.hidden = true; lenis?.start(); lastFocus?.focus?.(); };
+  const openPal = () => { palReturn = document.activeElement; closeAllDD(); pal.hidden = false; palQ.value = ''; palSel = 0; renderPal(); palQ.focus(); lenis?.stop(); };
+  const closePal = () => { pal.hidden = true; lenis?.start(); palReturn?.focus?.(); };
   const runPal = i => { const c = palItems[i]; if (!c) return; closePal(); c.run(); };
   document.addEventListener('click', e => { if (e.target.closest('[data-open-palette]')) { e.preventDefault(); openPal(); } });
   palQ.addEventListener('input', () => { palSel = 0; renderPal(); });
   palList.addEventListener('click', e => { const li = e.target.closest('[data-i]'); if (li) runPal(+li.dataset.i); });
   pal.addEventListener('click', e => { if (e.target === pal) closePal(); });
   pal.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closePal(); return; }
+    if (e.key === 'Escape') { e.stopPropagation(); closePal(); }
     if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && palItems.length) { palSel = (palSel + (e.key === 'ArrowDown' ? 1 : -1) + palItems.length) % palItems.length; renderPal(); e.preventDefault(); }
     if (e.key === 'Enter') { runPal(palSel); e.preventDefault(); }
     if (e.key === 'Tab') { e.preventDefault(); palQ.focus(); }
   });
-  let typed = '';
-  document.addEventListener('keydown', e => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); pal.hidden ? openPal() : closePal(); return; }
-    if (e.key === 'Escape') { setDD(false); closeMenu(); }
-    if (e.target.matches('input, textarea')) return;
-    typed = (typed + e.key.toLowerCase()).slice(-7);
-    if (typed === 'veltrix') {
-      typed = '';
-      toast('Everything connected. You found the hidden shortcut.', { icon: 'i-spark' });
-      if (motion) G.fromTo('.nav .logo-mark', { rotate: 0 }, { rotate: 360, duration: 1.1, ease: 'expo.inOut' });
-    }
-  });
+  document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); pal.hidden ? openPal() : closePal(); } });
 
-  /* ================= section entrances, each with its own motion ================= */
+  /* ================= section entrances: one language, different gestures ================= */
   if (motion) {
-    const mark = (sel, kind = '') => $$(sel).forEach(el => el.setAttribute('data-reveal', kind));
-    mark('.sec-kicker'); mark('.sec-sub'); mark('.logos p');
-    mark('.play-in', 'left'); mark('.play-out', 'right'); mark('.play-bridge', 'scale');
-    // on narrow screens the tabs scroll sideways, so off-screen tabs would never intersect: reveal the row as one
-    mark(wide() ? '.ex-tabs button' : '.ex-tabs', 'left');
-    mark('.an-kpi'); mark('.fineprint-dark'); mark('.dash', 'scale');
-    mark('.integr-copy .h2'); mark('.dir', 'right');
-    mark('.story-tabs button'); mark('.estimator'); mark('.faq details', 'right'); mark('.faq-side .btn'); mark('.support', 'scale');
-    mark('.cta-sub'); mark('.cta-form'); mark('.cta-msg'); mark('.foot-brand > *'); mark('.foot-cols > div'); mark('.news');
-    // reveals use IntersectionObserver, so they fire even when content above changes height later
-    const queue = [];
-    let qT;
-    const revealIO = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) { queue.push(e.target); revealIO.unobserve(e.target); } });
-      clearTimeout(qT);
-      qT = setTimeout(() => { if (queue.length) G.to(queue.splice(0), { opacity: 1, x: 0, y: 0, scale: 1, duration: 1.1, ease: 'expo.out', stagger: 0.08, overwrite: 'auto' }); }, 20);
+    // headings rise word by word from a mask
+    $$('.sec-head .h2, .tour-copy .h2, .cop-copy .h2, .faq-head .h2, .demo-h').forEach(h => {
+      const parts = [];
+      h.childNodes.forEach(n => {
+        const words = n.textContent.split(/(\s+)/);
+        const wrapCls = n.nodeType === 1 ? n.className : '';
+        words.forEach(w => parts.push(/^\s+$/.test(w) ? ' ' : w ? `<span class="w-mask"><span${wrapCls ? ` class="${wrapCls}"` : ''}>${esc(w)}</span></span>` : ''));
+      });
+      h.setAttribute('aria-label', h.textContent);
+      h.innerHTML = parts.join('');
+      $$('.w-mask', h).forEach(w => w.setAttribute('aria-hidden', 'true'));
+      const tw = G.from($$('.w-mask > span', h), { yPercent: 105, duration: 1.1, stagger: 0.035, ease: EASE, paused: true });
+      whenSeen(h, () => tw.play(), 0.4);
+    });
+    const reveal = (sel, kind = '') => $$(sel).forEach(el => el.setAttribute('data-reveal', kind));
+    reveal('.sec-tag'); reveal('.sec-sub'); reveal('.cop-can li'); reveal('.demo-note'); reveal('.wfb-tabs button', 'left'); reveal('.cases-list button', 'left');
+    reveal('.int-side'); reveal('.faq details'); reveal('.demo-copy > p'); reveal('.demo-steps li'); reveal('.foot-cols > div'); reveal('.foot-brand');
+    const q = []; let qt;
+    const io = new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) { q.push(e.target); io.unobserve(e.target); } });
+      clearTimeout(qt); qt = setTimeout(() => { q.forEach(el => el.classList.add('is-in')); if (q.length) G.to(q.splice(0), { opacity: 1, x: 0, y: 0, scale: 1, duration: 1, stagger: 0.07, ease: EASE, overwrite: 'auto' }); }, 20);
     }, { rootMargin: '0px 0px -8% 0px' });
-    $$('[data-reveal]').forEach(el => revealIO.observe(el));
-    // keyboard users can tab into a block before its entrance has played: show it at once
-    document.addEventListener('focusin', e => { const r = e.target.closest('[data-reveal]'); if (r && +getComputedStyle(r).opacity < 1) { revealIO.unobserve(r); G.to(r, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.3, overwrite: 'auto' }); } });
-    const onSeen = (el, tween, threshold) => { tween.pause(0); whenSeen(el, () => tween.play(), threshold); };
-    // word-by-word headings
-    $$('.split-words').forEach(h => onSeen(h, G.from($$('.w > span', h), { yPercent: 110, duration: 1.1, ease: 'expo.out', stagger: 0.045 }), 0.3));
-    // feature panel swings in
-    onSeen($('.explorer'), G.from('.ex-panel', { rotateX: 14, y: 80, opacity: 0, transformPerspective: 1600, transformOrigin: '50% 0', duration: 1.4, ease: 'expo.out' }));
-    // story card opens like a curtain
-    onSeen($('.story'), G.fromTo('.story-card', { clipPath: 'inset(0% 0% 100% 0% round 22px)' }, { clipPath: 'inset(0% 0% 0% 0% round 22px)', duration: 1.4, ease: 'expo.inOut', clearProps: 'clipPath' }), 0.05);
-    // pricing cards rise in a fan
-    onSeen($('.plans'), G.from('.plan', { y: 90, opacity: 0, rotateX: 18, transformPerspective: 1200, transformOrigin: '50% 100%', duration: 1.2, stagger: { each: 0.12, onComplete() { this.targets()[0]._arrived = true; } }, ease: 'expo.out' }), 0.1);
-    // final call to action: the dark panel expands into the page
-    G.fromTo('.cta', { clipPath: 'inset(6% 4% 6% 4% round 40px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'none', scrollTrigger: { trigger: '.cta', start: 'top bottom', end: 'top 25%', scrub: 0.6 } });
-    onSeen($('.cta-in'), G.from('.cta-mark', { scale: 0.4, rotate: -40, opacity: 0, duration: 1.2, ease: 'expo.out' }), 0.3);
-    // marquee fades in after the hero
-    onSeen($('.logos'), G.from('.marquee', { opacity: 0, y: 30, duration: 1.2, ease: 'expo.out' }), 0.3);
-    // parallax on the photos
-    G.fromTo('.story-pic img', { yPercent: -6, scale: 1.12 }, { yPercent: 6, scale: 1.12, ease: 'none', scrollTrigger: { trigger: '.story-card', start: 'top bottom', end: 'bottom top', scrub: true } });
-    G.fromTo('.foot-word', { yPercent: 30 }, { yPercent: 0, ease: 'none', scrollTrigger: { trigger: '.foot', start: 'top bottom', end: 'bottom bottom', scrub: true } });
+    $$('[data-reveal]').forEach(el => io.observe(el));
+    document.addEventListener('focusin', e => { const r = e.target.closest('[data-reveal]'); if (r && +getComputedStyle(r).opacity < 1) { io.unobserve(r); G.to(r, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.3 }); } });
+    // product surfaces each arrive their own way
+    const intoView = (el, from, th = 0.15) => { const tw = G.from(el, { ...from, paused: true }); whenSeen($(el).parentElement, () => tw.play(), th); };
+    intoView('.wfb-app', { y: 70, opacity: 0, rotateX: 8, transformPerspective: 1600, transformOrigin: '50% 0', duration: 1.3, ease: EASE });
+    intoView('.chat', { x: 60, opacity: 0, duration: 1.2, ease: EASE });
+    intoView('.an', { clipPath: 'inset(0% 0% 100% 0% round 14px)', duration: 1.4, ease: 'expo.inOut' }, 0.05);
+    intoView('.case', { y: 50, opacity: 0, duration: 1.2, ease: EASE });
+    intoView('.int-detail', { y: 40, opacity: 0, duration: 1.1, ease: EASE });
+    intoView('.demo-form', { y: 60, opacity: 0, scale: 0.98, duration: 1.2, ease: EASE });
+    whenSeen($('#intTiles'), () => G.from('#intTiles li', { y: 20, opacity: 0, duration: 0.7, stagger: 0.03, ease: EASE }), 0.1);
   }
 
-  if (ST) { addEventListener('load', () => { layoutFits(); ST.refresh(); }); document.fonts?.ready.then(() => { layoutFits(); ST.refresh(); }); }
+  /* ================= pointer layer: light, hover links, reactive grids (fine pointers only) ================= */
+  if (motion && finePointer) {
+    root.classList.add('spot-on');
+    $$('.int-tiles, .wfb-tabs, .why-rail, .cases-list, .cop-can, .demo-steps, .allv').forEach(g => g.addEventListener('pointermove', e => {
+      const el = e.target.closest('.int-tiles button, .wfb-tabs button, .why-rail li, .cases-list button, .allc');
+      if (!el) return;
+      if (!el.hasAttribute('data-spot')) el.setAttribute('data-spot', '');
+      const r = el.getBoundingClientRect(), k = r.width / el.offsetWidth || 1;
+      el.style.setProperty('--mx', `${(e.clientX - r.left) / k}px`); el.style.setProperty('--my', `${(e.clientY - r.top) / k}px`);
+    }));
+    // dark sections carry a wide, faint light that trails the pointer
+    $$('main > section[data-theme="dark"]').forEach(s => {
+      s.classList.add('spot-sec');
+      let raf = 0, ex = 0, ey = 0;
+      s.addEventListener('pointermove', e => { ex = e.clientX; ey = e.clientY; if (raf) return; raf = requestAnimationFrame(() => { raf = 0; const r = s.getBoundingClientRect(); s.style.setProperty('--sx', `${ex - r.left}px`); s.style.setProperty('--sy', `${ey - r.top}px`); }); });
+    });
+    // tower windows light under the pointer, then fade back to what they were doing
+    towerGrid.addEventListener('pointerover', e => { const c = e.target; if (c.tagName !== 'I') return; c.classList.add('hov'); setTimeout(() => c.classList.remove('hov'), 650); });
+    // hovering a workflow step lights every edge connected to it
+    wfNodesEl.addEventListener('pointerover', e => { const n = e.target.closest('.wn'); $$('path', wfEdges).forEach(p => p.classList.toggle('is-near', !!n && (p.dataset.a === n.dataset.id || p.dataset.b === n.dataset.id))); });
+    wfNodesEl.addEventListener('pointerleave', () => $$('path.is-near', wfEdges).forEach(p => p.classList.remove('is-near')));
+    // the why-rail glyphs redraw when you point at them
+    $$('.why-rail li').forEach(li => li.addEventListener('mouseenter', () => { const parts = $$('svg *', li); parts.forEach(p => { const len = p.getTotalLength?.() || 100; G.fromTo(p, { strokeDashoffset: len }, { strokeDashoffset: 0, duration: 0.9, ease: 'power2.inOut', overwrite: true }); }); }));
+  }
+
+  /* ================= scroll layer: progress-linked details ================= */
+  if (motion) {
+    // the dark workflow panel rises over the light section above it as it scrolls in
+    mm.add('(min-width: 961px)', () => {
+      G.fromTo('#workflows .wfb-frame', { y: 60 }, { y: 0, ease: 'none', scrollTrigger: { trigger: '#workflows', start: 'top bottom', end: 'top 20%', scrub: 0.6 } });
+      G.fromTo('.cases-grid .case-pics', { yPercent: 6 }, { yPercent: -6, ease: 'none', scrollTrigger: { trigger: '#solutions', start: 'top bottom', end: 'bottom top', scrub: true } });
+      // the footer grid settles in row by row as the page ends
+      G.from('#footGrid i', { opacity: 0, scale: 0.3, ease: 'none', stagger: { grid: 'auto', from: 'start', amount: 1 }, scrollTrigger: { trigger: '#footGrid', start: 'top 95%', end: 'bottom 75%', scrub: 0.8 } });
+    });
+    // KPI tiles in the hero answer the pointer with a small lift of their figures
+    $$('#heroWs .hw-kpis > *').forEach(k => k.addEventListener('mouseenter', () => G.fromTo($('b', k), { y: 0 }, { y: -3, duration: 0.25, yoyo: true, repeat: 1, ease: 'power2.out' })));
+  }
+
+  if (ST) { addEventListener('load', () => { layoutFits(); placePills(); ST.refresh(); }); document.fonts?.ready.then(() => { layoutFits(); placePills(); ST.refresh(); }); }
 })();

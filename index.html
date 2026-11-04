@@ -3,387 +3,337 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VELTRIX — Everything connected. Everything moving.</title>
-<meta name="description" content="VELTRIX is the AI operations platform that brings projects, workflow automation, team collaboration and live business analytics into one connected workspace.">
-<meta name="theme-color" content="#0B1211">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B1211'/%3E%3Cpath d='M8 10l8 13 8-13' fill='none' stroke='%23EEF1EE' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='8' cy='10' r='2.6' fill='%231DB386'/%3E%3Ccircle cx='24' cy='10' r='2.6' fill='%23F2B04A'/%3E%3Ccircle cx='16' cy='23' r='2.6' fill='%231DB386'/%3E%3C/svg%3E">
+<title>VELTRIX · The AI operations workspace for projects, automations and analytics</title>
+<meta name="description" content="VELTRIX brings projects, workflow automation, team conversation and business analytics into one AI-assisted workspace, so work moves between people and tools without anyone chasing it.">
+<meta name="theme-color" content="#0B0E17">
+<meta property="og:title" content="VELTRIX · Every handoff, automated. Every number, live.">
+<meta property="og:description" content="One AI-assisted workspace for projects, automations, team conversation and analytics.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B0E17'/%3E%3Crect x='7' y='7' width='5' height='5' rx='1' fill='%23F2B441'/%3E%3Crect x='13.5' y='7' width='5' height='5' rx='1' fill='%233557F5'/%3E%3Crect x='20' y='7' width='5' height='5' rx='1' fill='%23F2B441'/%3E%3Crect x='13.5' y='13.5' width='5' height='5' rx='1' fill='%233557F5'/%3E%3Crect x='13.5' y='20' width='5' height='5' rx='1' fill='%23F4F3EF'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <script>document.documentElement.classList.add('js')</script>
 </head>
 <body>
 
-<!-- Icon sprite -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <symbol id="mark" viewBox="0 0 32 32"><path d="M7 9l9 14 9-14" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle class="mk-a" cx="7" cy="9" r="3"/><circle class="mk-b" cx="25" cy="9" r="3"/><circle class="mk-a" cx="16" cy="23" r="3"/></symbol>
-    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V21h-6v-6H9v6H3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
-    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6.5A1.5 1.5 0 014.5 5H9l2 2h8.5A1.5 1.5 0 0121 8.5v9a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 17.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
-    <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
-    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16M8 16v-5M12 16V8M16 16v-3M20 16V6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
-    <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3 13l3-8h12l3 8v6H3zM3 13h5l1.5 2.5h5L16 13h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
-    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.8a3.5 3.5 0 010 6.4M18 14.8c1.8.7 3 2.4 3.5 5.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
-    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
-    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-arrow-ur" viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2.5l2.2 6.3 6.3 2.2-6.3 2.2L12 19.5l-2.2-6.3L3.5 11l6.3-2.2zM19 16l.9 2.1L22 19l-2.1.9L19 22l-.9-2.1L16 19l2.1-.9z" fill="currentColor"/></symbol>
-    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0112 0v5l1.5 2h-15zM10 20.5a2 2 0 004 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
-    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
-    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 6.5L12 13l8.5-6.5" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
-    <symbol id="i-msg" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
-    <symbol id="i-card" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2.5 10h19M6 15h4" stroke="currentColor" stroke-width="1.7"/></symbol>
-    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.5 12l2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
-    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
-    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5l9.5 16.5h-19z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 10v4.5M12 17.2v.3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
-    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></symbol>
-    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
-    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
-    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></symbol>
-    <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v4h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
-    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
-    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
     <symbol id="i-chev" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h4l2.5-6 5 12 2.5-6h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6.5A1.5 1.5 0 014.5 5H9l2 2h8.5A1.5 1.5 0 0121 8.5v9a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 17.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+    <symbol id="i-flow" viewBox="0 0 24 24"><rect x="3" y="4" width="7" height="5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="15" width="7" height="5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6.5 9v3.5a2 2 0 002 2H14" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2.5l2.2 6.3 6.3 2.2-6.3 2.2L12 19.5l-2.2-6.3L3.5 11l6.3-2.2zM19 16l.9 2.1L22 19l-2.1.9L19 22l-.9-2.1L16 19l2.1-.9z" fill="currentColor"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16M8 16v-5M12 16V8M16 16v-3M20 16V6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.8a3.5 3.5 0 010 6.4M18 14.8c1.8.7 3 2.4 3.5 5.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 6.5L12 13l8.5-6.5" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+    <symbol id="i-sheet" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4 9h16M4 15h16M10 3v18" stroke="currentColor" stroke-width="1.5"/></symbol>
+    <symbol id="i-msg" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2.5 10h19M6 15h4" stroke="currentColor" stroke-width="1.7"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2.5-6.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5l9.5 16.5h-19z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 10v4.5M12 17.2v.3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+    <symbol id="i-branch" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="6" cy="18" r="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="18" cy="9" r="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6 8.5v7M18 11.5c0 3-4 3.5-10.5 5" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
   </defs>
 </svg>
 
+<!-- opening: the wordmark lights up cell by cell -->
 <div class="intro" aria-hidden="true">
-  <div class="intro-mark"><svg viewBox="0 0 32 32"><path d="M7 9l9 14 9-14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="9" r="2.6"/><circle cx="25" cy="9" r="2.6"/><circle cx="16" cy="23" r="2.6"/></svg></div>
-  <div class="intro-count"><span id="introNum">0</span></div>
+  <div class="intro-grid"></div>
+  <div class="intro-word"><span>V</span><span>E</span><span>L</span><span>T</span><span>R</span><span>I</span><span>X</span></div>
 </div>
 
 <a class="skip" href="#main">Skip to content</a>
 
-<!-- ================= NAV ================= -->
 <header class="nav" id="nav">
   <div class="nav-bar">
-    <a class="logo" href="#top" aria-label="VELTRIX home">
-      <svg class="logo-mark" width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 9l9 14 9-14" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle class="mk-a" cx="7" cy="9" r="3"/><circle class="mk-b" cx="25" cy="9" r="3"/><circle class="mk-a" cx="16" cy="23" r="3"/></svg>
-      <span class="logo-word">VELTRIX</span>
+    <a class="brand" href="#top" aria-label="VELTRIX home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="brand-word">VELTRIX</span>
     </a>
     <nav class="nav-links" aria-label="Primary">
-      <div class="dd">
-        <button class="nav-link dd-btn" aria-expanded="false" aria-controls="dd-product">Product <svg width="14" height="14"><use href="#i-chev"/></svg></button>
-        <div class="dd-menu" id="dd-product">
-          <div class="dd-grid">
-            <a href="#product" data-feature="projects"><span class="dd-ico c-jade"><svg width="18" height="18"><use href="#i-folder"/></svg></span><span><b>Projects</b><small>Boards, lists and timelines over one set of tasks</small></span></a>
-            <a href="#workflows"><span class="dd-ico c-saffron"><svg width="18" height="18"><use href="#i-zap"/></svg></span><span><b>Automations</b><small>Rules written in plain words, logged every run</small></span></a>
-            <a href="#results"><span class="dd-ico c-sky"><svg width="18" height="18"><use href="#i-chart"/></svg></span><span><b>Analytics</b><small>Revenue, delivery and workload, live</small></span></a>
-            <a href="#product" data-feature="collab"><span class="dd-ico c-coral"><svg width="18" height="18"><use href="#i-msg"/></svg></span><span><b>Collaboration</b><small>Threads and decisions pinned to the work</small></span></a>
-            <a href="#product" data-feature="monitor"><span class="dd-ico c-jade"><svg width="18" height="18"><use href="#i-pulse"/></svg></span><span><b>Monitoring</b><small>Warnings before deadlines or budgets slip</small></span></a>
-            <a href="#integrations"><span class="dd-ico c-sky"><svg width="18" height="18"><use href="#i-link"/></svg></span><span><b>Integrations</b><small>42 two-way connections</small></span></a>
+      <div class="dd" data-dd>
+        <button class="nav-link" type="button" aria-expanded="false" aria-controls="dd-product">Product <svg width="14" height="14"><use href="#i-chev"/></svg></button>
+        <div class="dd-panel dd-mega" id="dd-product">
+          <div class="mega-cols">
+            <a href="#tour" data-tour="0"><span class="mi"><svg width="18" height="18"><use href="#i-grid"/></svg></span><span><b>Workspace</b><small>Every project, owner and deadline on one screen</small></span></a>
+            <a href="#workflows"><span class="mi"><svg width="18" height="18"><use href="#i-flow"/></svg></span><span><b>Workflow automation</b><small>Rules that move work between people and tools</small></span></a>
+            <a href="#copilot"><span class="mi mi-amber"><svg width="18" height="18"><use href="#i-spark"/></svg></span><span><b>Copilot</b><small>Questions answered from your own workspace</small></span></a>
+            <a href="#analytics"><span class="mi"><svg width="18" height="18"><use href="#i-chart"/></svg></span><span><b>Analytics</b><small>Revenue, delivery and workload, as work happens</small></span></a>
+            <a href="#tour" data-tour="5"><span class="mi"><svg width="18" height="18"><use href="#i-users"/></svg></span><span><b>Team</b><small>Who owns what, and who has room</small></span></a>
+            <a href="#integrations"><span class="mi"><svg width="18" height="18"><use href="#i-link"/></svg></span><span><b>Integrations</b><small>Connect the tools you already use</small></span></a>
           </div>
-          <a class="dd-foot" href="#product" data-feature="copilot"><svg width="16" height="16"><use href="#i-spark"/></svg><span><b>New: VELTRIX Copilot</b> Ask your operations a question in plain English</span><svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+          <a class="mega-feature" href="#tour"><span><b>Take the product tour</b><small>Scroll through the workspace, module by module</small></span><svg width="18" height="18"><use href="#i-arrow"/></svg></a>
         </div>
       </div>
-      <a class="nav-link" href="#workflows" data-section="workflows">Workflows</a>
-      <a class="nav-link" href="#results" data-section="results">Analytics</a>
-      <a class="nav-link" href="#customers" data-section="customers">Customers</a>
-      <a class="nav-link" href="#pricing" data-section="pricing">Pricing</a>
+      <div class="dd" data-dd>
+        <button class="nav-link" type="button" aria-expanded="false" aria-controls="dd-solutions">Solutions <svg width="14" height="14"><use href="#i-chev"/></svg></button>
+        <div class="dd-panel" id="dd-solutions">
+          <a href="#solutions" data-case="0"><b>Studios and agencies</b><small>Projects, approvals and billing in one place</small></a>
+          <a href="#solutions" data-case="1"><b>Client services</b><small>Onboarding and renewals without the chasing</small></a>
+          <a href="#solutions" data-case="2"><b>Operations teams</b><small>Recurring work that runs on rules</small></a>
+          <a href="#solutions" data-case="3"><b>Field and logistics</b><small>Jobs, crews and invoices kept in step</small></a>
+        </div>
+      </div>
+      <a class="nav-link" href="#integrations">Integrations</a>
+      <div class="dd" data-dd>
+        <button class="nav-link" type="button" aria-expanded="false" aria-controls="dd-resources">Resources <svg width="14" height="14"><use href="#i-chev"/></svg></button>
+        <div class="dd-panel" id="dd-resources">
+          <a href="#tour"><b>Product tour</b><small>The workspace, module by module</small></a>
+          <a href="#workflows"><b>Workflow builder demo</b><small>Inspect and run sample automations</small></a>
+          <a href="#faq"><b>Questions</b><small>What VELTRIX does, and what this page shows</small></a>
+          <button type="button" data-open-palette><b>Command menu</b><small>Jump anywhere with Ctrl K</small></button>
+        </div>
+      </div>
       <span class="nav-ind" aria-hidden="true"></span>
     </nav>
     <div class="nav-act">
-      <button class="kbd" type="button" aria-label="Open command menu" data-open-palette><kbd>Ctrl</kbd><kbd>K</kbd></button>
-      <button class="btn btn-ghost btn-sm" type="button" data-open-demo>Book a demo</button>
-      <a class="btn btn-primary btn-sm magnetic" href="#start"><span>Start free</span></a>
+      <a class="btn btn-primary btn-sm" href="#demo" data-magnetic><span>Request a demo</span><svg width="16" height="16"><use href="#i-arrow"/></svg></a>
       <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mnav"><svg width="22" height="22"><use href="#i-menu"/></svg></button>
     </div>
   </div>
 </header>
-<div class="nav-progress" aria-hidden="true"><span></span></div>
+<div class="progress" aria-hidden="true"><span></span></div>
 
 <div class="mnav" id="mnav" hidden>
   <nav aria-label="Mobile">
-    <a href="#product">Product</a><a href="#workflows">Workflows</a><a href="#results">Analytics</a><a href="#integrations">Integrations</a><a href="#customers">Customers</a><a href="#pricing">Pricing</a><a href="#faq">Questions</a>
+    <details><summary>Product <svg width="16" height="16"><use href="#i-chev"/></svg></summary><div><a href="#tour">Workspace tour</a><a href="#workflows">Workflow automation</a><a href="#copilot">Copilot</a><a href="#analytics">Analytics</a><a href="#integrations">Integrations</a></div></details>
+    <details><summary>Solutions <svg width="16" height="16"><use href="#i-chev"/></svg></summary><div><a href="#solutions" data-case="0">Studios and agencies</a><a href="#solutions" data-case="1">Client services</a><a href="#solutions" data-case="2">Operations teams</a><a href="#solutions" data-case="3">Field and logistics</a></div></details>
+    <a href="#integrations">Integrations</a>
+    <a href="#faq">Questions</a>
   </nav>
-  <div class="mnav-cta"><a class="btn btn-primary" href="#start">Start free</a><button class="btn btn-ghost-light" type="button" data-open-demo>Book a demo</button></div>
+  <a class="btn btn-primary btn-lg" href="#demo">Request a demo</a>
 </div>
-
-<!-- section rail -->
-<nav class="rail" aria-label="Page sections"></nav>
 
 <main id="main">
 
-<!-- ================= HERO ================= -->
-<section class="hero" id="top" data-name="Overview" data-theme="dark">
-  <div class="hero-bg" aria-hidden="true"><div class="hero-grid"></div><div class="hero-glow g1"></div><div class="hero-glow g2"></div></div>
+<!-- ============ HERO: the operating grid ============ -->
+<section class="hero" id="top" data-name="Overview">
   <div class="hero-copy">
-    <a class="announce" href="#product" data-feature="copilot"><span class="announce-tag">New</span>Copilot now answers questions about every project <svg width="14" height="14"><use href="#i-arrow"/></svg></a>
-    <h1 class="hero-title"><span class="ln"><span>Everything connected.</span></span><span class="ln"><span>Everything <em>moving.</em></span></span></h1>
-    <p class="hero-sub">VELTRIX is the AI operations platform for growing companies. Projects, automations, team conversation and live analytics share one workspace, so a change in one place moves everything it touches.</p>
-    <div class="hero-actions">
-      <a class="btn btn-primary btn-lg magnetic" href="#start"><span>Start your free trial</span><svg width="18" height="18"><use href="#i-arrow"/></svg></a>
-      <button class="btn btn-ghost btn-lg" type="button" data-open-demo><svg width="16" height="16"><use href="#i-play"/></svg><span>Book a 20-minute demo</span></button>
+    <p class="hero-tag"><span class="live-dot"></span>AI operations workspace</p>
+    <h1 class="hero-title"><span class="ln"><span>Every handoff,</span></span><span class="ln"><span>automated.</span></span><span class="ln ln-2"><span>Every number,</span></span><span class="ln ln-2"><span>live.</span></span></h1>
+    <p class="hero-sub">VELTRIX brings projects, workflow automation, team conversation and business analytics into one AI-assisted workspace. Work moves between people and tools on its own, and you can see where everything stands without asking.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary btn-lg" href="#demo" data-magnetic><span>Request a demo</span><svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+      <a class="btn btn-quiet btn-lg" href="#tour"><span>Take the product tour</span></a>
     </div>
-    <ul class="hero-proof">
-      <li><svg width="16" height="16"><use href="#i-check"/></svg>14 days free, no card</li>
-      <li><svg width="16" height="16"><use href="#i-check"/></svg>Import from spreadsheets in minutes</li>
-      <li><svg width="16" height="16"><use href="#i-check"/></svg>SOC 2 Type II</li>
+    <ul class="hero-modules" aria-label="What VELTRIX includes">
+      <li><svg width="15" height="15"><use href="#i-folder"/></svg>Projects</li>
+      <li><svg width="15" height="15"><use href="#i-flow"/></svg>Automations</li>
+      <li><svg width="15" height="15"><use href="#i-spark"/></svg>Copilot</li>
+      <li><svg width="15" height="15"><use href="#i-chart"/></svg>Analytics</li>
+      <li><svg width="15" height="15"><use href="#i-link"/></svg>Integrations</li>
     </ul>
   </div>
 
-  <div class="hero-visual" id="heroVisual">
-    <div class="fit" data-w="1200" data-h="720" data-wm="420">
-      <div class="app" id="app" data-view="overview">
-        <!-- sidebar -->
-        <aside class="app-side">
-          <div class="ws"><span class="ws-logo">N</span><div><b>Northbeam</b><small>42 members</small></div><svg width="14" height="14"><use href="#i-chev"/></svg></div>
-          <button class="app-search" type="button" data-open-palette><svg width="14" height="14"><use href="#i-search"/></svg>Search<kbd>Ctrl K</kbd></button>
-          <nav class="app-nav" aria-label="Product demo navigation">
-            <button class="is-on" data-app="overview"><svg width="16" height="16"><use href="#i-home"/></svg>Overview</button>
-            <button data-app="projects"><svg width="16" height="16"><use href="#i-folder"/></svg>Projects</button>
-            <button data-app="inbox"><svg width="16" height="16"><use href="#i-inbox"/></svg>Inbox<span class="badge" id="inboxBadge">3</span></button>
-            <button data-app="automations"><svg width="16" height="16"><use href="#i-zap"/></svg>Automations</button>
-          </nav>
-          <p class="app-side-h">Projects</p>
-          <ul class="app-projects">
-            <li><i style="background:var(--jade)"></i>Q4 launch<span>50%</span></li>
-            <li><i style="background:var(--saffron)"></i>Website relaunch<span>42%</span></li>
-            <li><i style="background:var(--sky)"></i>Client onboarding<span>88%</span></li>
-            <li><i style="background:var(--coral)"></i>Hiring · Support<span>30%</span></li>
-          </ul>
-          <div class="app-side-foot"><span class="av av-3">PR</span><div><b>Priya Raman</b><small>COO</small></div></div>
-        </aside>
-        <!-- main -->
-        <div class="app-main">
-          <div class="app-top">
-            <div class="crumbs"><span>Northbeam</span><svg width="12" height="12"><use href="#i-chev"/></svg><b id="appTitle">Overview</b></div>
-            <div class="app-top-r">
-              <div class="people"><span class="av av-1">MO</span><span class="av av-2">LK</span><span class="av av-4">JT</span><span class="av av-5">OA</span><span class="online"></span></div>
-              <button class="app-btn" type="button" data-copy-link><svg width="14" height="14"><use href="#i-link"/></svg>Share</button>
-            </div>
-          </div>
-
-          <!-- overview -->
-          <div class="app-view is-on" data-v="overview">
-            <div class="kpis">
-              <div class="kpi"><span>Revenue, last 30 days</span><b data-count="196.4" data-prefix="$" data-suffix="k" data-dec="1">$196.4k</b><em class="up">+12.4%</em><svg class="kspark" viewBox="0 0 80 24"><path d="M0 18 L10 16 L20 17 L30 12 L40 13 L50 9 L60 10 L70 5 L80 6" /></svg></div>
-              <div class="kpi"><span>On-time delivery</span><b data-count="93" data-suffix="%">93%</b><em class="up">+4 pts</em><div class="kbar"><i style="width:93%"></i></div></div>
-              <div class="kpi"><span>Automation runs this month</span><b id="kRuns" data-count="18420">18,420</b><em>4 rules live</em><div class="kdots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="off"></i></div></div>
-              <div class="kpi"><span>Open blockers</span><b id="kBlock">1</b><em class="down">down from 6</em><div class="kbar warn"><i style="width:18%"></i></div></div>
-            </div>
-            <div class="ov-grid">
-              <div class="card chart-card">
-                <div class="card-h"><b>Revenue recognised</b><div class="legend"><span><i class="l-jade"></i>This quarter</span><span><i class="l-dim"></i>Last quarter</span></div></div>
-                <svg class="hero-chart" id="heroChart" viewBox="0 0 520 200" preserveAspectRatio="none" aria-label="Revenue chart, rising through the quarter" role="img">
-                  <g class="hc-grid"><line x1="0" x2="520" y1="50" y2="50"/><line x1="0" x2="520" y1="100" y2="100"/><line x1="0" x2="520" y1="150" y2="150"/></g>
-                  <path class="hc-prev" d="M0 160 C 40 150, 70 158, 110 140 S 180 132, 220 128 S 300 120, 340 112 S 420 104, 460 98 S 500 92, 520 90"/>
-                  <path class="hc-area" d="M0 170 C 40 160, 70 150, 110 138 S 180 120, 220 110 S 300 86, 340 80 S 420 56, 460 46 S 500 34, 520 28 L520 200 L0 200Z"/>
-                  <path class="hc-line" d="M0 170 C 40 160, 70 150, 110 138 S 180 120, 220 110 S 300 86, 340 80 S 420 56, 460 46 S 500 34, 520 28"/>
-                  <circle class="hc-dot" cx="460" cy="46" r="5"/>
-                </svg>
-                <div class="hc-tip"><b>$46.5k</b> week 11</div>
-                <div class="hc-axis"><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span></div>
-              </div>
-              <div class="card check-card">
-                <div class="card-h"><b>Q4 launch</b><span class="pill pill-jade"><span><span id="pct">50</span>% ready</span></span></div>
-                <div class="meter"><i id="pctBar" style="width:50%"></i></div>
-                <ul class="tasks" id="tasks">
-                  <li class="task is-done" data-id="t1"><label><input type="checkbox" checked><span class="cb"><svg width="12" height="12"><use href="#i-check"/></svg></span><span class="t-title">Finalize pricing page copy</span></label><span class="av av-s av-2">LK</span></li>
-                  <li class="task is-done" data-id="t2"><label><input type="checkbox" checked><span class="cb"><svg width="12" height="12"><use href="#i-check"/></svg></span><span class="t-title">Vendor contract signed</span></label><span class="av av-s av-1">MO</span></li>
-                  <li class="task is-done" data-id="t6"><label><input type="checkbox" checked><span class="cb"><svg width="12" height="12"><use href="#i-check"/></svg></span><span class="t-title">Support macros for launch</span></label><span class="av av-s av-4">JT</span></li>
-                  <li class="task hint" data-id="t3"><label><input type="checkbox"><span class="cb"><svg width="12" height="12"><use href="#i-check"/></svg></span><span class="t-title">Design QA on onboarding</span></label><span class="due-today">Today</span><span class="av av-s av-3">PR</span></li>
-                  <li class="task" data-id="t4"><label><input type="checkbox"><span class="cb"><svg width="12" height="12"><use href="#i-check"/></svg></span><span class="t-title">Launch email · 12,400</span></label><span class="tag tag-warn" data-blocked>Waiting on QA</span><span class="av av-s av-2">LK</span></li>
-                  <li class="task" data-id="t5"><label><input type="checkbox"><span class="cb"><svg width="12" height="12"><use href="#i-check"/></svg></span><span class="t-title">Q4 revenue forecast</span></label><span class="av av-s av-5">OA</span></li>
-                </ul>
-              </div>
-              <div class="card feed-card">
-                <div class="card-h"><b>Live activity</b><span class="live"><i></i>Live</span></div>
-                <ol class="feed" id="autoLog">
-                  <li><span class="f-ico c-jade"><svg width="13" height="13"><use href="#i-zap"/></svg></span><p>Contract signed → invoice drafted in QuickBooks</p><time>09:12</time></li>
-                  <li><span class="f-ico c-sky"><svg width="13" height="13"><use href="#i-msg"/></svg></span><p>Lena shared pricing copy to #launch</p><time>08:40</time></li>
-                  <li><span class="f-ico c-saffron"><svg width="13" height="13"><use href="#i-card"/></svg></span><p>Stripe payout matched to Acme Freight</p><time>08:05</time></li>
-                </ol>
-              </div>
-            </div>
-          </div>
-
-          <!-- projects -->
-          <div class="app-view" data-v="projects">
-            <div class="pj-head"><div class="seg" role="group" aria-label="Project view"><button class="is-on" type="button">Timeline</button><button type="button" data-toast="Board view is in the product tour below">Board</button><button type="button" data-toast="List view is in the product tour below">List</button></div><span class="muted">Nov 2 – Nov 20</span></div>
-            <div class="gantt">
-              <div class="g-days"><span></span><span>Mon 2</span><span>Wed 4</span><span>Fri 6</span><span>Tue 10</span><span>Thu 12</span><span>Mon 16</span><span>Wed 18</span><span>Fri 20</span></div>
-              <div class="g-row"><span class="g-name"><i style="background:var(--jade)"></i>Vendor contract</span><span class="g-bar b-done" style="--s:0;--e:1.4">Signed v4</span></div>
-              <div class="g-row"><span class="g-name"><i style="background:var(--sky)"></i>Design QA</span><span class="g-bar b-run" style="--s:.6;--e:2.2">8 of 11 screens</span></div>
-              <div class="g-row"><span class="g-name"><i style="background:var(--saffron)"></i>Launch email</span><span class="g-bar b-wait" style="--s:2;--e:3">Waits for QA</span></div>
-              <div class="g-row"><span class="g-name"><i style="background:var(--coral)"></i>Q4 forecast</span><span class="g-bar b-run" style="--s:1.4;--e:4.2">Draft from live revenue</span></div>
-              <div class="g-row"><span class="g-name"><i style="background:var(--jade)"></i>Hire 2 agents</span><span class="g-bar b-plan" style="--s:3;--e:6.6">3 candidates in final round</span></div>
-              <div class="g-row"><span class="g-name"><i style="background:var(--sky)"></i>Website relaunch</span><span class="g-bar b-plan" style="--s:4.5;--e:8">Pages 6 of 14</span></div>
-              <div class="g-today" style="--t:.9"><span>Today</span></div>
-            </div>
-          </div>
-
-          <!-- inbox -->
-          <div class="app-view" data-v="inbox">
-            <ul class="inbox" id="inboxList">
-              <li class="unread"><span class="av av-3">PR</span><div><b>Priya mentioned you in Design QA</b><p>Can you sign off step 3 before noon?</p></div><time>10:15</time><button class="app-btn" type="button" data-done>Done</button></li>
-              <li class="unread"><span class="f-ico c-coral"><svg width="14" height="14"><use href="#i-alert"/></svg></span><div><b>Launch email may slip one day</b><p>Monitoring flagged it: it waits on Design QA.</p></div><time>09:58</time><button class="app-btn" type="button" data-done>Done</button></li>
-              <li class="unread"><span class="f-ico c-jade"><svg width="14" height="14"><use href="#i-card"/></svg></span><div><b>Acme Freight paid invoice 2287</b><p>Milestone “Kickoff” closed automatically.</p></div><time>09:30</time><button class="app-btn" type="button" data-done>Done</button></li>
-              <li><span class="av av-5">OA</span><div><b>Omar shared the Q4 forecast draft</b><p>Built from live Stripe data, 3 open questions.</p></div><time>Mon</time><button class="app-btn" type="button" data-done>Done</button></li>
-            </ul>
-          </div>
-
-          <!-- automations -->
-          <div class="app-view" data-v="automations">
-            <ul class="mini-rules">
-              <li><span class="f-ico c-saffron"><svg width="14" height="14"><use href="#i-zap"/></svg></span><div><b>Deal closes → open onboarding project</b><p>HubSpot · VELTRIX · Slack · 1,284 runs</p></div><button class="switch is-on" role="switch" aria-checked="true" aria-label="Onboarding rule"><i></i></button></li>
-              <li><span class="f-ico c-coral"><svg width="14" height="14"><use href="#i-clock"/></svg></span><div><b>Overdue 2 days → tell the owner's lead</b><p>VELTRIX · Slack · 312 runs</p></div><button class="switch is-on" role="switch" aria-checked="true" aria-label="Overdue rule"><i></i></button></li>
-              <li><span class="f-ico c-jade"><svg width="14" height="14"><use href="#i-card"/></svg></span><div><b>Invoice paid → close the milestone</b><p>Stripe · VELTRIX · 486 runs</p></div><button class="switch is-on" role="switch" aria-checked="true" aria-label="Invoice rule"><i></i></button></li>
-              <li><span class="f-ico c-sky"><svg width="14" height="14"><use href="#i-mail"/></svg></span><div><b>Friday 4pm → send the weekly summary</b><p>VELTRIX · Email · 52 runs</p></div><button class="switch is-on" role="switch" aria-checked="true" aria-label="Weekly summary rule"><i></i></button></li>
-            </ul>
-          </div>
+  <div class="hero-stage" id="heroStage">
+    <div class="tower" aria-hidden="true">
+      <div class="tower-grid" id="towerGrid"></div>
+      <div class="tower-signals" id="towerSignals"></div>
+    </div>
+    <div class="fit" data-w="640" data-h="560" data-wm="420">
+      <div class="ui hero-ws" id="heroWs" data-depth="1">
+        <div class="ui-bar"><span class="ui-dots"><i></i><i></i><i></i></span><b>Northbeam · Workspace</b><span class="ui-chip">Sample workspace</span></div>
+        <div class="hw-kpis">
+          <div class="hw-kpi"><span>Revenue, 30 days</span><b id="hwRevenue">$0</b><em class="up" id="hwRevenueDelta">+0%</em></div>
+          <div class="hw-kpi"><span>On time</span><b id="hwOntime">0%</b><em id="hwOntimeDelta">0 pts</em></div>
+          <div class="hw-kpi"><span>Automation runs</span><b id="hwRuns">0</b><em>last 30 days</em></div>
+        </div>
+        <div class="hw-projects">
+          <div class="hw-h"><b>Active projects</b><span>4</span></div>
+          <div class="hw-row" data-p="0"><i class="pd pd-blue"></i><span class="hw-n">Q4 product launch</span><span class="hw-bar"><i style="--v:.62"></i></span><span class="hw-s s-warn">At risk</span></div>
+          <div class="hw-row" data-p="1"><i class="pd pd-amber"></i><span class="hw-n">Website relaunch</span><span class="hw-bar"><i style="--v:.42"></i></span><span class="hw-s s-ok">On track</span></div>
+          <div class="hw-row" data-p="2"><i class="pd pd-green"></i><span class="hw-n">Acme Freight onboarding</span><span class="hw-bar"><i style="--v:.88"></i></span><span class="hw-s s-ok">On track</span></div>
+          <div class="hw-row" data-p="3"><i class="pd pd-red"></i><span class="hw-n">Support hiring</span><span class="hw-bar"><i style="--v:.3"></i></span><span class="hw-s s-bad">Behind</span></div>
         </div>
       </div>
-
-      <!-- floating layers -->
-      <div class="float f-copilot" data-depth="18">
-        <div class="fc-h"><span class="fc-spark"><svg width="14" height="14"><use href="#i-spark"/></svg></span><b>Copilot</b><span class="muted">just now</span></div>
-        <p id="copilotText">If Design QA closes today, the launch email can still go out on Thursday. Want me to tell Lena?</p>
-        <div class="fc-act"><button class="app-btn app-btn-primary" type="button" id="copilotYes">Tell Lena</button><button class="app-btn" type="button" id="copilotNo">Not now</button></div>
+      <div class="ui hero-card hc-flow" data-depth="2">
+        <div class="hc-h"><span class="ic ic-blue"><svg width="13" height="13"><use href="#i-flow"/></svg></span><b>Automation ran</b><time id="hcFlowTime">just now</time></div>
+        <p id="hcFlowText">Deal marked won → onboarding project created, Priya assigned</p>
+        <div class="hc-steps"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
       </div>
-      <div class="float f-deal" data-depth="26">
-        <span class="f-ico c-jade"><svg width="14" height="14"><use href="#i-check"/></svg></span>
-        <div><b>Deal closed · Acme Freight</b><small>$48,000 · onboarding project opened</small></div>
+      <div class="ui hero-card hc-ai" data-depth="3">
+        <div class="hc-h"><span class="ic ic-amber"><svg width="13" height="13"><use href="#i-spark"/></svg></span><b>Copilot</b><time>suggestion</time></div>
+        <p id="hcAiText">Design QA is 3 screens from done. If it closes today, the launch email can still go out Thursday.</p>
+        <div class="hc-act"><button class="ui-btn ui-btn-primary" type="button" id="hcAiYes">Remind Lena</button><button class="ui-btn" type="button" id="hcAiNo">Dismiss</button></div>
       </div>
-      <div class="float f-run" data-depth="12">
-        <div class="fr-nodes"><span>HubSpot</span><i></i><span class="core">VELTRIX</span><i></i><span>Slack</span></div>
-        <small><span id="runCount">18,420</span> runs this month · 0 failed</small>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= LOGOS ================= -->
-<section class="logos" aria-label="Example customers" data-theme="dark">
-  <p>Illustrative customer names: teams of 20 to 400 people running operations on VELTRIX</p>
-  <div class="marquee"><div class="marquee-track">
-    <span class="lg lg-1">Northbeam</span><span class="lg lg-2">Acme Freight</span><span class="lg lg-3">holloway</span><span class="lg lg-4">BRIGHTLINE</span><span class="lg lg-5">Kessler&amp;Ode</span><span class="lg lg-6">fjord coffee</span><span class="lg lg-7">MARLOW</span><span class="lg lg-8">Tessera</span>
-    <span class="lg lg-1" aria-hidden="true">Northbeam</span><span class="lg lg-2" aria-hidden="true">Acme Freight</span><span class="lg lg-3" aria-hidden="true">holloway</span><span class="lg lg-4" aria-hidden="true">BRIGHTLINE</span><span class="lg lg-5" aria-hidden="true">Kessler&amp;Ode</span><span class="lg lg-6" aria-hidden="true">fjord coffee</span><span class="lg lg-7" aria-hidden="true">MARLOW</span><span class="lg lg-8" aria-hidden="true">Tessera</span>
-  </div></div>
-</section>
-
-<!-- ================= PROBLEM → SOLUTION (pinned) ================= -->
-<section class="problem" id="problem" data-name="The problem">
-  <div class="problem-pin">
-    <div class="problem-copy">
-      <p class="sec-kicker"><span class="dot dot-coral"></span>The problem</p>
-      <div class="scrub-wrap"><h2 class="scrub-text" id="scrubText">Your launch lives in six tools, nine status meetings a week and one spreadsheet nobody trusts.</h2>
-      <h2 class="scrub-after" id="scrubAfter">VELTRIX puts it on one board that answers the question before anyone asks it.</h2></div>
-      <dl class="problem-stats">
-        <div><dt>Tools to check</dt><dd><span id="psTools">6</span></dd></div>
-        <div><dt>Status meetings a week</dt><dd><span id="psMeet">9</span></dd></div>
-        <div><dt>Hours spent chasing</dt><dd><span id="psHours">9.5</span><small>h</small></dd></div>
-      </dl>
-      <p class="fineprint">Illustrative example: Northbeam Studio, 42 people.</p>
-    </div>
-    <div class="problem-stage" id="problemStage">
-      <div class="fit" data-w="760" data-h="600" data-wm="420" data-vh="170">
-        <div class="chaos">
-          <div class="m m-mail" data-x="-40" data-y="-30" data-r="-5">
-            <div class="m-h"><svg width="14" height="14"><use href="#i-mail"/></svg><b>Inbox</b><span class="m-bad">23 unread</span></div>
-            <p><b>RE: RE: FW: launch date??</b><span>Omar: I thought we said the 12th?</span></p>
-            <p><b>Vendor contract, which version</b><span>Maya: attaching v4, ignore v3</span></p>
-            <p><b>Can someone own the forecast</b><span>Priya: bumping this again</span></p>
-          </div>
-          <div class="m m-sheet" data-x="30" data-y="20" data-r="3">
-            <div class="m-h"><svg width="14" height="14"><use href="#i-file"/></svg><b>Q4_tracker_FINAL_v3.xlsx</b><span class="m-bad">5 editors</span></div>
-            <table><tr><th>Task</th><th>Owner</th><th>Status</th></tr><tr><td>Launch email</td><td>?</td><td class="bad">On track</td></tr><tr><td>Design QA</td><td>Priya</td><td>Done?</td></tr><tr><td>Forecast</td><td></td><td class="bad">#REF!</td></tr><tr><td>Hiring</td><td>Jonas</td><td>See email</td></tr></table>
-          </div>
-          <div class="m m-chat" data-x="-30" data-y="40" data-r="4">
-            <div class="m-h"><svg width="14" height="14"><use href="#i-msg"/></svg><b>#launch</b><span>14 new</span></div>
-            <p><b>Lena</b> does anyone know who owns the vendor contract</p><p><b>Omar</b> thought it was ops?</p><p><b>Maya</b> it's in my drafts, sending tonight</p>
-          </div>
-          <div class="m m-cal" data-x="40" data-y="-40" data-r="-3">
-            <div class="m-h"><svg width="14" height="14"><use href="#i-cal"/></svg><b>Monday</b><span class="m-bad">4 meetings</span></div>
-            <span>09:00 Launch sync</span><span>11:30 Ops check-in</span><span>14:00 Where are we on QA</span><span>16:30 Launch sync (again)</span>
-          </div>
-          <div class="m m-note" data-x="20" data-y="50" data-r="7">ask omar re forecast<br>email lena the QA list<br><b>WHERE IS v4</b></div>
-        </div>
-        <div class="order">
-          <div class="o-h"><svg width="18" height="18"><use href="#mark"/></svg><b>Q4 launch</b><span class="pill pill-jade">On track</span><span class="muted">Status meeting cancelled</span></div>
-          <div class="o-rows">
-            <div class="o-row"><span class="o-n"><i class="c-jade"></i>Vendor contract</span><span class="av av-s av-1">MO</span><span class="pill pill-jade">Signed v4</span><span class="o-d">Oct 30</span></div>
-            <div class="o-row"><span class="o-n"><i class="c-sky"></i>Design QA</span><span class="av av-s av-3">PR</span><span class="pill pill-sky">8 of 11</span><span class="o-d">Today</span></div>
-            <div class="o-row"><span class="o-n"><i class="c-saffron"></i>Launch email</span><span class="av av-s av-2">LK</span><span class="pill pill-saffron">Starts after QA</span><span class="o-d">Nov 5</span></div>
-            <div class="o-row"><span class="o-n"><i class="c-coral"></i>Q4 forecast</span><span class="av av-s av-5">OA</span><span class="pill pill-sky">Draft, live data</span><span class="o-d">Nov 7</span></div>
-            <div class="o-row"><span class="o-n"><i class="c-jade"></i>Hire 2 agents</span><span class="av av-s av-4">JT</span><span class="pill">3 in final round</span><span class="o-d">Nov 12</span></div>
-          </div>
-          <div class="o-foot"><span><svg width="14" height="14"><use href="#i-zap"/></svg>3 rules keep this board current</span><span>Updated 2 min ago</span></div>
-        </div>
+      <div class="ui hero-card hc-chart" data-depth="2">
+        <div class="hc-h"><b>Revenue, 12 weeks</b><span class="ui-chip">Sample</span></div>
+        <svg viewBox="0 0 220 70" class="hc-spark" aria-hidden="true"><path id="hcSparkArea" class="sa"/><path id="hcSparkLine" class="sl"/></svg>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= PLAYGROUND: notes → tasks ================= -->
-<section class="play" id="notes" data-name="Copilot playground">
-  <div class="sec-head">
-    <p class="sec-kicker"><span class="dot dot-saffron"></span>Try it here</p>
-    <h2 class="h2 split-words">Paste a meeting note. <em>Get a plan.</em></h2>
-    <p class="sec-sub">Edit the meeting note. Copilot reads owners, dates and urgency as you type, then files each line as a task in the right project.</p>
-  </div>
-  <div class="play-frame">
-    <div class="play-in">
-      <div class="pi-h"><span class="pi-dots"><i></i><i></i><i></i></span><label for="noteInput">ops-sync-notes.txt</label><span class="muted">Editable</span></div>
-      <textarea id="noteInput" class="note" spellcheck="false" rows="8">ops sync — tue
-maya to finish vendor contract by fri
-need Q4 forecast, omar, next wed !!
-lena: onboarding checklist for 3 new hires
-invoice 2291 overdue, chase finance tomorrow</textarea>
-      <div class="pi-chips"><span class="muted">Try:</span><button type="button" data-add="priya to review the homepage tomorrow">priya … tomorrow</button><button type="button" data-add="jonas: hire two support agents by fri !!">jonas … !!</button><button type="button" data-add="book kickoff with acme freight next mon">… next mon</button></div>
+<!-- ============ INTRO: what changes ============ -->
+<section class="why" id="why" data-name="Why VELTRIX">
+  <div class="why-grid">
+    <div class="why-copy">
+      <h2 class="why-h">Operations break in the gaps between tools.</h2>
+      <p class="why-statement" id="whyStatement">A project lives in one app, the conversation about it in another, the invoice in a third and the numbers in a spreadsheet someone updates on Fridays. Nobody owns the handoffs, so people chase them. VELTRIX closes those gaps: one workspace where the work, the rules that move it and the numbers it produces are the same thing.</p>
     </div>
-    <div class="play-bridge" aria-hidden="true"><span class="pb-dot"></span><span class="pb-spark"><svg width="18" height="18"><use href="#i-spark"/></svg></span><span class="pb-dot"></span></div>
-    <div class="play-out">
-      <div class="po-h"><span class="ai-chip"><svg width="12" height="12"><use href="#i-spark"/></svg>Copilot</span><b class="po-title">Ops sync</b><span class="muted" id="parsedCount">5 tasks</span></div>
-      <div class="po-cols"><span>Task</span><span>Project</span><span>Owner</span><span>Due</span></div>
-      <ul class="parsed-list" id="parsedList"></ul><p class="sr-only" id="parsedLive" aria-live="polite"></p>
-      <div class="po-foot"><span class="muted" id="parsedMeta">3 owners notified on save</span><button class="btn btn-primary btn-sm" type="button" id="parsedSave">Add to Q4 launch</button></div>
-    </div>
+    <figure class="why-media">
+      <div class="why-mask"><img src="assets/img/tower.jpg" alt="A tower at night with dozens of lit office floors" width="2400" height="1500" loading="lazy"></div>
+      <figcaption>Many teams, one structure.</figcaption>
+    </figure>
   </div>
+  <ol class="why-rail" aria-label="What VELTRIX connects">
+    <li><svg viewBox="0 0 48 48" class="glyph" aria-hidden="true"><rect x="8" y="10" width="32" height="28" rx="4"/><path d="M8 18h32M16 26h10M16 31h16"/></svg><b>Projects</b><span>Boards, timelines and owners that update when the work does.</span></li>
+    <li><svg viewBox="0 0 48 48" class="glyph" aria-hidden="true"><rect x="6" y="8" width="14" height="10" rx="3"/><rect x="28" y="30" width="14" height="10" rx="3"/><path d="M13 18v8a4 4 0 004 4h11"/></svg><b>Automations</b><span>Plain-language rules for every handoff, with a log of each run.</span></li>
+    <li><svg viewBox="0 0 48 48" class="glyph" aria-hidden="true"><path d="M24 6l4 11 11 4-11 4-4 11-4-11-11-4 11-4z"/></svg><b>Copilot</b><span>Answers about your operations, drawn from the workspace itself.</span></li>
+    <li><svg viewBox="0 0 48 48" class="glyph" aria-hidden="true"><path d="M8 40V8M8 40h32M15 32V22M23 32V14M31 32V26M39 32V18"/></svg><b>Analytics</b><span>Revenue, delivery and workload read from the work, not exports.</span></li>
+    <li><svg viewBox="0 0 48 48" class="glyph" aria-hidden="true"><circle cx="24" cy="24" r="6"/><circle cx="8" cy="10" r="3"/><circle cx="40" cy="10" r="3"/><circle cx="8" cy="38" r="3"/><circle cx="40" cy="38" r="3"/><path d="M10 12l9 8M38 12l-9 8M10 36l9-8M38 36l-9-8"/></svg><b>Integrations</b><span>Two-way connections to the tools your team already uses.</span></li>
+  </ol>
 </section>
 
-<!-- ================= WORKFLOW (pinned) ================= -->
-<section class="flow" id="workflows" data-name="Workflows" data-theme="dark">
-  <div class="flow-pin">
-    <div class="flow-copy">
-      <p class="sec-kicker"><span class="dot dot-jade"></span>Automations</p>
-      <h2 class="h2">Write the rule once. <em>It runs forever.</em></h2>
-      <ol class="flow-steps">
-        <li class="is-on" data-step="0"><span class="fs-bar"><i></i></span><div><p class="step-lead">Connect the tools you already use</p><p>Two-way sync with your CRM, chat, billing and calendar. Nothing to migrate on day one.</p></div></li>
-        <li data-step="1"><span class="fs-bar"><i></i></span><div><p class="step-lead">Describe what should happen</p><p>Copilot turns a sentence into a rule with a trigger, conditions and actions you can read back.</p></div></li>
-        <li data-step="2"><span class="fs-bar"><i></i></span><div><p class="step-lead">Watch every run, in the open</p><p>Each run is logged with inputs, timing and result, so nothing happens that you can't trace.</p></div></li>
+<!-- ============ SEQUENCE 1: from disconnected to connected (pinned) ============ -->
+<section class="connect" id="connect" data-name="Connected" data-theme="dark">
+  <div class="connect-pin">
+    <div class="connect-copy">
+      <p class="sec-tag">From scattered to connected</p>
+      <ol class="cx-steps" id="cxSteps">
+        <li class="is-on"><b>Seven tools, seven versions of the truth.</b><span>Email, chat, a tracker, the CRM, calendars, docs and invoices each hold part of the picture.</span></li>
+        <li><b>VELTRIX connects to each of them.</b><span>Two-way links, so nothing has to be migrated on day one.</span></li>
+        <li><b>Handoffs start running on rules.</b><span>When something changes in one tool, the next step happens in another.</span></li>
+        <li><b>Information falls into place.</b><span>Updates are filed against the right project, owner and deadline.</span></li>
+        <li><b>One workspace holds it all.</b><span>The same tasks, people and numbers, in one place.</span></li>
+        <li><b>Clarity, and control.</b><span>You can see what is on track, what is at risk and what to do next.</span></li>
       </ol>
+      <div class="cx-meter" aria-hidden="true"><span id="cxMeter"></span></div>
     </div>
-    <div class="flow-stage">
-      <div class="fit" data-w="760" data-h="560" data-min="0.66" data-vh="160">
-        <div class="canvas" id="canvas" data-step="0">
-          <div class="cv-top">
-            <div class="crumbs"><svg width="14" height="14"><use href="#i-zap"/></svg><b>Client onboarding</b><span class="muted">Rule v3</span></div>
-            <div class="cv-status"><span class="live"><i></i><span id="canvasState">Connecting</span></span></div>
-            <button class="app-btn app-btn-primary" type="button" id="runTest"><svg width="12" height="12"><use href="#i-play"/></svg>Run test</button>
+    <div class="connect-stage" id="connectStage">
+      <div class="fit" data-w="980" data-h="620" data-wm="420">
+        <div class="cx" id="cx">
+          <svg class="cx-lines" viewBox="0 0 980 620" aria-hidden="true"><g id="cxPaths"></g><g id="cxPulses"></g></svg>
+          <div class="cx-hub" id="cxHub"><span class="brand-mark big"><i></i><i></i><i></i><i></i><i></i></span><b>VELTRIX</b></div>
+          <div class="cx-ws ui" id="cxWs">
+            <div class="ui-bar"><span class="ui-dots"><i></i><i></i><i></i></span><b>Q4 product launch</b><span class="ui-chip">Sample workspace</span></div>
+            <div class="cxw-body">
+              <div class="cxw-col"><p class="cxw-h">Work</p><div class="cxw-slot" data-slot="0"></div><div class="cxw-slot" data-slot="1"></div><div class="cxw-slot" data-slot="2"></div></div>
+              <div class="cxw-col"><p class="cxw-h">People &amp; time</p><div class="cxw-slot" data-slot="3"></div><div class="cxw-slot" data-slot="4"></div></div>
+              <div class="cxw-col"><p class="cxw-h">Money</p><div class="cxw-slot" data-slot="5"></div><div class="cxw-slot" data-slot="6"></div></div>
+            </div>
+            <div class="cxw-foot" id="cxFoot"><span><i class="pd pd-green"></i>12 tasks on track</span><span><i class="pd pd-amber"></i>1 at risk: Design QA</span><span><i class="pd pd-blue"></i>3 rules running</span><span class="cxw-next">Next: confirm QA by Thursday</span></div>
           </div>
-          <div class="rule-bar"><span class="ai-chip"><svg width="12" height="12"><use href="#i-spark"/></svg>Rule</span><span class="rule-text" id="ruleText"></span><span class="caret"></span></div>
-          <div class="graph" id="graph">
-            <svg class="edges" viewBox="0 0 720 336" preserveAspectRatio="none" aria-hidden="true">
-              <path id="e1" d="M170 70 C 250 70, 250 170, 300 170"/>
-              <path id="e2" d="M170 270 C 250 270, 250 170, 300 170"/>
-              <path id="e3" d="M440 170 C 500 170, 500 70, 550 70"/>
-              <path id="e4" d="M440 170 C 500 170, 500 170, 550 170"/>
-              <path id="e5" d="M440 170 C 500 170, 500 270, 550 270"/>
-            </svg>
-            <div class="node n-src" style="left:14px;top:38px" data-links="e1"><span class="n-ico c-coral"><svg width="14" height="14"><use href="#i-target"/></svg></span><div><span class="n-k">HubSpot · trigger</span><b>Deal closed-won</b><em class="n-c">Connected</em></div></div>
-            <div class="node n-src" style="left:14px;top:238px" data-links="e2"><span class="n-ico c-sky"><svg width="14" height="14"><use href="#i-cal"/></svg></span><div><span class="n-k">Calendar · trigger</span><b>Kickoff booked</b><em class="n-c">Connected</em></div></div>
-            <div class="node n-core" style="left:300px;top:126px" data-links="e1 e2 e3 e4 e5"><span class="n-ico"><svg width="16" height="16"><use href="#mark"/></svg></span><div><span class="n-k">VELTRIX</span><b>Open onboarding project</b><em class="n-c">Template · 14 tasks</em></div></div>
-            <div class="node n-act" style="left:550px;top:42px" data-links="e3"><span class="n-ico c-jade"><svg width="14" height="14"><use href="#i-users"/></svg></span><div><span class="n-k">Assign</span><b>Priya R.</b></div></div>
-            <div class="node n-act" style="left:550px;top:142px" data-links="e4"><span class="n-ico c-saffron"><svg width="14" height="14"><use href="#i-msg"/></svg></span><div><span class="n-k">Slack</span><b>Post in #wins</b></div></div>
-            <div class="node n-act" style="left:550px;top:242px" data-links="e5"><span class="n-ico c-sky"><svg width="14" height="14"><use href="#i-card"/></svg></span><div><span class="n-k">Stripe</span><b>Kickoff invoice</b></div></div>
-            <span class="pulse p1"></span><span class="pulse p2"></span><span class="pulse p3"></span>
-          </div>
-          <div class="run-log" id="runLog">
-            <div class="run-row"><span class="ok"><svg width="10" height="10"><use href="#i-check"/></svg></span><b>Run 1,284</b><span>Acme Freight</span><span class="muted">3 actions</span><span class="muted">2.1 s</span></div>
+          <div id="cxTiles"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SEQUENCE 2: product tour (pinned) ============ -->
+<section class="tour" id="tour" data-name="Product tour">
+  <div class="tour-pin">
+    <div class="tour-copy">
+      <p class="sec-tag">Product tour</p>
+      <h2 class="h2">One workspace, <span class="accent">six views of it.</span></h2>
+      <div class="tour-steps" id="tourSteps">
+        <article class="is-on" data-v="overview"><b>Overview</b><p>Every project, its owner, its risk and the numbers it moves, on the first screen you open.</p></article>
+        <article data-v="projects"><b>Projects</b><p>Boards and timelines over the same tasks. Move a card and every view, report and rule follows.</p></article>
+        <article data-v="workflows"><b>Workflows</b><p>Rules written in plain language, each run logged with what triggered it and what it did.</p></article>
+        <article data-v="copilot"><b>Copilot</b><p>Ask a question about your operations and get an answer that points to the work it came from.</p></article>
+        <article data-v="analytics"><b>Analytics</b><p>Revenue, delivery and cycle time calculated from the tasks and invoices themselves.</p></article>
+        <article data-v="team"><b>Team</b><p>Who is on what this week, who is overloaded, and who has room.</p></article>
+        <article data-v="all"><b>All of it, connected</b><p>Six views of one set of tasks, people and numbers. Change something once and it is current everywhere.</p></article>
+      </div>
+      <div class="tour-dots" aria-hidden="true"></div>
+    </div>
+    <div class="tour-stage" id="tourStage">
+      <div class="fit" data-w="900" data-h="580" data-wm="420">
+        <div class="ui app" id="app" data-view="overview">
+          <aside class="app-side">
+            <div class="app-ws"><span class="app-ws-logo">N</span><div><b>Northbeam</b><small>Sample workspace</small></div></div>
+            <nav class="app-nav" aria-label="Workspace views">
+              <button type="button" class="is-on" aria-current="page" data-v="overview"><svg width="15" height="15"><use href="#i-grid"/></svg>Overview</button>
+              <button type="button" data-v="projects"><svg width="15" height="15"><use href="#i-folder"/></svg>Projects</button>
+              <button type="button" data-v="workflows"><svg width="15" height="15"><use href="#i-flow"/></svg>Workflows</button>
+              <button type="button" data-v="copilot"><svg width="15" height="15"><use href="#i-spark"/></svg>Copilot</button>
+              <button type="button" data-v="analytics"><svg width="15" height="15"><use href="#i-chart"/></svg>Analytics</button>
+              <button type="button" data-v="team"><svg width="15" height="15"><use href="#i-users"/></svg>Team</button>
+            </nav>
+            <div class="app-side-foot"><span class="av av-3">PR</span><div><b>Priya R.</b><small>Operations lead</small></div></div>
+          </aside>
+          <div class="app-main">
+            <div class="app-top"><span class="crumb">Northbeam <svg width="12" height="12"><use href="#i-chev"/></svg> <b id="appCrumb">Overview</b></span><span class="people"><span class="av av-1">MO</span><span class="av av-2">LK</span><span class="av av-4">JT</span><span class="av av-5">OA</span></span></div>
+            <div class="views">
+              <div class="v is-on" data-v="overview">
+                <div class="ov-kpis"><div><span>Revenue, 30 days</span><b data-kpi="rev30">$0</b></div><div><span>On-time delivery</span><b data-kpi="ontime30">0%</b></div><div><span>Avg. cycle time</span><b data-kpi="cycle30">0 d</b></div><div><span>Automation runs</span><b data-kpi="runs30">0</b></div></div>
+                <div class="ov-grid">
+                  <div class="panel"><p class="ph">Projects</p>
+                    <div class="pl"><i class="pd pd-blue"></i><span>Q4 product launch</span><em class="s-warn">At risk</em><small>62%</small></div>
+                    <div class="pl"><i class="pd pd-amber"></i><span>Website relaunch</span><em class="s-ok">On track</em><small>42%</small></div>
+                    <div class="pl"><i class="pd pd-green"></i><span>Acme Freight onboarding</span><em class="s-ok">On track</em><small>88%</small></div>
+                    <div class="pl"><i class="pd pd-red"></i><span>Support hiring</span><em class="s-bad">Behind</em><small>30%</small></div>
+                  </div>
+                  <div class="panel"><p class="ph">Today</p>
+                    <div class="act"><span class="ic ic-blue"><svg width="12" height="12"><use href="#i-flow"/></svg></span><p>Onboarding rule ran for Acme Freight</p><time>09:12</time></div>
+                    <div class="act"><span class="ic ic-amber"><svg width="12" height="12"><use href="#i-spark"/></svg></span><p>Copilot flagged Design QA as the launch blocker</p><time>09:40</time></div>
+                    <div class="act"><span class="ic ic-green"><svg width="12" height="12"><use href="#i-card"/></svg></span><p>Invoice 2287 paid, milestone closed</p><time>10:05</time></div>
+                    <div class="act"><span class="ic"><svg width="12" height="12"><use href="#i-msg"/></svg></span><p>Lena commented on Launch email</p><time>10:31</time></div>
+                  </div>
+                </div>
+              </div>
+              <div class="v" data-v="projects">
+                <div class="kb">
+                  <div class="kb-col"><p class="ph">To do <span>3</span></p><div class="kc"><b>Launch email</b><span class="tg tg-amber">Waits on QA</span><i class="av av-2">LK</i></div><div class="kc"><b>Q4 forecast</b><span class="tg">Finance</span><i class="av av-5">OA</i></div><div class="kc"><b>Press kit</b><span class="tg">Marketing</span><i class="av av-2">LK</i></div></div>
+                  <div class="kb-col"><p class="ph">In progress <span>2</span></p><div class="kc kc-hot"><b>Design QA, onboarding flow</b><span class="kp"><i style="width:73%"></i></span><span class="tg tg-blue">8 of 11 screens</span><i class="av av-3">PR</i></div><div class="kc"><b>Pricing page build</b><span class="kp"><i style="width:55%"></i></span><span class="tg">Product</span><i class="av av-3">PR</i></div></div>
+                  <div class="kb-col"><p class="ph">Done <span>3</span></p><div class="kc kc-done"><b>Vendor contract</b><i class="av av-1">MO</i></div><div class="kc kc-done"><b>Pricing copy</b><i class="av av-2">LK</i></div><div class="kc kc-done"><b>Support macros</b><i class="av av-4">JT</i></div></div>
+                </div>
+              </div>
+              <div class="v" data-v="workflows">
+                <div class="wf-list">
+                  <div class="wfr"><span class="ic ic-blue"><svg width="13" height="13"><use href="#i-target"/></svg></span><div><b>When a deal is won, open an onboarding project</b><small>CRM → VELTRIX → Chat · ran 9 times this month</small></div><span class="tg tg-green">On</span></div>
+                  <div class="wfr"><span class="ic ic-amber"><svg width="13" height="13"><use href="#i-clock"/></svg></span><div><b>When a task is 2 days late, tell the owner's lead</b><small>VELTRIX → Chat · ran 14 times this month</small></div><span class="tg tg-green">On</span></div>
+                  <div class="wfr"><span class="ic ic-green"><svg width="13" height="13"><use href="#i-card"/></svg></span><div><b>When an invoice is paid, close the milestone</b><small>Billing → VELTRIX · ran 11 times this month</small></div><span class="tg tg-green">On</span></div>
+                  <div class="wfr wfr-off"><span class="ic"><svg width="13" height="13"><use href="#i-users"/></svg></span><div><b>When a hire signs, create a first-week checklist</b><small>Hiring → VELTRIX · paused</small></div><span class="tg">Paused</span></div>
+                </div>
+              </div>
+              <div class="v" data-v="copilot">
+                <div class="cp-mini">
+                  <div class="cpm cpm-me">Which project is most at risk this week?</div>
+                  <div class="cpm cpm-ai"><span class="ic ic-amber"><svg width="12" height="12"><use href="#i-spark"/></svg></span><p><b>Q4 product launch.</b> Design QA has 3 screens left and the launch email waits on it. Closing QA by Thursday keeps the launch date.</p></div>
+                  <div class="cpm-src"><span>Design QA task</span><span>Launch timeline</span><span>QA thread</span></div>
+                </div>
+              </div>
+              <div class="v" data-v="analytics">
+                <div class="an-mini"><div class="anm-h"><b>Revenue, last 12 weeks</b><span data-kpi="rev84">$0</span></div><svg viewBox="0 0 600 220" class="anm-chart" id="tourChart" aria-hidden="true"></svg></div>
+              </div>
+              <div class="v" data-v="team">
+                <div class="tm">
+                  <div class="tmr"><span class="av av-3">PR</span><b>Priya R.</b><span class="tmb"><i style="width:92%" class="hot"></i></span><small>37 h</small></div>
+                  <div class="tmr"><span class="av av-2">LK</span><b>Lena K.</b><span class="tmb"><i style="width:70%"></i></span><small>28 h</small></div>
+                  <div class="tmr"><span class="av av-1">MO</span><b>Maya O.</b><span class="tmb"><i style="width:58%"></i></span><small>23 h</small></div>
+                  <div class="tmr"><span class="av av-5">OA</span><b>Omar A.</b><span class="tmb"><i style="width:45%"></i></span><small>18 h</small></div>
+                  <div class="tmr"><span class="av av-4">JT</span><b>Jonas T.</b><span class="tmb"><i style="width:50%"></i></span><small>20 h</small></div>
+                  <p class="tm-note"><svg width="13" height="13"><use href="#i-spark"/></svg>Priya is at 92% of capacity. Moving “Pricing page build” to Omar would bring her to 78%.</p>
+                </div>
+              </div>
+              <div class="v" data-v="all">
+                <div class="allv">
+                  <svg class="allv-lines" aria-hidden="true"></svg>
+                  <button type="button" class="allc" data-go="overview"><svg width="16" height="16"><use href="#i-grid"/></svg><b>Overview</b><small>4 projects, 1 at risk</small></button>
+                  <button type="button" class="allc" data-go="projects"><svg width="16" height="16"><use href="#i-folder"/></svg><b>Projects</b><small>8 tasks this week</small></button>
+                  <button type="button" class="allc" data-go="workflows"><svg width="16" height="16"><use href="#i-flow"/></svg><b>Workflows</b><small>3 rules on</small></button>
+                  <button type="button" class="allc" data-go="copilot"><svg width="16" height="16"><use href="#i-spark"/></svg><b>Copilot</b><small>1 suggestion</small></button>
+                  <button type="button" class="allc" data-go="analytics"><svg width="16" height="16"><use href="#i-chart"/></svg><b>Analytics</b><small data-kpi="rev30">$0</small></button>
+                  <button type="button" class="allc" data-go="team"><svg width="16" height="16"><use href="#i-users"/></svg><b>Team</b><small>1 person over 90%</small></button>
+                  <div class="allv-core"><span class="brand-mark"><i></i><i></i><i></i><i></i><i></i></span></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -391,345 +341,245 @@ invoice 2291 overdue, chase finance tomorrow</textarea>
   </div>
 </section>
 
-<!-- ================= CINEMATIC IMAGE ================= -->
-<section class="cine" id="cine" data-name="One structure" data-theme="dark">
-  <div class="cine-pin">
-    <div class="cine-media"><img src="assets/img/cables.jpg" alt="Suspension bridge cables fanning out from a single stone tower, seen from below" width="2400" height="1400"></div>
-    <div class="cine-scrim" aria-hidden="true"></div>
-    <div class="cine-copy">
-      <h2 class="cine-h"><span class="ln"><span>Every line</span></span><span class="ln"><span>runs to <em>one tower.</em></span></span></h2>
-      <p>Projects, rules, conversations and numbers all hang from the same structure in VELTRIX. Pull on one and you can see exactly what it carries.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ================= FEATURE EXPLORER ================= -->
-<section class="features" id="product" data-name="Product">
-  <div class="sec-head sec-head-split">
+<!-- ============ WORKFLOW BUILDER ============ -->
+<section class="wfb" id="workflows" data-name="Workflows" data-theme="dark">
+  <div class="sec-head">
     <div>
-      <p class="sec-kicker"><span class="dot dot-jade"></span>The platform</p>
-      <h2 class="h2 split-words">Five modules. <em>One source of truth.</em></h2>
+      <p class="sec-tag">Workflow automation</p>
+      <h2 class="h2">Write the rule once. <span class="accent">Watch every run.</span></h2>
     </div>
-    <p class="sec-sub">Every module reads and writes the same tasks, people and numbers. Pick one to see it working with Northbeam's sample data.</p>
+    <p class="sec-sub">Pick a sample automation, select any step to see how it is configured, then run it. The run is simulated in your browser; no tools are contacted.</p>
   </div>
-  <div class="explorer">
-    <div class="ex-tabs" role="tablist" aria-label="VELTRIX modules">
-      <button role="tab" id="tab-projects" aria-controls="panel-ex" aria-selected="true" class="is-on" data-feature="projects"><span class="ex-ico c-jade"><svg width="18" height="18"><use href="#i-folder"/></svg></span><span class="ex-t"><b>Projects</b><span>Board, list and timeline over the same tasks. Drag a card and every view follows.</span></span><i class="ex-prog"></i></button>
-      <button role="tab" id="tab-auto" aria-controls="panel-ex" aria-selected="false" data-feature="auto"><span class="ex-ico c-saffron"><svg width="18" height="18"><use href="#i-zap"/></svg></span><span class="ex-t"><b>Automations</b><span>Rules that move work between people and tools. Pause one without losing its history.</span></span><i class="ex-prog"></i></button>
-      <button role="tab" id="tab-copilot" aria-controls="panel-ex" aria-selected="false" data-feature="copilot"><span class="ex-ico c-sky"><svg width="18" height="18"><use href="#i-spark"/></svg></span><span class="ex-t"><b>Copilot</b><span>Ask a question about your operations and get an answer built from live data.</span></span><i class="ex-prog"></i></button>
-      <button role="tab" id="tab-collab" aria-controls="panel-ex" aria-selected="false" data-feature="collab"><span class="ex-ico c-coral"><svg width="18" height="18"><use href="#i-msg"/></svg></span><span class="ex-t"><b>Collaboration</b><span>Threads attached to the task, with decisions pinned where the next person looks.</span></span><i class="ex-prog"></i></button>
-      <button role="tab" id="tab-monitor" aria-controls="panel-ex" aria-selected="false" data-feature="monitor"><span class="ex-ico c-jade"><svg width="18" height="18"><use href="#i-pulse"/></svg></span><span class="ex-t"><b>Monitoring</b><span>Deadlines, budgets and workload watched for you, with warnings before anything slips.</span></span><i class="ex-prog"></i></button>
+  <div class="wfb-frame">
+    <div class="wfb-tabs" role="tablist" aria-label="Sample automations" id="wfbTabs">
+      <button role="tab" aria-selected="true" aria-controls="wfbApp" class="is-on" data-wf="onboard"><b>Client onboarding</b><small>CRM · 6 steps</small></button>
+      <button role="tab" aria-selected="false" aria-controls="wfbApp" data-wf="invoice"><b>Invoice follow-up</b><small>Billing · 6 steps</small></button>
+      <button role="tab" aria-selected="false" aria-controls="wfbApp" data-wf="hire"><b>New hire setup</b><small>Hiring · 5 steps</small></button>
     </div>
-    <div class="ex-stage">
-      <div class="ex-panel" id="panel-ex" role="tabpanel" aria-labelledby="tab-projects">
-        <div class="view is-on" data-view="projects">
-          <div class="v-top"><div class="crumbs"><svg width="14" height="14"><use href="#i-folder"/></svg><b>Website relaunch</b><span class="muted">Board</span></div><span class="muted" id="kanMeta" aria-live="polite">Drag cards, or use arrow keys</span></div>
-          <div class="kanban">
-            <div class="col" data-col="todo"><div class="col-h"><i class="c-dim"></i>To do <span>3</span></div>
-              <div class="kcard" draggable="true" tabindex="0"><b>Case study: Acme Freight</b><div class="kc-m"><span class="tag tag-coral">Marketing</span><span class="av av-s av-2">LK</span></div></div>
-              <div class="kcard" draggable="true" tabindex="0"><b>Migrate blog redirects</b><div class="kc-m"><span class="tag tag-sky">Product</span><span class="av av-s av-3">PR</span></div></div>
-              <div class="kcard" draggable="true" tabindex="0"><b>Legal review of terms</b><div class="kc-m"><span class="tag tag-jade">Ops</span><span class="av av-s av-1">MO</span></div></div>
-            </div>
-            <div class="col" data-col="doing"><div class="col-h"><i class="c-saffron"></i>In progress <span>2</span></div>
-              <div class="kcard" draggable="true" tabindex="0"><b>Pricing page build</b><div class="kc-prog"><i style="width:70%"></i></div><div class="kc-m"><span class="tag tag-sky">Product</span><span class="muted">7/10</span><span class="av av-s av-3">PR</span></div></div>
-              <div class="kcard" draggable="true" tabindex="0"><b>Homepage photography</b><div class="kc-prog"><i style="width:35%"></i></div><div class="kc-m"><span class="tag tag-coral">Marketing</span><span class="muted">2/6</span><span class="av av-s av-2">LK</span></div></div>
-            </div>
-            <div class="col" data-col="done"><div class="col-h"><i class="c-jade"></i>Done <span>2</span></div>
-              <div class="kcard is-done" draggable="true" tabindex="0"><b>Sitemap and IA</b><div class="kc-m"><span class="tag tag-sky">Product</span><span class="av av-s av-3">PR</span></div></div>
-              <div class="kcard is-done" draggable="true" tabindex="0"><b>Brand audit</b><div class="kc-m"><span class="tag tag-coral">Marketing</span><span class="av av-s av-2">LK</span></div></div>
-            </div>
-          </div>
-        </div>
-        <div class="view" data-view="auto">
-          <div class="v-top"><div class="crumbs"><svg width="14" height="14"><use href="#i-zap"/></svg><b>Automations</b><span class="muted">Workspace</span></div><span class="muted"><b id="autoActive">4</b> of 5 active</span></div>
-          <ul class="rules">
-            <li><span class="n-ico c-coral"><svg width="14" height="14"><use href="#i-target"/></svg></span><div><b>When a deal closes, open an onboarding project</b><span>HubSpot → VELTRIX → Slack · 1,284 runs · 99.9% success</span></div><button class="switch is-on" role="switch" aria-checked="true" aria-label="Onboarding rule"><i></i></button></li>
-            <li><span class="n-ico c-saffron"><svg width="14" height="14"><use href="#i-clock"/></svg></span><div><b>When a task is 2 days overdue, tell its owner's lead</b><span>VELTRIX → Slack · 312 runs</span></div><button class="switch is-on" role="switch" aria-checked="true" aria-label="Overdue rule"><i></i></button></li>
-            <li><span class="n-ico c-jade"><svg width="14" height="14"><use href="#i-card"/></svg></span><div><b>When an invoice is paid, close the milestone</b><span>Stripe → VELTRIX · 486 runs</span></div><button class="switch is-on" role="switch" aria-checked="true" aria-label="Invoice rule"><i></i></button></li>
-            <li><span class="n-ico c-sky"><svg width="14" height="14"><use href="#i-mail"/></svg></span><div><b>Every Friday at 4pm, send the week's summary</b><span>VELTRIX → Email · 52 runs</span></div><button class="switch is-on" role="switch" aria-checked="true" aria-label="Weekly summary rule"><i></i></button></li>
-            <li><span class="n-ico c-dim"><svg width="14" height="14"><use href="#i-users"/></svg></span><div><b>When a hire signs, create a first-week checklist</b><span>Greenhouse → VELTRIX · paused</span></div><button class="switch" role="switch" aria-checked="false" aria-label="New hire rule"><i></i></button></li>
-          </ul>
-        </div>
-        <div class="view" data-view="copilot">
-          <div class="v-top"><div class="crumbs"><svg width="14" height="14"><use href="#i-spark"/></svg><b>Copilot</b><span class="muted">Reads all 4 projects</span></div><span class="muted">Answers cite their sources</span></div>
-          <div class="cp">
-            <div class="cp-q" role="group" aria-label="Example questions">
-              <button type="button" class="is-on" data-q="risk">Which projects are at risk?</button>
-              <button type="button" data-q="load">Who is overloaded this week?</button>
-              <button type="button" data-q="week">Summarise this week</button>
-            </div>
-            <div class="cp-a" id="cpAnswer" aria-live="polite"></div>
-          </div>
-        </div>
-        <div class="view" data-view="collab">
-          <div class="v-top"><div class="crumbs"><svg width="14" height="14"><use href="#i-msg"/></svg><b>Design QA on onboarding</b><span class="muted">Thread</span></div><span class="tag tag-sky">Product</span></div>
-          <div class="thread" id="thread">
-            <div class="msg"><span class="av av-s av-3">PR</span><div><b>Priya R.</b><time>10:02</time><p>8 of 11 screens pass. Step 3 still shows the old plan names.</p></div></div>
-            <div class="msg"><span class="av av-s av-2">LK</span><div><b>Lena K.</b><time>10:09</time><p>I'll hold the launch email until this closes. The rule is already waiting on it.</p></div></div>
-            <div class="msg pinned"><span class="av av-s av-1">MO</span><div><b>Maya O.</b><time>10:15</time><p>Decision: ship with the new names only, no legacy toggle.</p><em><svg width="11" height="11"><use href="#i-check"/></svg>Pinned decision</em></div></div>
-          </div>
-          <form class="compose" id="compose"><input type="text" id="composeIn" placeholder="Reply to the thread…" aria-label="Reply to the thread" autocomplete="off"><button class="app-btn app-btn-primary" type="submit">Send</button></form>
-        </div>
-        <div class="view" data-view="monitor">
-          <div class="v-top"><div class="crumbs"><svg width="14" height="14"><use href="#i-pulse"/></svg><b>Health</b><span class="muted">All projects</span></div><span class="live"><i></i>Checked 1 min ago</span></div>
-          <div class="mon">
-            <div class="mon-alert"><span class="n-ico c-saffron"><svg width="14" height="14"><use href="#i-alert"/></svg></span><div><b>Launch email may slip one day</b><span>Waiting on Design QA, which is 3 screens from done.</span></div><button class="app-btn" type="button" data-goto-feature="collab">Open thread</button></div>
-            <div class="mon-grid">
-              <div><span class="muted">On-time delivery</span><b>93%</b><svg viewBox="0 0 100 28" class="mspark"><path d="M0 22 L15 20 L30 21 L45 15 L60 14 L75 9 L90 8 L100 4"/></svg></div>
-              <div><span class="muted">Budget used</span><b>61%</b><div class="ring" style="--p:61"><span>$51k / $84k</span></div></div>
-              <div><span class="muted">Open blockers</span><b>1</b><small class="up">down from 6</small></div>
-            </div>
-            <div class="load">
-              <p class="muted">Workload this week</p>
-              <div class="load-row"><span>Priya R.</span><em><i style="width:92%" class="hot"></i></em><b>37 h</b></div>
-              <div class="load-row"><span>Lena K.</span><em><i style="width:70%"></i></em><b>28 h</b></div>
-              <div class="load-row"><span>Maya O.</span><em><i style="width:58%"></i></em><b>23 h</b></div>
-              <div class="load-row"><span>Omar A.</span><em><i style="width:44%"></i></em><b>18 h</b></div>
-            </div>
-          </div>
-        </div>
+    <div class="ui wfb-app" id="wfbApp" role="tabpanel" aria-label="Automation">
+      <div class="wfb-top">
+        <span class="crumb"><svg width="14" height="14"><use href="#i-flow"/></svg><b id="wfbName">Client onboarding</b><span class="ui-chip" id="wfbState">Ready</span></span>
+        <div class="wfb-actions"><button class="ui-btn" type="button" id="wfbReset">Reset</button><button class="ui-btn ui-btn-primary" type="button" id="wfbRun"><svg width="12" height="12"><use href="#i-play"/></svg>Run sample</button></div>
       </div>
+      <div class="wfb-body">
+        <div class="wfb-canvas-box" id="wfbCanvasBox">
+          <div class="fit" data-w="760" data-h="420" data-min="0.72">
+            <div class="wfb-canvas" id="wfbCanvas"><svg class="wfb-edges" viewBox="0 0 760 420" aria-hidden="true" id="wfbEdges"></svg><div id="wfbNodes"></div></div>
+          </div>
+        </div>
+        <aside class="wfb-inspector" id="wfbInspector" aria-live="polite"></aside>
+      </div>
+      <div class="wfb-log" id="wfbLog"><p class="wl-empty">Run the sample to see each step execute here.</p></div>
     </div>
   </div>
 </section>
 
-<!-- ================= ANALYTICS ================= -->
-<section class="analytics" id="results" data-name="Analytics" data-theme="dark">
-  <div class="sec-head sec-head-split">
+<!-- ============ COPILOT ============ -->
+<section class="copilot" id="copilot" data-name="Copilot">
+  <div class="cop-grid">
+    <div class="cop-copy">
+      <p class="sec-tag">Copilot</p>
+      <h2 class="h2">Ask your operations <span class="accent">a straight question.</span></h2>
+      <p class="sec-sub">Copilot answers from the projects, rules and numbers in your workspace, and shows where each answer came from. It drafts tasks and automations for you to approve; it never acts on its own.</p>
+      <ul class="cop-can">
+        <li><svg width="16" height="16"><use href="#i-check"/></svg>Find risks across projects</li>
+        <li><svg width="16" height="16"><use href="#i-check"/></svg>Turn meeting notes into owned tasks</li>
+        <li><svg width="16" height="16"><use href="#i-check"/></svg>Draft an automation from a sentence</li>
+        <li><svg width="16" height="16"><use href="#i-check"/></svg>Summarise the week from what changed</li>
+      </ul>
+      <p class="demo-note"><svg width="14" height="14"><use href="#i-alert"/></svg>Demo: scripted answers built from the sample workspace. No AI service is connected to this page.</p>
+    </div>
+    <div class="ui chat">
+      <div class="chat-top"><span class="ic ic-amber"><svg width="13" height="13"><use href="#i-spark"/></svg></span><b>Copilot</b><span class="ui-chip">Northbeam · sample data</span><button class="ui-btn" type="button" id="chatClear">New chat</button></div>
+      <div class="chat-log" id="chatLog" aria-live="polite" aria-busy="false"></div>
+      <div class="chat-sugg" id="chatSugg">
+        <button type="button" data-prompt="Which projects are at risk this week?">Which projects are at risk?</button>
+        <button type="button" data-prompt="Who is overloaded this week?">Who is overloaded?</button>
+        <button type="button" data-prompt="Turn these notes into tasks:&#10;maya to finish vendor contract by fri&#10;omar: q4 forecast next wed !!&#10;lena: onboarding checklist for 3 new hires">Notes into tasks</button>
+        <button type="button" data-prompt="Create an automation: when an invoice is 3 days overdue, remind the client and tell Omar">Draft an automation</button>
+        <button type="button" data-prompt="Summarise the last 7 days">Summarise the week</button>
+      </div>
+      <form class="chat-input" id="chatForm" autocomplete="off">
+        <label class="sr-only" for="chatIn">Message Copilot</label>
+        <textarea id="chatIn" rows="1" placeholder="Ask about projects, people or numbers…"></textarea>
+        <button class="send" type="submit" aria-label="Send" disabled><svg width="16" height="16"><use href="#i-send"/></svg></button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ANALYTICS ============ -->
+<section class="analytics" id="analytics" data-name="Analytics" data-theme="dark">
+  <div class="sec-head">
     <div>
-      <p class="sec-kicker"><span class="dot dot-sky"></span>Analytics</p>
-      <h2 class="h2 split-words">Numbers that move <em>when the work does.</em></h2>
+      <p class="sec-tag">Analytics</p>
+      <h2 class="h2">Numbers that come <span class="accent">from the work itself.</span></h2>
     </div>
-    <p class="sec-sub">Revenue, delivery and workload are read from the tasks, invoices and calendars themselves, not from a weekly export. Switch between views below.</p>
+    <p class="sec-sub">Every figure here is calculated from one sample dataset, so changing the range or the metric never contradicts another number on the page.</p>
   </div>
-  <div class="an-kpis">
-    <div class="an-kpi"><b><span class="cnt" data-to="41">0</span><small>h</small></b><span>saved per week by month twelve</span></div>
-    <div class="an-kpi"><b><span class="cnt" data-to="93">0</span><small>%</small></b><span>of projects delivered on time</span></div>
-    <div class="an-kpi"><b><span class="cnt" data-to="2">0</span></b><span>status meetings a week, down from nine</span></div>
-    <div class="an-kpi"><b>$<span class="cnt" data-to="572">0</span><small>k</small></b><span>revenue tracked live over the last 90 days</span></div>
-  </div>
-  <p class="fineprint fineprint-dark">Sample data: Northbeam Studio, 42 people, first year on VELTRIX (illustrative).</p>
-  <div class="dash">
-    <div class="dash-top">
-      <div class="seg seg-dark" role="tablist" aria-label="Analytics view" id="dashTabs">
-        <button role="tab" aria-controls="dashPanel" aria-selected="true" class="is-on" data-dash="revenue"><svg width="14" height="14"><use href="#i-chart"/></svg>Revenue</button>
-        <button role="tab" aria-controls="dashPanel" aria-selected="false" data-dash="delivery"><svg width="14" height="14"><use href="#i-target"/></svg>Delivery</button>
-        <button role="tab" aria-controls="dashPanel" aria-selected="false" data-dash="workload"><svg width="14" height="14"><use href="#i-users"/></svg>Workload</button>
-        <button role="tab" aria-controls="dashPanel" aria-selected="false" data-dash="pipeline"><svg width="14" height="14"><use href="#i-pulse"/></svg>Pipeline</button>
+  <div class="ui an">
+    <div class="an-controls">
+      <div class="seg" role="group" aria-label="Metric" id="anMetric">
+        <button type="button" class="is-on" aria-pressed="true" data-m="revenue">Revenue</button>
+        <button type="button" aria-pressed="false" data-m="ontime">On-time delivery</button>
+        <button type="button" aria-pressed="false" data-m="cycle">Cycle time</button>
+        <button type="button" aria-pressed="false" data-m="runs">Automation runs</button>
       </div>
-      <div class="dash-ctl" id="dashCtl"></div>
+      <div class="an-right">
+        <div class="seg" role="group" aria-label="Date range" id="anRange">
+          <button type="button" aria-pressed="false" data-r="7">7D</button>
+          <button type="button" class="is-on" aria-pressed="true" data-r="30">30D</button>
+          <button type="button" aria-pressed="false" data-r="90">90D</button>
+          <button type="button" aria-pressed="false" data-r="365">12M</button>
+        </div>
+        <div class="seg seg-icon" role="group" aria-label="Chart type" id="anType">
+          <button type="button" class="is-on" aria-pressed="true" data-t="line" aria-label="Line chart"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" aria-pressed="false" data-t="bar" aria-label="Bar chart"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M5 20V11M10 20V5M15 20v-7M20 20V9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+        </div>
+      </div>
     </div>
-    <div class="dash-body" id="dashPanel" role="tabpanel" aria-label="Analytics view">
-      <div class="dash-main">
-        <div class="dash-sum" id="dashSum"></div>
-        <div class="dash-chart" id="dashChart"></div>
-      </div>
-      <aside class="dash-side" id="dashSide"></aside>
+    <div class="an-kpis" id="anKpis"></div>
+    <div class="an-body">
+      <div class="an-chart" id="anChart"><div class="an-tip" id="anTip"></div></div>
+      <aside class="an-side" id="anSide"></aside>
+    </div>
+    <p class="an-foot">Sample dataset for the Northbeam demo workspace. Not customer data.</p>
+  </div>
+</section>
+
+<!-- ============ SOLUTIONS: an index of use cases ============ -->
+<section class="cases" id="solutions" data-name="Solutions">
+  <div class="sec-head">
+    <div>
+      <p class="sec-tag">Solutions</p>
+      <h2 class="h2">Built around how <span class="accent">your team actually works.</span></h2>
+    </div>
+    <p class="sec-sub">Four common ways teams use VELTRIX. Select one to see the work it organises and an example automation.</p>
+  </div>
+  <div class="cases-grid">
+    <div class="cases-list" role="tablist" aria-label="Use cases" id="casesList">
+      <button role="tab" aria-selected="true" class="is-on" data-case="0" aria-controls="casePanel"><span class="cl-n">01</span><span class="cl-t">Studios and agencies</span><span class="cl-s">Projects, approvals, billing</span></button>
+      <button role="tab" aria-selected="false" data-case="1" aria-controls="casePanel"><span class="cl-n">02</span><span class="cl-t">Client services</span><span class="cl-s">Onboarding, renewals, requests</span></button>
+      <button role="tab" aria-selected="false" data-case="2" aria-controls="casePanel"><span class="cl-n">03</span><span class="cl-t">Operations teams</span><span class="cl-s">Recurring work on rules</span></button>
+      <button role="tab" aria-selected="false" data-case="3" aria-controls="casePanel"><span class="cl-n">04</span><span class="cl-t">Field and logistics</span><span class="cl-s">Jobs, crews, invoices</span></button>
+    </div>
+    <div class="case" id="casePanel" role="tabpanel" aria-label="Use case">
+      <figure class="case-pic"><div class="case-pics" id="casePics">
+        <img src="assets/img/studio.jpg" alt="A studio table with white chairs by tall windows" width="1200" height="1500" loading="lazy" class="is-on">
+        <img src="assets/img/clients.jpg" alt="People at cafe tables in front of bright windows, in black and white" width="1200" height="1500" loading="lazy">
+        <img src="assets/img/console.jpg" alt="A hand adjusting faders on a mixing console" width="1200" height="1500" loading="lazy">
+        <img src="assets/img/traffic.jpg" alt="City traffic and building lights at night, blurred" width="1200" height="1500" loading="lazy">
+      </div></figure>
+      <div class="case-body" id="caseBody"></div>
     </div>
   </div>
 </section>
 
-<!-- ================= INTEGRATIONS ================= -->
+<!-- ============ INTEGRATIONS ============ -->
 <section class="integr" id="integrations" data-name="Integrations">
-  <div class="orbit-wrap">
-    <div class="orbit" id="orbit">
-      <svg class="orbit-rings" viewBox="0 0 600 600" aria-hidden="true"><circle cx="300" cy="300" r="140"/><circle cx="300" cy="300" r="230"/><g id="orbitLines"></g></svg>
-      <div class="orbit-core"><svg width="44" height="44"><use href="#mark"/></svg></div>
-      <div id="orbitNodes"></div>
-    </div>
-  </div>
-  <div class="integr-copy">
-    <p class="sec-kicker"><span class="dot dot-jade"></span>Integrations</p>
-    <h2 class="h2 split-words">Keeps the tools <em>you already pay for.</em></h2>
-    <p class="sec-sub">42 two-way integrations. A change made in Slack, HubSpot or Stripe lands on the board in seconds, and changes on the board go back.</p>
-    <div class="dir">
-      <div class="dir-top">
-        <label class="dir-search"><svg width="15" height="15"><use href="#i-search"/></svg><input type="search" id="dirQ" placeholder="Search integrations" aria-label="Search integrations"></label>
-        <div class="seg" role="group" aria-label="Category" id="dirCats"><button class="is-on" data-cat="all">All</button><button data-cat="chat">Chat</button><button data-cat="sales">Sales</button><button data-cat="finance">Finance</button><button data-cat="dev">Dev</button></div>
-      </div>
-      <ul class="dir-list" id="dirList"></ul>
-      <div class="dir-foot"><span><b id="connCount">6</b> connected in this demo workspace</span><span class="muted">Showing <span id="dirShown">24</span> of 42</span></div>
-      <p class="dir-empty" id="dirEmpty" hidden>No match. Use the Zapier connector, or ask us to build it.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ================= CUSTOMERS ================= -->
-<section class="stories" id="customers" data-name="Customers">
-  <div class="sec-head sec-head-split">
+  <div class="sec-head">
     <div>
-      <p class="sec-kicker"><span class="dot dot-coral"></span>Customer stories</p>
-      <h2 class="h2 split-words">Teams that stopped <em>chasing status.</em></h2>
+      <p class="sec-tag">Integrations</p>
+      <h2 class="h2">Keep your tools. <span class="accent">Connect the gaps.</span></h2>
     </div>
-    <p class="sec-sub">Illustrative stories showing how different teams use VELTRIX. Names and figures are sample content.</p>
+    <p class="sec-sub">The connectors below show the kinds of tools VELTRIX is designed to work with. Availability of specific connectors is to be confirmed.</p>
   </div>
-  <div class="story" id="story">
-    <div class="story-tabs" role="tablist" aria-label="Customer stories">
-      <button role="tab" aria-controls="storyPanel" aria-selected="true" class="is-on" data-story="0"><b>Northbeam Studio</b><span>Design studio · 42 people</span><i></i></button>
-      <button role="tab" aria-controls="storyPanel" aria-selected="false" data-story="1"><b>Acme Freight</b><span>Logistics · 180 people</span><i></i></button>
-      <button role="tab" aria-controls="storyPanel" aria-selected="false" data-story="2"><b>Holloway Dental</b><span>Healthcare group · 9 clinics</span><i></i></button>
+  <div class="int-grid">
+    <div class="int-side">
+      <label class="int-search"><svg width="16" height="16"><use href="#i-search"/></svg><input type="search" id="intQ" placeholder="Search tools" aria-label="Search tools"></label>
+      <div class="int-cats" role="group" aria-label="Category" id="intCats"></div>
     </div>
-    <div class="story-card" id="storyPanel" role="tabpanel" aria-label="Customer story">
-      <figure class="story-pic"><img src="assets/img/windows.jpg" alt="Silhouetted people at tall windows overlooking a city, in black and white" width="1600" height="1000" loading="lazy"></figure>
-      <div class="story-body" id="storyBody">
-        <blockquote><p id="storyQuote">We cancelled our Monday status meeting in week three and nobody asked for it back. I open one tab in the morning and I know which two things need me.</p></blockquote>
-        <p class="story-who"><span class="av av-3" id="storyAv">PR</span><span><b id="storyName">Priya Raman</b><small id="storyRole">COO, Northbeam Studio</small></span></p>
-        <dl class="story-stats" id="storyStats"></dl>
-      </div>
+    <div class="int-main">
+      <ul class="int-tiles" id="intTiles"></ul>
+      <p class="int-empty" id="intEmpty" hidden>No tools match that search.</p>
     </div>
+    <aside class="ui int-detail" id="intDetail" aria-live="polite"></aside>
   </div>
 </section>
 
-<!-- ================= PRICING ================= -->
-<section class="pricing" id="pricing" data-name="Pricing">
-  <div class="sec-head sec-head-center">
-    <p class="sec-kicker"><span class="dot dot-saffron"></span>Pricing</p>
-    <h2 class="h2 split-words">Simple per-seat pricing. <em>Viewers are free.</em></h2>
-    <div class="bill-toggle" role="group" aria-label="Billing period">
-      <button type="button" data-bill="monthly">Monthly</button>
-      <button type="button" class="is-on" data-bill="yearly">Yearly <span class="save">2 months free</span></button>
-      <span class="bt-pill" aria-hidden="true"></span>
-    </div>
-  </div>
-  <div class="plans">
-    <article class="plan" data-plan="starter">
-      <h3>Starter</h3><p class="plan-for">For small teams getting out of spreadsheets.</p>
-      <p class="plan-price"><span class="cur">$</span><span class="num" data-y="10" data-m="12">10</span><span class="per">per seat / month</span></p>
-      <a class="btn btn-ghost-dark btn-block" href="#start" data-plan-cta="Starter">Start Starter free</a>
-      <ul><li>Unlimited projects and guests</li><li>1,000 automation runs a month</li><li>Board, list and timeline views</li><li>8 core integrations</li></ul>
-    </article>
-    <article class="plan plan-hot" data-plan="team">
-      <span class="plan-flag">Most teams choose this</span>
-      <h3>Team</h3><p class="plan-for">For growing companies running ops across tools.</p>
-      <p class="plan-price"><span class="cur">$</span><span class="num" data-y="18" data-m="22">18</span><span class="per">per seat / month</span></p>
-      <a class="btn btn-primary btn-block magnetic" href="#start" data-plan-cta="Team"><span>Start Team free</span></a>
-      <ul><li>Everything in Starter</li><li>25,000 automation runs a month</li><li>Copilot and live analytics</li><li>All 42 integrations, two-way</li><li>Workload and budget monitoring</li></ul>
-    </article>
-    <article class="plan" data-plan="scale">
-      <h3>Scale</h3><p class="plan-for">For larger organisations with security needs.</p>
-      <p class="plan-price"><span class="cur">$</span><span class="num" data-y="32" data-m="38">32</span><span class="per">per seat / month</span></p>
-      <button class="btn btn-ghost-dark btn-block" type="button" data-open-demo>Talk to sales</button>
-      <ul><li>Everything in Team</li><li>Unlimited automation runs</li><li>SSO, SCIM and audit log</li><li>EU or US data residency</li><li>A named success manager</li></ul>
-    </article>
-  </div>
-  <div class="estimator">
-    <div class="est-l"><b>Estimate your bill</b><span class="muted" id="estPlan">Team, billed yearly</span></div>
-    <div class="est-seats">
-      <label for="seats">Editors <b id="seatOut">24</b></label>
-      <input type="range" id="seats" min="3" max="200" value="24" aria-label="Number of editors">
-    </div>
-    <div class="est-seg seg" role="group" aria-label="Plan for estimate" id="estPlans"><button data-p="starter">Starter</button><button class="is-on" data-p="team">Team</button><button data-p="scale">Scale</button></div>
-    <div class="est-r"><span class="muted">Per month</span><b id="invTotal">$432</b><small id="invSave">Saves $1,152 a year</small></div>
-  </div>
-</section>
-
-<!-- ================= FAQ ================= -->
+<!-- ============ FAQ ============ -->
 <section class="faq" id="faq" data-name="Questions">
-  <div class="faq-side">
-    <p class="sec-kicker"><span class="dot dot-jade"></span>Questions</p>
-    <h2 class="h2">Before you switch.</h2>
-    <p class="sec-sub">Still deciding? A 20-minute walkthrough with your own data usually answers the rest.</p>
-    <button class="btn btn-ghost-dark" type="button" data-open-demo>Book a walkthrough</button>
-    <div class="support"><div class="support-people"><span class="av av-1">MO</span><span class="av av-3">PR</span><span class="av av-2">LK</span><span class="av av-4">JT</span></div><p>Real people answer, from Rotterdam and Toronto. Every plan includes onboarding help for your first rules.</p><dl><div><dt>Median first reply</dt><dd>1 h 52 m</dd></div><div><dt>Satisfaction, last 90 days</dt><dd>4.8 / 5</dd></div></dl></div>
+  <div class="faq-head">
+    <p class="sec-tag">Questions</p>
+    <h2 class="h2">Before you <span class="accent">book a demo.</span></h2>
+    <p class="sec-sub">If your question isn't here, add it to the demo request and it will be covered on the call.</p>
   </div>
   <div class="faq-list">
-    <details><summary>How long does it take to move from spreadsheets and email?<i></i></summary><div class="faq-a"><p>Most teams import their current tracker in an afternoon. VELTRIX reads CSV, Excel and Google Sheets, maps owners by email and keeps your column names. The first rules usually go live in week one.</p></div></details>
-    <details><summary>What does Copilot actually do?<i></i></summary><div class="faq-a"><p>It turns written notes into tasks with owners and dates, drafts rules from plain sentences, answers questions about your projects and writes the Friday summary from what changed. You approve what it creates; it never sends a message on its own.</p></div></details>
-    <details><summary>Where is our data stored, and who can see it?<i></i></summary><div class="faq-a"><p>In the EU or the US, your choice at sign-up. Data is encrypted at rest and in transit. Scale workspaces add SSO, SCIM, audit logs and a signed data processing agreement.</p></div></details>
-    <details><summary>Can guests and clients see the board?<i></i></summary><div class="faq-a"><p>Yes, for free. Share a project or a single view with a link, choose what they can see, and revoke it at any time.</p></div></details>
-    <details><summary>Does it replace Slack, HubSpot or our accounting tool?<i></i></summary><div class="faq-a"><p>No. VELTRIX connects them. Conversations stay in Slack, deals stay in your CRM, invoices stay in accounting. VELTRIX is where the work between them is planned, automated and measured.</p></div></details>
-    <details><summary>What happens after the 14-day trial?<i></i></summary><div class="faq-a"><p>Nothing automatic. We ask before charging, and if you leave you can export every project, comment and file as CSV and JSON.</p></div></details>
+    <details><summary>What exactly is VELTRIX?<i></i></summary><div class="faq-a"><p>An operations workspace that combines project management, workflow automation, team conversation and business analytics. The same tasks, people and numbers power every view, and an AI assistant helps you find risks, draft tasks and write automations.</p></div></details>
+    <details><summary>Is the data on this page real?<i></i></summary><div class="faq-a"><p>No. Every project, person, figure and chart on this page belongs to a sample workspace called Northbeam, created for demonstration. The Copilot answers are scripted from that sample data, and the workflow runs are simulated in your browser.</p></div></details>
+    <details><summary>Do we have to move off our current tools?<i></i></summary><div class="faq-a"><p>No. VELTRIX is designed to connect to the tools you already use, so conversations can stay in chat and deals in your CRM. The integrations section shows the kinds of tools it is built to connect with.</p></div></details>
+    <details><summary>Does Copilot take actions on its own?<i></i></summary><div class="faq-a"><p>No. Copilot suggests and drafts: tasks from notes, rules from sentences, summaries from what changed. A person approves anything it creates.</p></div></details>
+    <details><summary>What does pricing look like?<i></i></summary><div class="faq-a"><p>Pricing hasn't been published yet. Request a demo and it will be shared for your team size.</p></div></details>
+    <details><summary>What happens after I request a demo?<i></i></summary><div class="faq-a"><p>On the live product site, the team would reply to arrange a walkthrough with your own workflows. On this page the form isn't connected to a backend yet, so it tells you plainly that nothing was sent.</p></div></details>
   </div>
 </section>
 
-<!-- ================= CTA ================= -->
-<section class="cta" id="start" data-name="Start" data-theme="dark">
-  <div class="cta-bg" aria-hidden="true"><div class="hero-grid"></div><div class="cta-glow"></div></div>
-  <div class="cta-in">
-    <svg class="cta-mark" width="64" height="64" aria-hidden="true"><use href="#mark"/></svg>
-    <h2 class="cta-h split-words">Connect the work. <em>Watch it move.</em></h2>
-    <p class="cta-sub">Start with your current spreadsheet. Your first board, rule and dashboard take about ten minutes.</p>
-    <form class="cta-form" id="ctaForm" novalidate>
-      <label class="sr-only" for="ctaEmail">Work email</label>
-      <div class="cta-field"><svg width="18" height="18"><use href="#i-mail"/></svg><input id="ctaEmail" type="email" name="email" placeholder="you@company.com" autocomplete="email" aria-describedby="ctaMsg" required></div>
-      <button type="submit" class="btn btn-primary btn-lg magnetic"><span>Start free trial</span><svg width="18" height="18"><use href="#i-arrow"/></svg></button>
+<!-- ============ DEMO REQUEST ============ -->
+<section class="demo" id="demo" data-name="Request a demo" data-theme="dark">
+  <div class="demo-grid">
+    <div class="demo-copy">
+      <h2 class="demo-h">See your own operations <span class="accent">running in one place.</span></h2>
+      <p>Tell us how your team works today. The walkthrough is built around your real handoffs, not a generic script.</p>
+      <ol class="demo-steps">
+        <li><b>Tell us your stack</b><span>The tools and handoffs you want to connect first.</span></li>
+        <li><b>One workflow gets mapped</b><span>A real process of yours, drafted as VELTRIX rules.</span></li>
+        <li><b>You see it run</b><span>A walkthrough with that workflow running.</span></li>
+      </ol>
+    </div>
+    <form class="ui demo-form" id="demoForm" novalidate>
+      <div class="row2">
+        <div class="field"><label for="fName">Full name</label><input id="fName" name="name" autocomplete="name" required><small class="err" id="fName-err"></small></div>
+        <div class="field"><label for="fEmail">Work email</label><input id="fEmail" name="email" type="email" autocomplete="email" required><small class="err" id="fEmail-err"></small></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="fCompany">Company</label><input id="fCompany" name="company" autocomplete="organization" required><small class="err" id="fCompany-err"></small></div>
+        <div class="field"><span class="flabel" id="sizeLabel">Team size</span>
+          <div class="select" id="sizeSelect">
+            <button type="button" class="select-btn is-empty" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="sizeLabel sizeVal" id="sizeBtn"><span id="sizeVal">Choose a size</span><svg width="14" height="14"><use href="#i-chev"/></svg></button>
+            <ul class="select-list" role="listbox" aria-labelledby="sizeLabel" tabindex="-1"><li role="option" id="so-0" data-v="1–20">1–20 people</li><li role="option" id="so-1" data-v="21–100">21–100 people</li><li role="option" id="so-2" data-v="101–500">101–500 people</li><li role="option" id="so-3" data-v="500+">500+ people</li></ul>
+          </div><small class="err" id="sizeBtn-err"></small></div>
+      </div>
+      <div class="field"><span class="flabel">Most interested in</span>
+        <div class="chips" role="group" aria-label="Interests"><button type="button" aria-pressed="false">Projects</button><button type="button" aria-pressed="false">Automations</button><button type="button" aria-pressed="false">Copilot</button><button type="button" aria-pressed="false">Analytics</button><button type="button" aria-pressed="false">Integrations</button></div></div>
+      <div class="field"><label for="fMsg">What should the demo cover? <span class="opt">Optional</span></label><textarea id="fMsg" rows="3" maxlength="500"></textarea><small class="count" id="fMsgCount">0 / 500</small></div>
+      <button class="btn btn-primary btn-lg btn-block" type="submit" id="demoSubmit"><span>Request a demo</span><svg width="18" height="18"><use href="#i-arrow"/></svg></button>
+      <div class="form-state" id="formState" role="status" aria-live="polite" hidden></div>
+      <p class="form-note">This form isn't connected to a backend yet. Submitting it checks your entries and shows what would be sent; nothing leaves this page.</p>
     </form>
-    <p class="cta-msg" id="ctaMsg" aria-live="polite">14 days free. No card. Cancel in two clicks.</p>
   </div>
 </section>
 
 </main>
 
-<!-- ================= FOOTER ================= -->
-<footer class="foot" id="footer" data-theme="dark">
+<footer class="foot">
   <div class="foot-top">
     <div class="foot-brand">
-      <a class="logo" href="#top"><svg class="logo-mark" width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 9l9 14 9-14" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle class="mk-a" cx="7" cy="9" r="3"/><circle class="mk-b" cx="25" cy="9" r="3"/><circle class="mk-a" cx="16" cy="23" r="3"/></svg><span class="logo-word">VELTRIX</span></a>
-      <p>The AI operations platform for growing companies. Everything connected. Everything moving.</p>
-      <a class="status" href="#footer" data-toast="Status page: all 6 services operational for the last 90 days (demo)"><i></i>All systems operational</a>
+      <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="brand-word">VELTRIX</span></a>
+      <p>The AI operations workspace for projects, automations, team conversation and analytics.</p>
     </div>
     <nav class="foot-cols" aria-label="Footer">
-      <div><p>Product</p><a href="#product">Projects</a><a href="#workflows">Automations</a><a href="#results">Analytics</a><a href="#product" data-feature="copilot">Copilot</a><a href="#integrations">Integrations</a></div>
-      <div><p>Company</p><a href="#customers">Customers</a><a href="#pricing">Pricing</a><a href="#faq">Questions</a><a href="mailto:hello@veltrix.io?subject=Careers">Careers</a></div>
-      <div><p>Resources</p><button type="button" data-open-palette>Command menu</button><button type="button" data-open-demo>Book a demo</button><a href="mailto:hello@veltrix.io?subject=VELTRIX%20question">hello@veltrix.io</a></div>
+      <div><p>Product</p><a href="#tour">Workspace</a><a href="#workflows">Automations</a><a href="#copilot">Copilot</a><a href="#analytics">Analytics</a><a href="#integrations">Integrations</a></div>
+      <div><p>Solutions</p><a href="#solutions" data-case="0">Studios and agencies</a><a href="#solutions" data-case="1">Client services</a><a href="#solutions" data-case="2">Operations teams</a><a href="#solutions" data-case="3">Field and logistics</a></div>
+      <div><p>Resources</p><a href="#tour">Product tour</a><a href="#faq">Questions</a><button type="button" data-open-palette>Command menu</button><a href="#demo">Request a demo</a></div>
     </nav>
-    <form class="news" id="newsForm" novalidate>
-      <p>The ops letter</p>
-      <span>One email a month on running operations well. No product spam.</span>
-      <div class="news-f"><label class="sr-only" for="newsEmail">Email for newsletter</label><input id="newsEmail" type="email" placeholder="you@company.com"><button type="submit" aria-label="Subscribe"><svg width="16" height="16"><use href="#i-arrow"/></svg></button></div>
-      <small id="newsMsg" aria-live="polite"></small>
-    </form>
   </div>
-  <div class="foot-word" aria-hidden="true">VELTRIX</div>
+  <div class="foot-grid" aria-hidden="true" id="footGrid"></div>
   <div class="foot-bot">
-    <span>© 2026 Veltrix B.V. · Rotterdam <b id="clock">09:00</b></span>
-    <span class="legal"><button type="button" data-toast="Privacy policy: not included in this demo site">Privacy</button> · <button type="button" data-toast="Terms of service: not included in this demo site">Terms</button> · <button type="button" data-toast="Security overview: not included in this demo site">Security</button> · <button type="button" data-toast="Data processing agreement: not included in this demo site">DPA</button></span>
-    <span class="credit">Photos: Vita Vilcina, Charles Forerunner, Matthew Wiebe, Mika Ruusunen via Unsplash</span>
+    <span>© 2026 VELTRIX. Company and legal details to be added before launch.</span>
+    <span>All product data shown is sample data. Third-party logos belong to their owners and are shown for illustration only; no partnership is implied.</span>
+    <span class="credit">Photos via Unsplash: Vladimir Kudinov, Breather, Adam Przewoski, Drew Patrick Miller, Israel Sundseth</span>
   </div>
 </footer>
 
-<!-- ================= DEMO MODAL ================= -->
-<div class="modal" id="demoModal" role="dialog" aria-modal="true" aria-labelledby="demoTitle" hidden>
-  <div class="modal-box">
-    <button class="modal-x" type="button" aria-label="Close" data-close-modal><svg width="18" height="18"><use href="#i-x"/></svg></button>
-    <div class="modal-side">
-      <svg width="34" height="34"><use href="#mark"/></svg>
-      <h2 id="demoTitle">See VELTRIX with your own workflow</h2>
-      <ul><li><svg width="14" height="14"><use href="#i-check"/></svg>20 minutes, with a product specialist</li><li><svg width="14" height="14"><use href="#i-check"/></svg>We import a sample of your tracker</li><li><svg width="14" height="14"><use href="#i-check"/></svg>You leave with three working rules</li></ul>
-    </div>
-    <form class="modal-form" id="demoForm" novalidate>
-      <div class="field"><label for="dName">Full name</label><input id="dName" name="name" autocomplete="name" required><small class="err"></small></div>
-      <div class="field"><label for="dEmail">Work email</label><input id="dEmail" name="email" type="email" autocomplete="email" required><small class="err"></small></div>
-      <div class="field"><span class="flabel" id="sizeLabel">Team size</span>
-        <div class="select" id="sizeSelect">
-          <button type="button" class="select-btn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="sizeLabel sizeVal"><span id="sizeVal">Choose a size</span><svg width="14" height="14"><use href="#i-chev"/></svg></button>
-          <ul class="select-list" role="listbox" aria-labelledby="sizeLabel" tabindex="-1"><li role="option" data-v="1–20">1–20 people</li><li role="option" data-v="21–100">21–100 people</li><li role="option" data-v="101–400">101–400 people</li><li role="option" data-v="400+">400+ people</li></ul>
-        </div><small class="err"></small></div>
-      <div class="field"><span class="flabel">Most interested in</span>
-        <div class="chips" role="group" aria-label="Interests"><button type="button" aria-pressed="false">Projects</button><button type="button" aria-pressed="false">Automations</button><button type="button" aria-pressed="false">Analytics</button><button type="button" aria-pressed="false">Copilot</button></div></div>
-      <button class="btn btn-primary btn-block" type="submit"><span>Request a demo</span></button>
-      <p class="modal-note">Demo form: nothing is sent from this page.</p>
-    </form>
-    <div class="modal-done" hidden>
-      <span class="done-ico"><svg width="28" height="28"><use href="#i-check"/></svg></span>
-      <h3>Request ready</h3>
-      <p id="demoDoneText"></p>
-      <button class="btn btn-ghost-dark" type="button" data-close-modal>Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- Command palette -->
 <div class="palette" id="palette" role="dialog" aria-modal="true" aria-label="Command menu" hidden>
   <div class="pal-box">
-    <div class="pal-in"><svg width="16" height="16"><use href="#i-search"/></svg><input type="text" id="palQ" placeholder="Jump to a section or run a command" aria-label="Search commands" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="palList" aria-autocomplete="list"></div>
+    <div class="pal-in"><svg width="16" height="16"><use href="#i-search"/></svg><input type="text" id="palQ" placeholder="Jump to a section or run a demo" aria-label="Search commands" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="palList" aria-autocomplete="list"></div>
     <ul id="palList" role="listbox" aria-label="Commands"></ul>
     <div class="pal-foot"><span><kbd>↑</kbd><kbd>↓</kbd> move</span><span><kbd>Enter</kbd> open</span><span><kbd>Esc</kbd> close</span></div>
   </div>
 </div>
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
-<div class="cursor" aria-hidden="true"><span class="cursor-label"></span></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
