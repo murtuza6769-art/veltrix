@@ -3,17 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VELTRIX · The AI operations workspace for projects, automations and analytics</title>
-<meta name="description" content="VELTRIX brings projects, workflow automation, team conversation and business analytics into one AI-assisted workspace, so work moves between people and tools without anyone chasing it.">
-<meta name="theme-color" content="#0B0E17">
-<meta property="og:title" content="VELTRIX · Every handoff, automated. Every number, live.">
+<title>VELTRIX · Connect the work. Automate the handoffs. See it all, live.</title>
+<meta name="description" content="VELTRIX is an AI-assisted operations workspace that brings projects, workflow automation, team conversation and business analytics together, so work moves between people and tools without anyone chasing it.">
+<meta name="theme-color" content="#0C1217">
+<meta property="og:title" content="VELTRIX · Connect the work. Automate the handoffs. See it all, live.">
 <meta property="og:description" content="One AI-assisted workspace for projects, automations, team conversation and analytics.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B0E17'/%3E%3Crect x='7' y='7' width='5' height='5' rx='1' fill='%23F2B441'/%3E%3Crect x='13.5' y='7' width='5' height='5' rx='1' fill='%233557F5'/%3E%3Crect x='20' y='7' width='5' height='5' rx='1' fill='%23F2B441'/%3E%3Crect x='13.5' y='13.5' width='5' height='5' rx='1' fill='%233557F5'/%3E%3Crect x='13.5' y='20' width='5' height='5' rx='1' fill='%23F4F3EF'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<meta property="og:image" content="assets/film/overview.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23101820'/%3E%3Crect x='7' y='7' width='5' height='5' rx='1.2' fill='%23C9F36B'/%3E%3Crect x='13.5' y='7' width='5' height='5' rx='1.2' fill='%23EDF1F3'/%3E%3Crect x='20' y='7' width='5' height='5' rx='1.2' fill='%23EDF1F3'/%3E%3Crect x='13.5' y='13.5' width='5' height='5' rx='1.2' fill='%23EDF1F3'/%3E%3Crect x='13.5' y='20' width='5' height='5' rx='1.2' fill='%23C9F36B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <script>document.documentElement.classList.add('js')</script>
 </head>
@@ -49,183 +48,287 @@
   </defs>
 </svg>
 
-<!-- opening: the wordmark lights up cell by cell -->
-<div class="intro" aria-hidden="true">
-  <div class="intro-grid"></div>
-  <div class="intro-word"><span>V</span><span>E</span><span>L</span><span>T</span><span>R</span><span>I</span><span>X</span></div>
-</div>
 
 <a class="skip" href="#main">Skip to content</a>
 
+<!-- ============ NAVIGATION ============ -->
 <header class="nav" id="nav">
   <div class="nav-bar">
-    <a class="brand" href="#top" aria-label="VELTRIX home">
-      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
-      <span class="brand-word">VELTRIX</span>
-    </a>
+    <a class="brand" href="#top" aria-label="VELTRIX home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="brand-word">VELTRIX</span></a>
     <nav class="nav-links" aria-label="Primary">
       <div class="dd" data-dd>
         <button class="nav-link" type="button" aria-expanded="false" aria-controls="dd-product">Product <svg width="14" height="14"><use href="#i-chev"/></svg></button>
-        <div class="dd-panel dd-mega" id="dd-product">
-          <div class="mega-cols">
-            <a href="#tour" data-tour="0"><span class="mi"><svg width="18" height="18"><use href="#i-grid"/></svg></span><span><b>Workspace</b><small>Every project, owner and deadline on one screen</small></span></a>
-            <a href="#workflows"><span class="mi"><svg width="18" height="18"><use href="#i-flow"/></svg></span><span><b>Workflow automation</b><small>Rules that move work between people and tools</small></span></a>
-            <a href="#copilot"><span class="mi mi-amber"><svg width="18" height="18"><use href="#i-spark"/></svg></span><span><b>Copilot</b><small>Questions answered from your own workspace</small></span></a>
-            <a href="#analytics"><span class="mi"><svg width="18" height="18"><use href="#i-chart"/></svg></span><span><b>Analytics</b><small>Revenue, delivery and workload, as work happens</small></span></a>
-            <a href="#tour" data-tour="5"><span class="mi"><svg width="18" height="18"><use href="#i-users"/></svg></span><span><b>Team</b><small>Who owns what, and who has room</small></span></a>
-            <a href="#integrations"><span class="mi"><svg width="18" height="18"><use href="#i-link"/></svg></span><span><b>Integrations</b><small>Connect the tools you already use</small></span></a>
+        <div class="dd-panel" id="dd-product">
+          <div class="mega">
+            <div class="mega-list">
+              <a class="mega-item" href="#tour" data-tour="0"><span class="mi"><svg width="16" height="16"><use href="#i-grid"/></svg></span><b>Workspace</b><small>Projects, owners and risk on one screen</small></a>
+              <a class="mega-item" href="#workflows"><span class="mi"><svg width="16" height="16"><use href="#i-flow"/></svg></span><b>Workflow automation</b><small>Rules that move work between people and tools</small></a>
+              <a class="mega-item" href="#copilot"><span class="mi"><svg width="16" height="16"><use href="#i-spark"/></svg></span><b>Copilot</b><small>Straight answers from your own workspace</small></a>
+              <a class="mega-item" href="#analytics"><span class="mi"><svg width="16" height="16"><use href="#i-chart"/></svg></span><b>Analytics</b><small>Revenue, delivery and workload as work happens</small></a>
+              <a class="mega-item" href="#tour" data-tour="5"><span class="mi"><svg width="16" height="16"><use href="#i-users"/></svg></span><b>Team</b><small>Who owns what, and who has room</small></a>
+            </div>
+            <button class="mega-feature" type="button" data-film><img src="assets/film/overview.jpg" alt="" width="640" height="360" loading="lazy"><span><i class="pb"><svg width="12" height="12"><use href="#i-play"/></svg></i>Watch the product film · 0:36</span></button>
           </div>
-          <a class="mega-feature" href="#tour"><span><b>Take the product tour</b><small>Scroll through the workspace, module by module</small></span><svg width="18" height="18"><use href="#i-arrow"/></svg></a>
         </div>
       </div>
       <div class="dd" data-dd>
         <button class="nav-link" type="button" aria-expanded="false" aria-controls="dd-solutions">Solutions <svg width="14" height="14"><use href="#i-chev"/></svg></button>
         <div class="dd-panel" id="dd-solutions">
-          <a href="#solutions" data-case="0"><b>Studios and agencies</b><small>Projects, approvals and billing in one place</small></a>
-          <a href="#solutions" data-case="1"><b>Client services</b><small>Onboarding and renewals without the chasing</small></a>
-          <a href="#solutions" data-case="2"><b>Operations teams</b><small>Recurring work that runs on rules</small></a>
-          <a href="#solutions" data-case="3"><b>Field and logistics</b><small>Jobs, crews and invoices kept in step</small></a>
+          <div class="dd-simple">
+            <a href="#solutions" data-case="0"><b>Studios and agencies</b><small>Projects, approvals and billing in one place</small></a>
+            <a href="#solutions" data-case="1"><b>Client services</b><small>Onboarding, renewals and requests on rules</small></a>
+            <a href="#solutions" data-case="2"><b>Operations teams</b><small>Recurring work that runs itself</small></a>
+            <a href="#solutions" data-case="3"><b>Field and logistics</b><small>Jobs, crews and invoices in step</small></a>
+          </div>
         </div>
       </div>
       <a class="nav-link" href="#integrations">Integrations</a>
       <div class="dd" data-dd>
         <button class="nav-link" type="button" aria-expanded="false" aria-controls="dd-resources">Resources <svg width="14" height="14"><use href="#i-chev"/></svg></button>
         <div class="dd-panel" id="dd-resources">
-          <a href="#tour"><b>Product tour</b><small>The workspace, module by module</small></a>
-          <a href="#workflows"><b>Workflow builder demo</b><small>Inspect and run sample automations</small></a>
-          <a href="#faq"><b>Questions</b><small>What VELTRIX does, and what this page shows</small></a>
-          <button type="button" data-open-palette><b>Command menu</b><small>Jump anywhere with Ctrl K</small></button>
+          <div class="dd-simple">
+            <button type="button" data-film><b>Product film</b><small>A 36-second look at VELTRIX working</small></button>
+            <a href="#films"><b>Feature films</b><small>Workflows, Copilot, analytics and projects</small></a>
+            <a href="#faq"><b>Questions</b><small>Pricing, data, Copilot and getting started</small></a>
+            <button type="button" data-open-palette><b>Command menu</b><small>Jump anywhere or run a demo <kbd>Ctrl</kbd> <kbd>K</kbd></small></button>
+          </div>
         </div>
       </div>
       <span class="nav-ind" aria-hidden="true"></span>
     </nav>
     <div class="nav-act">
-      <a class="btn btn-primary btn-sm" href="#demo" data-magnetic><span>Request a demo</span><svg width="16" height="16"><use href="#i-arrow"/></svg></a>
-      <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mnav"><svg width="22" height="22"><use href="#i-menu"/></svg></button>
+      <button class="nav-film" type="button" data-film><i class="pb"><svg width="11" height="11"><use href="#i-play"/></svg></i><span>Watch film</span></button>
+      <a class="btn btn-lime" href="#demo" data-magnetic>Book a demo <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+      <button class="burger" type="button" aria-expanded="false" aria-controls="mnav" aria-label="Open menu"><svg width="22" height="22"><use href="#i-menu"/></svg></button>
     </div>
   </div>
+  <div class="progress" aria-hidden="true"><span></span></div>
 </header>
-<div class="progress" aria-hidden="true"><span></span></div>
-
 <div class="mnav" id="mnav" hidden>
   <nav aria-label="Mobile">
-    <details><summary>Product <svg width="16" height="16"><use href="#i-chev"/></svg></summary><div><a href="#tour">Workspace tour</a><a href="#workflows">Workflow automation</a><a href="#copilot">Copilot</a><a href="#analytics">Analytics</a><a href="#integrations">Integrations</a></div></details>
-    <details><summary>Solutions <svg width="16" height="16"><use href="#i-chev"/></svg></summary><div><a href="#solutions" data-case="0">Studios and agencies</a><a href="#solutions" data-case="1">Client services</a><a href="#solutions" data-case="2">Operations teams</a><a href="#solutions" data-case="3">Field and logistics</a></div></details>
-    <a href="#integrations">Integrations</a>
-    <a href="#faq">Questions</a>
+    <a href="#tour">Product tour <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+    <a href="#films">Feature films <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+    <a href="#workflows">Automations <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+    <a href="#copilot">Copilot <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+    <a href="#analytics">Analytics <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+    <a href="#integrations">Integrations <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+    <a href="#solutions">Solutions <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+    <a href="#faq">Questions <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
   </nav>
-  <a class="btn btn-primary btn-lg" href="#demo">Request a demo</a>
+  <a class="btn btn-lime btn-block" href="#demo">Book a demo <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
 </div>
 
 <main id="main">
 
-<!-- ============ HERO: the operating grid ============ -->
-<section class="hero" id="top" data-name="Overview">
-  <div class="hero-copy">
-    <p class="hero-tag"><span class="live-dot"></span>AI operations workspace</p>
-    <h1 class="hero-title"><span class="ln"><span>Every handoff,</span></span><span class="ln"><span>automated.</span></span><span class="ln ln-2"><span>Every number,</span></span><span class="ln ln-2"><span>live.</span></span></h1>
-    <p class="hero-sub">VELTRIX brings projects, workflow automation, team conversation and business analytics into one AI-assisted workspace. Work moves between people and tools on its own, and you can see where everything stands without asking.</p>
-    <div class="hero-cta">
-      <a class="btn btn-primary btn-lg" href="#demo" data-magnetic><span>Request a demo</span><svg width="18" height="18"><use href="#i-arrow"/></svg></a>
-      <a class="btn btn-quiet btn-lg" href="#tour"><span>Take the product tour</span></a>
+<!-- ============ HERO ============ -->
+<section class="hero" id="top" data-name="Overview" data-theme="dark">
+  <canvas class="sfield" id="heroField" aria-hidden="true"></canvas>
+  <div class="hero-inner">
+    <p class="eyebrow"><b>New</b>Projects · Automations · Copilot · Analytics, in one workspace</p>
+    <h1 class="hero-title"><span class="ln"><span>Connect the work.</span></span><span class="ln"><span>Automate the handoffs.</span></span><span class="ln ln-3"><span>See it all, live.</span></span></h1>
+    <div class="hero-side">
+      <p class="hero-sub">VELTRIX is an AI-assisted operations workspace. Projects, automations, team conversation and business numbers share one set of data, so work moves between people and tools without anyone chasing it.</p>
+      <div class="hero-cta">
+        <a class="btn btn-lime" href="#demo" data-magnetic>Book a demo <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-ghost" href="#tour" data-tour="0">Explore the product</a>
+      </div>
+      <button class="film-btn" type="button" data-film><span class="thumb"><img src="assets/film/overview.jpg" alt="" width="200" height="112"><i><svg width="11" height="11"><use href="#i-play"/></svg></i></span><span><b>Watch VELTRIX work</b><small>Product film · 0:36</small></span></button>
     </div>
-    <ul class="hero-modules" aria-label="What VELTRIX includes">
-      <li><svg width="15" height="15"><use href="#i-folder"/></svg>Projects</li>
-      <li><svg width="15" height="15"><use href="#i-flow"/></svg>Automations</li>
-      <li><svg width="15" height="15"><use href="#i-spark"/></svg>Copilot</li>
-      <li><svg width="15" height="15"><use href="#i-chart"/></svg>Analytics</li>
-      <li><svg width="15" height="15"><use href="#i-link"/></svg>Integrations</li>
-    </ul>
   </div>
 
   <div class="hero-stage" id="heroStage">
-    <div class="tower" aria-hidden="true">
-      <div class="tower-grid" id="towerGrid"></div>
-      <div class="tower-signals" id="towerSignals"></div>
-    </div>
-    <div class="fit" data-w="640" data-h="560" data-wm="420">
-      <div class="ui hero-ws" id="heroWs" data-depth="1">
-        <div class="ui-bar"><span class="ui-dots"><i></i><i></i><i></i></span><b>Northbeam · Workspace</b><span class="ui-chip">Sample workspace</span></div>
-        <div class="hw-kpis">
-          <div class="hw-kpi"><span>Revenue, 30 days</span><b id="hwRevenue">$0</b><em class="up" id="hwRevenueDelta">+0%</em></div>
-          <div class="hw-kpi"><span>On time</span><b id="hwOntime">0%</b><em id="hwOntimeDelta">0 pts</em></div>
-          <div class="hw-kpi"><span>Automation runs</span><b id="hwRuns">0</b><em>last 30 days</em></div>
+    <div class="stage-glow" aria-hidden="true"></div>
+    <div class="stage-tilt" id="stageTilt">
+      <div class="fit" data-w="1200" data-h="720" data-wm="340">
+        <div class="hs" id="hs">
+          <svg class="hs-lines" id="hsLines" aria-hidden="true"></svg>
+          <div class="hs-rail" id="hsRail" aria-label="Connected tools, illustrative">
+            <div class="hs-src" data-src="0"><span class="lg"><i style="--c:#FF7A59;--logo:url('assets/logos/hubspot.svg')"></i></span><span><b>HubSpot</b><small>Deal won · Acme</small></span></div>
+            <div class="hs-src" data-src="1"><span class="lg"><i style="--c:#4A154B;--logo:url('assets/logos/slack.svg')"></i></span><span><b>Slack</b><small>#launch · 3 new</small></span></div>
+            <div class="hs-src" data-src="2"><span class="lg"><i style="--c:#635BFF;--logo:url('assets/logos/stripe.svg')"></i></span><span><b>Stripe</b><small>Invoice 2287 paid</small></span></div>
+            <div class="hs-src" data-src="3"><span class="lg"><i style="--c:#4285F4;--logo:url('assets/logos/googlecalendar.svg')"></i></span><span><b>Calendar</b><small>Kickoff · Tue 10:00</small></span></div>
+          </div>
+
+          <div class="ui hs-win" id="hsWin" aria-hidden="true">
+            <div class="win-top"><span class="dots"><i></i><i></i><i></i></span><span class="crumb">Northbeam <svg width="12" height="12"><use href="#i-chev"/></svg> <b>Operations</b></span><span class="win-search"><svg width="13" height="13"><use href="#i-search"/></svg>Search or ask Copilot <kbd>⌘K</kbd></span><span class="people"><span class="av av-1">MO</span><span class="av av-2">LK</span><span class="av av-3">PR</span><span class="av av-5">OA</span></span></div>
+            <div class="hw">
+              <aside class="app-side">
+                <div class="app-ws"><span class="app-ws-logo">N</span><div><b>Northbeam</b><small>Sample workspace</small></div></div>
+                <div class="app-nav">
+                  <span class="navi is-on"><svg width="15" height="15"><use href="#i-grid"/></svg>Overview</span>
+                  <span class="navi"><svg width="15" height="15"><use href="#i-folder"/></svg>Projects</span>
+                  <span class="navi"><svg width="15" height="15"><use href="#i-flow"/></svg>Workflows<em>3</em></span>
+                  <span class="navi"><svg width="15" height="15"><use href="#i-spark"/></svg>Copilot</span>
+                  <span class="navi"><svg width="15" height="15"><use href="#i-chart"/></svg>Analytics</span>
+                  <span class="navi"><svg width="15" height="15"><use href="#i-users"/></svg>Team</span>
+                </div>
+                <div class="app-side-foot"><span class="av av-3">PR</span><div><b>Priya R.</b><small>Operations lead</small></div></div>
+              </aside>
+              <div class="hw-main">
+                <div class="hw-head"><h3>This week</h3><span class="crumb">Nov 3 – 7</span><span class="ui-chip live">Live · sample data</span></div>
+                <div class="ov-kpis">
+                  <div><span>Revenue, 30 days</span><b id="hwRev">$0</b><em class="kd" id="hwRevD"></em></div>
+                  <div><span>On-time delivery</span><b id="hwOn">0%</b><em class="kd" id="hwOnD"></em></div>
+                  <div><span>Avg. cycle time</span><b id="hwCycle">0 d</b><em class="kd">sample</em></div>
+                  <div><span>Automation runs</span><b id="hwRuns">0</b><em class="kd">last 30 days</em></div>
+                </div>
+                <div class="hw-cols">
+                  <div class="tl" id="hwTl">
+                    <div class="tl-days"><span>Project</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span></div>
+                    <div class="tl-row"><span><i class="pd pd-blue"></i>Q4 product launch</span><div class="tl-track"><i class="tl-bar" style="left:4%;width:66%;background:var(--lime)">Design QA · 8/11</i></div></div>
+                    <div class="tl-row"><span><i class="pd pd-amber"></i>Website relaunch</span><div class="tl-track"><i class="tl-bar" style="left:22%;width:48%;background:var(--warn)">Pricing page</i></div></div>
+                    <div class="tl-row"><span><i class="pd pd-green"></i>Acme onboarding</span><div class="tl-track"><i class="tl-bar" style="left:40%;width:56%;background:var(--aqua)">Kickoff → setup</i></div></div>
+                    <div class="tl-row"><span><i class="pd pd-red"></i>Support hiring</span><div class="tl-track"><i class="tl-bar" style="left:8%;width:30%;background:var(--bad)">Interviews</i></div></div>
+                    <div class="tl-row"><span><i class="pd pd-blue"></i>Month-end close</span><div class="tl-track"><i class="tl-bar" style="left:60%;width:38%;background:#B8C4CE">Checklist</i></div></div>
+                    <i class="tl-now" style="left:calc(140px + 14px + (100% - 168px) * .5)"></i>
+                  </div>
+                  <div class="feed"><p class="ph">Activity <span>Today</span></p><div id="hwFeed">
+                    <div class="fe"><span class="ic ic-blue"><svg width="12" height="12"><use href="#i-flow"/></svg></span><p><b>Rule ran</b> · onboarding project opened for Acme Freight</p><time>09:12</time></div>
+                    <div class="fe"><span class="ic ic-amber"><svg width="12" height="12"><use href="#i-spark"/></svg></span><p><b>Copilot</b> flagged Design QA as the launch blocker</p><time>09:40</time></div>
+                    <div class="fe"><span class="ic ic-green"><svg width="12" height="12"><use href="#i-card"/></svg></span><p><b>Invoice 2287</b> paid · milestone closed</p><time>10:05</time></div>
+                    <div class="fe"><span class="ic"><svg width="12" height="12"><use href="#i-msg"/></svg></span><p><b>Lena</b> commented on Launch email</p><time>10:31</time></div>
+                    <div class="fe"><span class="ic ic-blue"><svg width="12" height="12"><use href="#i-users"/></svg></span><p><b>Omar</b> took over Pricing page build</p><time>11:02</time></div>
+                  </div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ui hs-panel hs-auto" id="hsAuto">
+            <div class="pnl-h"><span class="ic ic-blue"><svg width="13" height="13"><use href="#i-flow"/></svg></span><b>Rule running</b><span class="ui-chip run" id="hsAutoState">Running</span></div>
+            <p class="pnl-p">When a deal is won, open the onboarding project</p>
+            <div class="auto-steps" id="hsSteps">
+              <div class="as"><i></i>Deal won · Acme Freight</div>
+              <div class="as"><i></i>Project created from template</div>
+              <div class="as"><i></i>Owner assigned · Priya R.</div>
+              <div class="as"><i></i>Kickoff booked · Tue 10:00</div>
+            </div>
+          </div>
+          <div class="ui hs-panel hs-chart" aria-hidden="true">
+            <div class="pnl-h"><span class="ic ic-green"><svg width="13" height="13"><use href="#i-chart"/></svg></span><b>Revenue · 12 weeks</b><span class="ui-chip">Sample</span></div>
+            <div class="big-num"><span id="hsRev">$0</span><small id="hsRevD"></small></div>
+            <svg class="spark" viewBox="0 0 270 74" preserveAspectRatio="none"><path class="ar" id="hsSparkA"/><path class="ln" id="hsSparkL"/></svg>
+          </div>
+          <div class="ui hs-panel hs-copilot" id="hsCopilot">
+            <div class="pnl-h"><span class="ic ic-amber"><svg width="13" height="13"><use href="#i-spark"/></svg></span><b>Copilot</b><time>suggestion</time></div>
+            <p class="pnl-p" id="hsAiText">Design QA is 3 screens from done. If it closes today, the launch email can still go out Thursday.</p>
+            <div class="pnl-act" id="hsAiAct"><button class="ui-btn ui-btn-primary" type="button" id="hsAiYes">Remind Lena</button><button class="ui-btn" type="button" id="hsAiNo">Not now</button></div>
+          </div>
         </div>
-        <div class="hw-projects">
-          <div class="hw-h"><b>Active projects</b><span>4</span></div>
-          <div class="hw-row" data-p="0"><i class="pd pd-blue"></i><span class="hw-n">Q4 product launch</span><span class="hw-bar"><i style="--v:.62"></i></span><span class="hw-s s-warn">At risk</span></div>
-          <div class="hw-row" data-p="1"><i class="pd pd-amber"></i><span class="hw-n">Website relaunch</span><span class="hw-bar"><i style="--v:.42"></i></span><span class="hw-s s-ok">On track</span></div>
-          <div class="hw-row" data-p="2"><i class="pd pd-green"></i><span class="hw-n">Acme Freight onboarding</span><span class="hw-bar"><i style="--v:.88"></i></span><span class="hw-s s-ok">On track</span></div>
-          <div class="hw-row" data-p="3"><i class="pd pd-red"></i><span class="hw-n">Support hiring</span><span class="hw-bar"><i style="--v:.3"></i></span><span class="hw-s s-bad">Behind</span></div>
-        </div>
-      </div>
-      <div class="ui hero-card hc-flow" data-depth="2">
-        <div class="hc-h"><span class="ic ic-blue"><svg width="13" height="13"><use href="#i-flow"/></svg></span><b>Automation ran</b><time id="hcFlowTime">just now</time></div>
-        <p id="hcFlowText">Deal marked won → onboarding project created, Priya assigned</p>
-        <div class="hc-steps"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
-      </div>
-      <div class="ui hero-card hc-ai" data-depth="3">
-        <div class="hc-h"><span class="ic ic-amber"><svg width="13" height="13"><use href="#i-spark"/></svg></span><b>Copilot</b><time>suggestion</time></div>
-        <p id="hcAiText">Design QA is 3 screens from done. If it closes today, the launch email can still go out Thursday.</p>
-        <div class="hc-act"><button class="ui-btn ui-btn-primary" type="button" id="hcAiYes">Remind Lena</button><button class="ui-btn" type="button" id="hcAiNo">Dismiss</button></div>
-      </div>
-      <div class="ui hero-card hc-chart" data-depth="2">
-        <div class="hc-h"><b>Revenue, 12 weeks</b><span class="ui-chip">Sample</span></div>
-        <svg viewBox="0 0 220 70" class="hc-spark" aria-hidden="true"><path id="hcSparkArea" class="sa"/><path id="hcSparkLine" class="sl"/></svg>
       </div>
     </div>
+    <div class="stage-fade" aria-hidden="true"></div>
   </div>
 </section>
 
-<!-- ============ INTRO: what changes ============ -->
-<section class="why" id="why" data-name="Why VELTRIX">
-  <div class="why-grid">
-    <div class="why-copy">
-      <h2 class="why-h">Operations break in the gaps between tools.</h2>
-      <p class="why-statement" id="whyStatement">A project lives in one app, the conversation about it in another, the invoice in a third and the numbers in a spreadsheet someone updates on Fridays. Nobody owns the handoffs, so people chase them. VELTRIX closes those gaps: one workspace where the work, the rules that move it and the numbers it produces are the same thing.</p>
+<!-- ============ SYSTEM: one statement, five working parts ============ -->
+<section class="sec system" id="system" data-name="What VELTRIX is">
+  <div class="sec-head" style="margin-bottom:0">
+    <div>
+      <p class="sec-tag">What VELTRIX is</p>
+      <p class="statement" id="statement">Most teams run operations across a project tool, a chat app, a CRM, a spreadsheet and somebody's memory. VELTRIX puts the work, the rules that move it and the numbers it produces into one system, so a change made once is true everywhere.</p>
     </div>
-    <figure class="why-media">
-      <div class="why-mask"><img src="assets/img/tower.jpg" alt="A tower at night with dozens of lit office floors" width="2400" height="1500" loading="lazy"></div>
-      <figcaption>Many teams, one structure.</figcaption>
-    </figure>
   </div>
-  <ol class="why-rail" aria-label="What VELTRIX connects">
-    <li><svg viewBox="0 0 48 48" class="glyph" aria-hidden="true"><rect x="8" y="10" width="32" height="28" rx="4"/><path d="M8 18h32M16 26h10M16 31h16"/></svg><b>Projects</b><span>Boards, timelines and owners that update when the work does.</span></li>
-    <li><svg viewBox="0 0 48 48" class="glyph" aria-hidden="true"><rect x="6" y="8" width="14" height="10" rx="3"/><rect x="28" y="30" width="14" height="10" rx="3"/><path d="M13 18v8a4 4 0 004 4h11"/></svg><b>Automations</b><span>Plain-language rules for every handoff, with a log of each run.</span></li>
-    <li><svg viewBox="0 0 48 48" class="glyph" aria-hidden="true"><path d="M24 6l4 11 11 4-11 4-4 11-4-11-11-4 11-4z"/></svg><b>Copilot</b><span>Answers about your operations, drawn from the workspace itself.</span></li>
-    <li><svg viewBox="0 0 48 48" class="glyph" aria-hidden="true"><path d="M8 40V8M8 40h32M15 32V22M23 32V14M31 32V26M39 32V18"/></svg><b>Analytics</b><span>Revenue, delivery and workload read from the work, not exports.</span></li>
-    <li><svg viewBox="0 0 48 48" class="glyph" aria-hidden="true"><circle cx="24" cy="24" r="6"/><circle cx="8" cy="10" r="3"/><circle cx="40" cy="10" r="3"/><circle cx="8" cy="38" r="3"/><circle cx="40" cy="38" r="3"/><path d="M10 12l9 8M38 12l-9 8M10 36l9-8M38 36l-9-8"/></svg><b>Integrations</b><span>Two-way connections to the tools your team already uses.</span></li>
-  </ol>
+  <div class="parts" id="parts" role="tablist" aria-label="The five working parts of VELTRIX">
+    <button class="part is-on" role="tab" aria-selected="true" type="button" data-part="0">
+      <span class="part-n">01</span><span class="part-ic"><svg width="20" height="20"><use href="#i-folder"/></svg></span>
+      <span class="part-vis" aria-hidden="true">
+        <span class="pv-card" style="left:0;top:10px;width:220px"><span class="ph">In progress <span>2</span></span><b>Design QA, onboarding flow</b><span class="kp" style="display:block;margin:8px 0"><i style="width:73%"></i></span><span class="tg tg-blue">8 of 11 screens</span></span>
+        <span class="pv-card" style="left:240px;top:44px;width:210px"><span class="ph">Done <span>3</span></span><b style="text-decoration:line-through;color:var(--on-3)">Vendor contract</b><br><span class="tg tg-green" style="margin-top:8px">Closed by rule</span></span>
+        <span class="pv-card" style="left:90px;top:150px;width:250px"><span class="ph">Owner</span><span style="display:flex;gap:8px;align-items:center"><i class="av av-3">PR</i><b>Priya R.</b><span class="tg" style="margin-left:auto">Due Thu</span></span></span>
+      </span>
+      <h3>Projects</h3><p>Boards and timelines over the same tasks. Move a card and every view, report and rule follows.</p><span class="part-bar"></span>
+    </button>
+    <button class="part" role="tab" aria-selected="false" type="button" data-part="1">
+      <span class="part-n">02</span><span class="part-ic"><svg width="20" height="20"><use href="#i-flow"/></svg></span>
+      <span class="part-vis" aria-hidden="true">
+        <span class="pv-card" style="left:0;top:20px;width:190px"><span class="ph">When</span><b>Deal marked won</b></span>
+        <span class="pv-card" style="left:220px;top:0;width:220px"><span class="ph">Then</span><b>Open onboarding project</b></span>
+        <span class="pv-card" style="left:220px;top:90px;width:220px"><span class="ph">And</span><b>Assign owner with most room</b></span>
+        <span class="pv-card" style="left:40px;top:150px;width:260px"><span class="ph">Last run</span><span style="display:flex;gap:8px;align-items:center"><span class="ui-chip done">Completed</span><span style="color:var(--on-3);font:500 11px var(--mono)">1.8 s · 4 steps</span></span></span>
+      </span>
+      <h3>Automations</h3><p>Rules written in plain language that move work between people and tools, with a log of every run.</p><span class="part-bar"></span>
+    </button>
+    <button class="part" role="tab" aria-selected="false" type="button" data-part="2">
+      <span class="part-n">03</span><span class="part-ic"><svg width="20" height="20"><use href="#i-spark"/></svg></span>
+      <span class="part-vis" aria-hidden="true">
+        <span class="pv-card" style="right:0;top:0;background:var(--lime);color:var(--g1);border-color:var(--lime)"><b>Which project is most at risk?</b></span>
+        <span class="pv-card" style="left:0;top:64px;width:360px"><b style="color:var(--lime)">Q4 product launch.</b> Design QA has 3 screens left and the launch email waits on it.</span>
+        <span class="pv-card" style="left:40px;top:170px"><span class="ph" style="margin:0">Sources · Design QA task · Launch timeline</span></span>
+      </span>
+      <h3>Copilot</h3><p>Ask about your operations and get an answer that points to the work it came from. It drafts; people approve.</p><span class="part-bar"></span>
+    </button>
+    <button class="part" role="tab" aria-selected="false" type="button" data-part="3">
+      <span class="part-n">04</span><span class="part-ic"><svg width="20" height="20"><use href="#i-chart"/></svg></span>
+      <span class="part-vis" aria-hidden="true">
+        <span class="pv-card" style="left:0;top:0;width:200px"><span class="ph">Revenue · 30 days</span><b style="font:600 24px var(--fd);letter-spacing:-.03em" data-kpi="rev30">$0</b></span>
+        <span class="pv-card" style="left:220px;top:30px;width:200px"><span class="ph">On-time delivery</span><b style="font:600 24px var(--fd);letter-spacing:-.03em" data-kpi="ontime30">0%</b></span>
+        <span class="pv-card" style="left:60px;top:120px;width:330px;height:110px"><svg viewBox="0 0 300 80" style="width:100%;height:80px" preserveAspectRatio="none"><path d="M0 64 L30 58 L60 62 L90 44 L120 48 L150 34 L180 38 L210 22 L240 28 L270 12 L300 16" fill="none" stroke="#C9F36B" stroke-width="2"/></svg></span>
+      </span>
+      <h3>Analytics</h3><p>Revenue, delivery, cycle time and workload, calculated from the tasks and invoices themselves rather than exported.</p><span class="part-bar"></span>
+    </button>
+    <button class="part" role="tab" aria-selected="false" type="button" data-part="4">
+      <span class="part-n">05</span><span class="part-ic"><svg width="20" height="20"><use href="#i-link"/></svg></span>
+      <span class="part-vis" aria-hidden="true">
+        <span class="pv-card" style="left:0;top:10px;display:flex;gap:10px;align-items:center"><span class="lg"><i style="--c:#FF7A59;--logo:url('assets/logos/hubspot.svg')"></i></span><b>HubSpot</b></span>
+        <span class="pv-card" style="left:170px;top:60px;display:flex;gap:10px;align-items:center"><span class="lg"><i style="--c:#4A154B;--logo:url('assets/logos/slack.svg')"></i></span><b>Slack</b></span>
+        <span class="pv-card" style="left:20px;top:120px;display:flex;gap:10px;align-items:center"><span class="lg"><i style="--c:#635BFF;--logo:url('assets/logos/stripe.svg')"></i></span><b>Stripe</b></span>
+        <span class="pv-card" style="left:220px;top:170px;display:flex;gap:10px;align-items:center"><span class="lg"><i style="--c:#181717;--logo:url('assets/logos/github.svg')"></i></span><b>GitHub</b></span>
+      </span>
+      <h3>Integrations</h3><p>Keep the tools your team already uses. VELTRIX is built to connect to them, so data arrives where the work is.</p><span class="part-bar"></span>
+    </button>
+  </div>
 </section>
 
-<!-- ============ SEQUENCE 1: from disconnected to connected (pinned) ============ -->
+<!-- ============ PROBLEM: full-bleed photograph ============ -->
+<section class="problem" id="problem" data-name="The problem">
+  <div class="problem-pin">
+    <div class="problem-media" id="problemMedia"><img src="assets/img/tower.jpg" alt="An office tower at night, every floor lit separately" width="2400" height="1500" loading="lazy"></div>
+    <div class="problem-copy">
+      <p class="sec-tag">The problem</p>
+      <h2 class="h2">Operations break in the gaps between tools.</h2>
+      <p class="sec-sub">Every team has its own system. The work that matters moves between them, and that is exactly where it gets lost.</p>
+    </div>
+    <div class="gaps" id="gaps" aria-label="Examples of gaps">
+      <p class="gap"><span class="gi"><svg width="14" height="14"><use href="#i-alert"/></svg></span>A deal closes in the CRM. Nobody opens the project.</p>
+      <p class="gap"><span class="gi"><svg width="14" height="14"><use href="#i-alert"/></svg></span>The tracker says done. The client hasn't heard.</p>
+      <p class="gap"><span class="gi"><svg width="14" height="14"><use href="#i-alert"/></svg></span>An invoice is overdue, and the reminder lives in one inbox.</p>
+      <p class="gap"><span class="gi"><svg width="14" height="14"><use href="#i-alert"/></svg></span>Friday's numbers are out of date by Monday.</p>
+    </div>
+    <p class="problem-cap">Photo: Unsplash</p>
+  </div>
+</section>
+
+<!-- ============ SEQUENCE 1: scattered → connected ============ -->
 <section class="connect" id="connect" data-name="Connected" data-theme="dark">
   <div class="connect-pin">
-    <div class="connect-copy">
+    <canvas class="sfield cx-field" id="cxField" aria-hidden="true"></canvas>
+    <div class="cx-copy">
       <p class="sec-tag">From scattered to connected</p>
+      <h2 class="h2">Watch one week of work <span class="hl">fall into place.</span></h2>
       <ol class="cx-steps" id="cxSteps">
-        <li class="is-on"><b>Seven tools, seven versions of the truth.</b><span>Email, chat, a tracker, the CRM, calendars, docs and invoices each hold part of the picture.</span></li>
-        <li><b>VELTRIX connects to each of them.</b><span>Two-way links, so nothing has to be migrated on day one.</span></li>
-        <li><b>Handoffs start running on rules.</b><span>When something changes in one tool, the next step happens in another.</span></li>
-        <li><b>Information falls into place.</b><span>Updates are filed against the right project, owner and deadline.</span></li>
-        <li><b>One workspace holds it all.</b><span>The same tasks, people and numbers, in one place.</span></li>
-        <li><b>Clarity, and control.</b><span>You can see what is on track, what is at risk and what to do next.</span></li>
+        <li class="is-on"><span>01</span><b>Seven tools, seven versions of the truth.</b><p>Email, chat, a tracker, the CRM, calendars and invoices each hold part of the picture.</p></li>
+        <li><span>02</span><b>VELTRIX connects to each of them.</b><p>Two-way links, so nothing has to be migrated on day one.</p></li>
+        <li><span>03</span><b>Handoffs start running on rules.</b><p>When something changes in one tool, the next step happens in another.</p></li>
+        <li><span>04</span><b>Information falls into place.</b><p>Updates are filed against the right project, owner and deadline.</p></li>
+        <li><span>05</span><b>One workspace holds it all.</b><p>The same tasks, people and numbers, in one place.</p></li>
+        <li><span>06</span><b>Clarity, and control.</b><p>You can see what is on track, what is at risk and what to do next.</p></li>
       </ol>
-      <div class="cx-meter" aria-hidden="true"><span id="cxMeter"></span></div>
+      <div class="cx-meter"><i id="cxMeter"></i></div>
     </div>
     <div class="connect-stage" id="connectStage">
       <div class="fit" data-w="980" data-h="620" data-wm="420">
         <div class="cx" id="cx">
           <svg class="cx-lines" viewBox="0 0 980 620" aria-hidden="true"><g id="cxPaths"></g><g id="cxPulses"></g></svg>
-          <div class="cx-hub" id="cxHub"><span class="brand-mark big"><i></i><i></i><i></i><i></i><i></i></span><b>VELTRIX</b></div>
-          <div class="cx-ws ui" id="cxWs">
-            <div class="ui-bar"><span class="ui-dots"><i></i><i></i><i></i></span><b>Q4 product launch</b><span class="ui-chip">Sample workspace</span></div>
+          <div class="cx-hub" id="cxHub" aria-hidden="true"><span class="brand-mark"><i></i><i></i><i></i><i></i><i></i></span>VELTRIX</div>
+          <div class="ui cx-ws" id="cxWs">
+            <div class="win-top"><span class="dots"><i></i><i></i><i></i></span><span class="crumb">Northbeam <svg width="12" height="12"><use href="#i-chev"/></svg> <b>Q4 product launch</b></span><span class="ui-chip live" style="margin-left:auto">Sample workspace</span></div>
             <div class="cxw-body">
               <div class="cxw-col"><p class="cxw-h">Work</p><div class="cxw-slot" data-slot="0"></div><div class="cxw-slot" data-slot="1"></div><div class="cxw-slot" data-slot="2"></div></div>
-              <div class="cxw-col"><p class="cxw-h">People &amp; time</p><div class="cxw-slot" data-slot="3"></div><div class="cxw-slot" data-slot="4"></div></div>
+              <div class="cxw-col"><p class="cxw-h">People and time</p><div class="cxw-slot" data-slot="3"></div><div class="cxw-slot" data-slot="4"></div></div>
               <div class="cxw-col"><p class="cxw-h">Money</p><div class="cxw-slot" data-slot="5"></div><div class="cxw-slot" data-slot="6"></div></div>
             </div>
-            <div class="cxw-foot" id="cxFoot"><span><i class="pd pd-green"></i>12 tasks on track</span><span><i class="pd pd-amber"></i>1 at risk: Design QA</span><span><i class="pd pd-blue"></i>3 rules running</span><span class="cxw-next">Next: confirm QA by Thursday</span></div>
+            <div class="cxw-foot" id="cxFoot"><span><i class="pd pd-green"></i>5 on track</span><span><i class="pd pd-amber"></i>1 at risk</span><span><i class="pd pd-blue"></i>3 rules running</span><span class="cxw-next">Next: close Design QA</span></div>
           </div>
           <div id="cxTiles"></div>
         </div>
@@ -239,7 +342,7 @@
   <div class="tour-pin">
     <div class="tour-copy">
       <p class="sec-tag">Product tour</p>
-      <h2 class="h2">One workspace, <span class="accent">six views of it.</span></h2>
+      <h2 class="h2">One workspace, <span class="hl">six views of it.</span></h2>
       <div class="tour-steps" id="tourSteps">
         <article class="is-on" data-v="overview"><b>Overview</b><p>Every project, its owner, its risk and the numbers it moves, on the first screen you open.</p></article>
         <article data-v="projects"><b>Projects</b><p>Boards and timelines over the same tasks. Move a card and every view, report and rule follows.</p></article>
@@ -341,12 +444,41 @@
   </div>
 </section>
 
-<!-- ============ WORKFLOW BUILDER ============ -->
-<section class="wfb" id="workflows" data-name="Workflows" data-theme="dark">
+<!-- ============ FILMS: feature explorer ============ -->
+<section class="sec films" id="films" data-name="Feature films" data-theme="dark">
+  <canvas class="sfield" id="filmsField" aria-hidden="true" style="opacity:.4"></canvas>
+  <div class="sec-head" style="position:relative;z-index:1">
+    <div>
+      <p class="sec-tag">See it work</p>
+      <h2 class="h2">Four films. <span class="hl">One connected system.</span></h2>
+    </div>
+    <p class="sec-sub">Pick a capability to watch it run end to end. Each film is an interface animation of VELTRIX built with the Northbeam sample workspace.</p>
+  </div>
+  <div class="films-grid">
+    <div class="chapters" id="chapters" role="tablist" aria-label="Feature films">
+      <button class="chap is-on" role="tab" aria-selected="true" type="button" data-film-ch="0"><span class="ci"><svg width="18" height="18"><use href="#i-folder"/></svg></span><b>Projects that keep themselves current</b><p><span>A card moves on the board; the timeline, owner and numbers follow on their own.</span></p><span class="chap-prog"><i></i></span></button>
+      <button class="chap" role="tab" aria-selected="false" type="button" data-film-ch="1"><span class="ci"><svg width="18" height="18"><use href="#i-flow"/></svg></span><b>A rule runs, step by step</b><p><span>A deal is won. The onboarding project, owner and kickoff appear without anyone asking.</span></p><span class="chap-prog"><i></i></span></button>
+      <button class="chap" role="tab" aria-selected="false" type="button" data-film-ch="2"><span class="ci"><svg width="18" height="18"><use href="#i-spark"/></svg></span><b>Copilot answers with sources</b><p><span>A plain question about risk, answered from the workspace with the tasks it came from.</span></p><span class="chap-prog"><i></i></span></button>
+      <button class="chap" role="tab" aria-selected="false" type="button" data-film-ch="3"><span class="ci"><svg width="18" height="18"><use href="#i-chart"/></svg></span><b>Numbers that update themselves</b><p><span>Revenue and delivery redraw as invoices are paid and tasks close.</span></p><span class="chap-prog"><i></i></span></button>
+    </div>
+    <div>
+      <div class="screen">
+        <div class="screen-bar"><span class="dots"><i></i><i></i><i></i></span><span id="filmLabel">Projects</span><span>Interface animation · sample data</span></div>
+        <div class="screen-media">
+          <video id="filmV" muted playsinline preload="metadata" poster="assets/film/projects.jpg" aria-label="Feature film: Projects"><source src="assets/film/projects.mp4" type="video/mp4"></video>
+          <div class="screen-ctl"><button class="round" type="button" id="filmToggle" aria-label="Pause film"><svg width="14" height="14"><use href="#i-pause"/></svg></button></div>
+        </div>
+      </div>
+      <p class="films-note">Films show the VELTRIX interface animated with sample data. They are not recordings of a production system.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec wfb" id="workflows" data-name="Workflows">
   <div class="sec-head">
     <div>
       <p class="sec-tag">Workflow automation</p>
-      <h2 class="h2">Write the rule once. <span class="accent">Watch every run.</span></h2>
+      <h2 class="h2">Write the rule once. <span class="hl">Watch every run.</span></h2>
     </div>
     <p class="sec-sub">Pick a sample automation, select any step to see how it is configured, then run it. The run is simulated in your browser; no tools are contacted.</p>
   </div>
@@ -374,12 +506,11 @@
   </div>
 </section>
 
-<!-- ============ COPILOT ============ -->
-<section class="copilot" id="copilot" data-name="Copilot">
+<section class="sec copilot" id="copilot" data-name="Copilot" data-theme="dark">
   <div class="cop-grid">
     <div class="cop-copy">
       <p class="sec-tag">Copilot</p>
-      <h2 class="h2">Ask your operations <span class="accent">a straight question.</span></h2>
+      <h2 class="h2">Ask your operations <span class="hl">a straight question.</span></h2>
       <p class="sec-sub">Copilot answers from the projects, rules and numbers in your workspace, and shows where each answer came from. It drafts tasks and automations for you to approve; it never acts on its own.</p>
       <ul class="cop-can">
         <li><svg width="16" height="16"><use href="#i-check"/></svg>Find risks across projects</li>
@@ -408,12 +539,11 @@
   </div>
 </section>
 
-<!-- ============ ANALYTICS ============ -->
-<section class="analytics" id="analytics" data-name="Analytics" data-theme="dark">
+<section class="sec analytics" id="analytics" data-name="Analytics">
   <div class="sec-head">
     <div>
       <p class="sec-tag">Analytics</p>
-      <h2 class="h2">Numbers that come <span class="accent">from the work itself.</span></h2>
+      <h2 class="h2">Numbers that come <span class="hl">from the work itself.</span></h2>
     </div>
     <p class="sec-sub">Every figure here is calculated from one sample dataset, so changing the range or the metric never contradicts another number on the page.</p>
   </div>
@@ -447,12 +577,32 @@
   </div>
 </section>
 
-<!-- ============ SOLUTIONS: an index of use cases ============ -->
-<section class="cases" id="solutions" data-name="Solutions">
+<section class="sec integr" id="integrations" data-name="Integrations" data-theme="dark">
+  <div class="sec-head">
+    <div>
+      <p class="sec-tag">Integrations</p>
+      <h2 class="h2">Keep your tools. <span class="hl">Connect the gaps.</span></h2>
+    </div>
+    <p class="sec-sub">The connectors below show the kinds of tools VELTRIX is designed to work with. Availability of specific connectors is to be confirmed.</p>
+  </div>
+  <div class="int-grid">
+    <div class="int-side">
+      <label class="int-search"><svg width="16" height="16"><use href="#i-search"/></svg><input type="search" id="intQ" placeholder="Search tools" aria-label="Search tools"></label>
+      <div class="int-cats" role="group" aria-label="Category" id="intCats"></div>
+    </div>
+    <div class="int-main">
+      <ul class="int-tiles" id="intTiles"></ul>
+      <p class="int-empty" id="intEmpty" hidden>No tools match that search.</p>
+    </div>
+    <aside class="ui int-detail" id="intDetail" aria-live="polite"></aside>
+  </div>
+</section>
+
+<section class="sec cases" id="solutions" data-name="Solutions">
   <div class="sec-head">
     <div>
       <p class="sec-tag">Solutions</p>
-      <h2 class="h2">Built around how <span class="accent">your team actually works.</span></h2>
+      <h2 class="h2">Built around how <span class="hl">your team actually works.</span></h2>
     </div>
     <p class="sec-sub">Four common ways teams use VELTRIX. Select one to see the work it organises and an example automation.</p>
   </div>
@@ -475,33 +625,11 @@
   </div>
 </section>
 
-<!-- ============ INTEGRATIONS ============ -->
-<section class="integr" id="integrations" data-name="Integrations">
-  <div class="sec-head">
-    <div>
-      <p class="sec-tag">Integrations</p>
-      <h2 class="h2">Keep your tools. <span class="accent">Connect the gaps.</span></h2>
-    </div>
-    <p class="sec-sub">The connectors below show the kinds of tools VELTRIX is designed to work with. Availability of specific connectors is to be confirmed.</p>
-  </div>
-  <div class="int-grid">
-    <div class="int-side">
-      <label class="int-search"><svg width="16" height="16"><use href="#i-search"/></svg><input type="search" id="intQ" placeholder="Search tools" aria-label="Search tools"></label>
-      <div class="int-cats" role="group" aria-label="Category" id="intCats"></div>
-    </div>
-    <div class="int-main">
-      <ul class="int-tiles" id="intTiles"></ul>
-      <p class="int-empty" id="intEmpty" hidden>No tools match that search.</p>
-    </div>
-    <aside class="ui int-detail" id="intDetail" aria-live="polite"></aside>
-  </div>
-</section>
-
-<!-- ============ FAQ ============ -->
-<section class="faq" id="faq" data-name="Questions">
+<section class="sec faq" id="faq" data-name="Questions">
+  <div class="faq-wrap">
   <div class="faq-head">
     <p class="sec-tag">Questions</p>
-    <h2 class="h2">Before you <span class="accent">book a demo.</span></h2>
+    <h2 class="h2">Before you <span class="hl">book a demo.</span></h2>
     <p class="sec-sub">If your question isn't here, add it to the demo request and it will be covered on the call.</p>
   </div>
   <div class="faq-list">
@@ -512,13 +640,14 @@
     <details><summary>What does pricing look like?<i></i></summary><div class="faq-a"><p>Pricing hasn't been published yet. Request a demo and it will be shared for your team size.</p></div></details>
     <details><summary>What happens after I request a demo?<i></i></summary><div class="faq-a"><p>On the live product site, the team would reply to arrange a walkthrough with your own workflows. On this page the form isn't connected to a backend yet, so it tells you plainly that nothing was sent.</p></div></details>
   </div>
+  </div>
 </section>
 
-<!-- ============ DEMO REQUEST ============ -->
-<section class="demo" id="demo" data-name="Request a demo" data-theme="dark">
+<section class="sec demo" id="demo" data-name="Book a demo" data-theme="dark">
+  <canvas class="sfield" id="demoField" aria-hidden="true"></canvas>
   <div class="demo-grid">
     <div class="demo-copy">
-      <h2 class="demo-h">See your own operations <span class="accent">running in one place.</span></h2>
+      <h2 class="demo-h">See your own operations <span class="hl">running in one place.</span></h2>
       <p>Tell us how your team works today. The walkthrough is built around your real handoffs, not a generic script.</p>
       <ol class="demo-steps">
         <li><b>Tell us your stack</b><span>The tools and handoffs you want to connect first.</span></li>
@@ -542,7 +671,7 @@
       <div class="field"><span class="flabel">Most interested in</span>
         <div class="chips" role="group" aria-label="Interests"><button type="button" aria-pressed="false">Projects</button><button type="button" aria-pressed="false">Automations</button><button type="button" aria-pressed="false">Copilot</button><button type="button" aria-pressed="false">Analytics</button><button type="button" aria-pressed="false">Integrations</button></div></div>
       <div class="field"><label for="fMsg">What should the demo cover? <span class="opt">Optional</span></label><textarea id="fMsg" rows="3" maxlength="500"></textarea><small class="count" id="fMsgCount">0 / 500</small></div>
-      <button class="btn btn-primary btn-lg btn-block" type="submit" id="demoSubmit"><span>Request a demo</span><svg width="18" height="18"><use href="#i-arrow"/></svg></button>
+      <button class="btn btn-lime btn-block" type="submit" id="demoSubmit"><span>Request a demo</span><svg width="18" height="18"><use href="#i-arrow"/></svg></button>
       <div class="form-state" id="formState" role="status" aria-live="polite" hidden></div>
       <p class="form-note">This form isn't connected to a backend yet. Submitting it checks your entries and shows what would be sent; nothing leaves this page.</p>
     </form>
@@ -551,25 +680,32 @@
 
 </main>
 
-<footer class="foot">
+<footer class="foot" data-theme="dark">
   <div class="foot-top">
     <div class="foot-brand">
       <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="brand-word">VELTRIX</span></a>
-      <p>The AI operations workspace for projects, automations, team conversation and analytics.</p>
+      <p>The AI-assisted operations workspace for projects, automations, team conversation and analytics.</p>
     </div>
     <nav class="foot-cols" aria-label="Footer">
       <div><p>Product</p><a href="#tour">Workspace</a><a href="#workflows">Automations</a><a href="#copilot">Copilot</a><a href="#analytics">Analytics</a><a href="#integrations">Integrations</a></div>
       <div><p>Solutions</p><a href="#solutions" data-case="0">Studios and agencies</a><a href="#solutions" data-case="1">Client services</a><a href="#solutions" data-case="2">Operations teams</a><a href="#solutions" data-case="3">Field and logistics</a></div>
-      <div><p>Resources</p><a href="#tour">Product tour</a><a href="#faq">Questions</a><button type="button" data-open-palette>Command menu</button><a href="#demo">Request a demo</a></div>
+      <div><p>Resources</p><button type="button" data-film>Product film</button><a href="#films">Feature films</a><a href="#faq">Questions</a><button type="button" data-open-palette>Command menu</button><a href="#demo">Book a demo</a></div>
     </nav>
   </div>
-  <div class="foot-grid" aria-hidden="true" id="footGrid"></div>
+  <p class="foot-word" id="footWord" aria-hidden="true"><span>V</span><span>E</span><span>L</span><span>T</span><span>R</span><span>I</span><span>X</span></p>
   <div class="foot-bot">
     <span>© 2026 VELTRIX. Company and legal details to be added before launch.</span>
     <span>All product data shown is sample data. Third-party logos belong to their owners and are shown for illustration only; no partnership is implied.</span>
-    <span class="credit">Photos via Unsplash: Vladimir Kudinov, Breather, Adam Przewoski, Drew Patrick Miller, Israel Sundseth</span>
+    <span>Photos via Unsplash: Vladimir Kudinov, Breather, Adam Przewoski, Drew Patrick Miller, Israel Sundseth. Logos: Simple Icons.</span>
   </div>
 </footer>
+
+<div class="film-modal" id="filmModal" role="dialog" aria-modal="true" aria-labelledby="filmTitle" hidden>
+  <div class="film-box">
+    <div class="film-head"><div><b id="filmTitle">VELTRIX in 36 seconds</b><small>Interface animation built from the VELTRIX design with the Northbeam sample workspace. Not a recording of production software.</small></div><button class="round" type="button" id="filmClose" aria-label="Close film"><svg width="16" height="16"><use href="#i-x"/></svg></button></div>
+    <video id="filmFull" controls playsinline preload="none" poster="assets/film/overview.jpg"><source src="assets/film/overview.mp4" type="video/mp4"></video>
+  </div>
+</div>
 
 <div class="palette" id="palette" role="dialog" aria-modal="true" aria-label="Command menu" hidden>
   <div class="pal-box">

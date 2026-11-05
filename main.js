@@ -181,139 +181,217 @@
   document.fonts?.ready.then(placePills);
   placePills();
 
-  /* ================= intro + hero entrance ================= */
-  const intro = $('.intro');
-  const towerGrid = $('#towerGrid');
-  const buildTower = () => {
-    const rows = Math.ceil((towerGrid.clientHeight || 700) / 42) + 1;
-    towerGrid.innerHTML = '<i></i>'.repeat(rows * 10);
-    const r = seeded(7);
-    $$('i', towerGrid).forEach(c => { const v = r(); if (v > 0.86) c.className = 'a'; else if (v > 0.74) c.className = 'w'; else if (v > 0.71) c.className = 'b'; });
+  /* ================= signal field: a dotted grid that carries lime pulses ================= */
+  // Dots are painted once to an offscreen canvas; each frame only draws the moving pulses and the pointer light.
+  const makeField = (canvas, { pulses = 6, gap = 28, light = true } = {}) => {
+    if (!canvas) return null;
+    const ctx = canvas.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1), host = canvas.parentElement;
+    let W = 0, H = 0, dots = null, list = [], raf = 0, on = false, last = 0, px = -9999, py = -9999;
+    const spawn = () => {
+      const h = Math.random() < 0.62, span = h ? W : H, lanes = Math.max(1, Math.floor((h ? H : W) / gap));
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      return { h, dir, lane: (Math.floor(Math.random() * lanes) + 0.5) * gap, p: dir > 0 ? -160 : span + 160, v: 110 + Math.random() * 170, span };
+    };
+    const paint = () => {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      if (dots) ctx.drawImage(dots, 0, 0, W, H);
+      if (light && px > -999) {
+        const g = ctx.createRadialGradient(px, py, 0, px, py, 260);
+        g.addColorStop(0, 'rgba(201,243,107,.09)'); g.addColorStop(1, 'rgba(201,243,107,0)');
+        ctx.fillStyle = g; ctx.fillRect(px - 260, py - 260, 520, 520);
+      }
+      list.forEach(s => {
+        const tail = 150, x1 = s.h ? s.p : s.lane, y1 = s.h ? s.lane : s.p, x0 = s.h ? s.p - tail * s.dir : s.lane, y0 = s.h ? s.lane : s.p - tail * s.dir;
+        const g = ctx.createLinearGradient(x0, y0, x1, y1);
+        g.addColorStop(0, 'rgba(201,243,107,0)'); g.addColorStop(1, 'rgba(201,243,107,.6)');
+        ctx.strokeStyle = g; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+        ctx.fillStyle = '#C9F36B'; ctx.shadowColor = 'rgba(201,243,107,.9)'; ctx.shadowBlur = 10;
+        ctx.beginPath(); ctx.arc(x1, y1, 2, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0;
+      });
+    };
+    const frame = t => {
+      const dt = Math.min(0.05, (t - (last || t)) / 1000); last = t;
+      list.forEach(s => { s.p += s.v * dt * s.dir; });
+      list = list.filter(s => s.dir > 0 ? s.p < s.span + 170 : s.p > -170);
+      while (list.length < pulses) list.push(spawn());
+      paint();
+      raf = on ? requestAnimationFrame(frame) : 0;
+    };
+    const size = () => {
+      W = canvas.clientWidth; H = canvas.clientHeight;
+      if (!W || !H) return;
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      dots = document.createElement('canvas'); dots.width = canvas.width; dots.height = canvas.height;
+      const d = dots.getContext('2d'); d.scale(dpr, dpr); d.fillStyle = 'rgba(214,228,238,.12)';
+      for (let x = gap / 2; x < W; x += gap) for (let y = gap / 2; y < H; y += gap) d.fillRect(x - 0.75, y - 0.75, 1.5, 1.5);
+      list = list.map(s => ({ ...s, span: s.h ? W : H }));
+      paint();
+    };
+    size();
+    if (!motion) return { size };
+    new IntersectionObserver(([e]) => { on = e.isIntersecting && !document.hidden; if (on && !raf) { last = 0; raf = requestAnimationFrame(frame); } }).observe(host);
+    document.addEventListener('visibilitychange', () => { on = !document.hidden && host.getBoundingClientRect().bottom > 0 && host.getBoundingClientRect().top < innerHeight; if (on && !raf) raf = requestAnimationFrame(frame); });
+    if (finePointer && light) {
+      host.addEventListener('pointermove', e => { const r = canvas.getBoundingClientRect(); px = e.clientX - r.left; py = e.clientY - r.top; });
+      host.addEventListener('pointerleave', () => { px = py = -9999; });
+    }
+    return { size };
   };
-  buildTower();
-  const heroIn = () => {
-    fillNumbers();
-    if (!motion) return;
-    const tl = G.timeline({ defaults: { ease: EASE } });
-    tl.from('.nav-bar > *', { y: -16, opacity: 0, duration: 0.9, stagger: 0.06 }, 0)
-      .from('.hero-tag', { y: 14, opacity: 0, duration: 0.8 }, 0.05)
-      // each line rises out of its mask and settles from a slight tilt
-      .from('.hero-title .ln > span', { yPercent: 110, rotate: 4, transformOrigin: '0% 100%', duration: 1.25, stagger: 0.09 }, 0.1)
-      .from('.hero-sub', { y: 22, opacity: 0, duration: 1 }, 0.5)
-      .from('.hero-cta > *', { y: 18, opacity: 0, scale: 0.96, duration: 0.9, stagger: 0.07 }, 0.6)
-      .from('.hero-modules li', { y: 10, opacity: 0, duration: 0.7, stagger: 0.05 }, 0.75)
-      .fromTo('.tower', { clipPath: 'inset(100% 0% 0% 0% round 28px 28px 0px 0px)' }, { clipPath: 'inset(0% 0% 0% 0% round 28px 28px 0px 0px)', duration: 1.4, ease: 'expo.inOut' }, 0.15)
-      // the windows switch on as a wave rising from the bottom corner
-      .from('#towerGrid i', { opacity: 0, scale: 0.6, duration: 0.7, stagger: { grid: 'auto', from: 'end', amount: 0.9 } }, 0.55)
-      .from('#heroWs', { y: 70, opacity: 0, rotateX: 10, transformPerspective: 1400, transformOrigin: '50% 100%', duration: 1.3 }, 0.85)
-      .from('#heroWs .hw-row', { x: -16, opacity: 0, duration: 0.8, stagger: 0.07 }, 1.15)
-      .from('#heroWs .hw-bar i', { scaleX: 0, duration: 1.2, stagger: 0.07 }, 1.2)
-      .from('.hc-flow', { x: 60, y: -10, opacity: 0, scale: 0.94, duration: 1.1 }, 1.25)
-      .from('.hc-chart', { x: -50, y: 20, opacity: 0, scale: 0.94, duration: 1.1 }, 1.35)
-      .from('.hc-ai', { y: 50, opacity: 0, scale: 0.94, duration: 1.1 }, 1.45)
-      .add(() => drawSpark(), 1.4)
-      // once assembled, the floating cards drift gently on their own rhythms (yPercent, so pointer depth stays free)
-      .add(() => ['.hc-flow', '.hc-chart', '.hc-ai'].forEach((s, i) => G.to(s, { yPercent: i % 2 ? 4 : -4, duration: 3.2 + i * 0.7, ease: 'sine.inOut', yoyo: true, repeat: -1 })), 2.4);
-  };
-  if (!motion) { intro?.remove(); heroIn(); drawSpark(); }
-  else {
-    // the grid lights from the centre, the wordmark rises, then the grid itself opens onto the page
-    const ig = $('.intro-grid'), cols = innerWidth > 700 ? 16 : 8, rowsN = Math.ceil(innerHeight / (innerWidth / cols));
-    ig.style.setProperty('--cols', cols);
-    ig.innerHTML = '<i></i>'.repeat(cols * rowsN);
-    const cells = $$('i', ig), rnd = seeded(11), grid = [rowsN, cols];
-    cells.forEach(c => { if (rnd() > 0.78) c.classList.add('lit'); });
-    G.set('.hero-title .ln > span', { yPercent: 110 });
-    const tl = G.timeline({ onComplete: () => intro.remove() });
-    tl.from(cells, { opacity: 0, scale: 0.4, duration: 0.5, ease: 'power2.out', stagger: { grid, from: 'center', amount: 0.45 } }, 0)
-      .from('.intro-word span', { yPercent: 70, opacity: 0, filter: 'blur(8px)', duration: 0.7, stagger: 0.05, ease: EASE }, 0.1)
-      .to('.intro-word span', { yPercent: -50, opacity: 0, duration: 0.4, stagger: 0.03, ease: 'power2.in' }, 0.95)
-      // cells turn solid so the page shows only through the grid lines, then they shrink away from the centre
-      .add(() => { intro.style.background = 'transparent'; cells.forEach(c => { c.className = ''; c.style.background = 'var(--ink)'; }); G.set('.hero-title .ln > span', { clearProps: 'yPercent' }); heroIn(); }, 1.2)
-      .to(cells, { scale: 0, borderRadius: '50%', duration: 0.55, ease: 'power3.in', stagger: { grid, from: 'center', amount: 0.5 } }, 1.2);
-    setTimeout(() => { if (document.contains(intro)) tl.progress(1); }, 4000);
-  }
+  const fields = [makeField($('#heroField'), { pulses: 8 }), makeField($('#cxField'), { pulses: 5, light: false }), makeField($('#filmsField'), { pulses: 4 }), makeField($('#demoField'), { pulses: 6 })].filter(Boolean);
+  let fieldT;
+  addEventListener('resize', () => { clearTimeout(fieldT); fieldT = setTimeout(() => fields.forEach(f => f.size()), 200); });
+
+  /* ================= numbers: every figure comes from DATA ================= */
   function fillNumbers() {
-    countTo($('#hwRevenue'), K.rev30, { format: money, dur: 1.6 });
-    $('#hwRevenueDelta').textContent = `${pctDelta(K.rev30, K.revPrev) >= 0 ? '+' : ''}${pctDelta(K.rev30, K.revPrev).toFixed(1)}%`;
-    countTo($('#hwOntime'), K.ontime30, { format: v => `${v.toFixed(1)}%`, dur: 1.6 });
+    const fmtD = d => `${d >= 0 ? '+' : ''}${d.toFixed(1)}%`;
+    countTo($('#hwRev'), K.rev30, { format: money, dur: 1.6 });
+    $('#hwRevD').textContent = `${fmtD(pctDelta(K.rev30, K.revPrev))} vs prior`;
+    $('#hwRevD').classList.toggle('up', K.rev30 >= K.revPrev);
+    countTo($('#hwOn'), K.ontime30, { format: v => `${v.toFixed(1)}%`, dur: 1.6 });
     const dOn = K.ontime30 - K.ontimePrev;
-    $('#hwOntimeDelta').textContent = `${dOn >= 0 ? '+' : ''}${dOn.toFixed(1)} pts`;
-    $('#hwOntimeDelta').classList.toggle('up', dOn >= 0);
+    $('#hwOnD').textContent = `${dOn >= 0 ? '+' : ''}${dOn.toFixed(1)} pts`;
+    $('#hwOnD').classList.toggle('up', dOn >= 0);
+    countTo($('#hwCycle'), K.cycle30, { format: v => `${v.toFixed(1)} d`, dur: 1.6 });
     countTo($('#hwRuns'), K.runs30, { dur: 1.6 });
+    const w12 = buckets('revenue', 84).slice(-12), p12 = buckets('revenue', 84, 84).slice(-12);
+    const t12 = w12.reduce((s, b) => s + b.v, 0), tp = p12.reduce((s, b) => s + b.v, 0);
+    countTo($('#hsRev'), t12, { format: money, dur: 1.8 });
+    $('#hsRevD').textContent = `${fmtD(pctDelta(t12, tp))} vs prior 12 wks`;
     const vals = { rev30: money(K.rev30), ontime30: `${K.ontime30.toFixed(1)}%`, cycle30: `${K.cycle30.toFixed(1)} d`, runs30: fmt(K.runs30), rev84: money(K.rev84) };
     $$('[data-kpi]').forEach(el => { el.textContent = vals[el.dataset.kpi]; });
     $$('.wfr small').forEach((s, i) => { if (i < 3) s.textContent = s.textContent.replace(/ran \d+ times/, `ran ${ruleRuns[i]} times`); });
-  }
-  function drawSpark() {
-    const pts = buckets('revenue', 84).slice(-12).map(b => b.v);
-    const max = Math.max(...pts), min = Math.min(...pts);
-    const xy = pts.map((v, i) => [i / (pts.length - 1) * 220, 64 - (v - min) / (max - min) * 54]);
-    const d = xy.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
-    $('#hcSparkLine').setAttribute('d', d);
-    $('#hcSparkArea').setAttribute('d', `${d} L220 70 L0 70 Z`);
-    if (motion) { const l = $('#hcSparkLine'), len = l.getTotalLength(); G.fromTo(l, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.6, ease: 'power2.inOut' }); G.from('#hcSparkArea', { opacity: 0, duration: 1.2, delay: 0.6 }); }
+    // the 12-week sparkline in the hero
+    const pts = w12.map(b => b.v), max = Math.max(...pts), min = Math.min(...pts) * 0.92;
+    const d = pts.map((v, i) => `${i ? 'L' : 'M'}${(i / (pts.length - 1) * 270).toFixed(1)} ${(70 - (v - min) / (max - min) * 62).toFixed(1)}`).join(' ');
+    $('#hsSparkL').setAttribute('d', d); $('#hsSparkA').setAttribute('d', `${d} L270 74 L0 74 Z`);
   }
 
-  // the tower keeps working: windows switch on and off, a few report what happened
-  const heroVis = visibleFlag($('.hero'));
-  const signals = ['Invoice 2287 paid', 'Kickoff booked', 'QA: 8 of 11', 'Deal won · Acme', 'Forecast updated', 'Owner assigned', 'Reminder sent', 'Timesheet filed'];
-  let sigI = 0;
-  const towerTick = () => {
-    if (!heroVis.on || document.hidden) return;
-    const cells = $$('i', towerGrid);
-    for (let k = 0; k < 4; k++) {
-      const c = cells[Math.floor(Math.random() * cells.length)];
-      const v = Math.random();
-      c.className = v > 0.6 ? 'a' : v > 0.35 ? 'w' : v > 0.28 ? 'b' : '';
-    }
-    if (Math.random() > 0.45) {
-      const lit = cells.filter(c => c.className === 'a');
-      const c = lit[Math.floor(Math.random() * lit.length)];
-      if (!c) return;
-      const tr = $('.tower').getBoundingClientRect(), cr = c.getBoundingClientRect();
-      const s = document.createElement('span');
-      s.className = 'sig';
-      s.textContent = signals[sigI++ % signals.length];
-      s.style.left = `${clamp(cr.left - tr.left, 8, tr.width - 140)}px`;
-      s.style.top = `${cr.top - tr.top - 26}px`;
-      $('#towerSignals').appendChild(s);
-      if (motion) G.timeline({ onComplete: () => s.remove() }).from(s, { y: 8, opacity: 0, duration: 0.5, ease: EASE }).to(s, { opacity: 0, y: -6, duration: 0.5, delay: 1.6 });
-      else setTimeout(() => s.remove(), 2200);
-    }
+  /* ================= hero: entrance, live workspace, signal lines ================= */
+  const hs = $('#hs'), hsLines = $('#hsLines'), rail = $$('#hsRail .hs-src'), hsWin = $('#hsWin');
+  // lines from each connected tool into the workspace window, measured from layout (transforms ignored)
+  const offIn = (el, anc) => { let x = 0, y = 0; for (let n = el; n && n !== anc; n = n.offsetParent) { x += n.offsetLeft; y += n.offsetTop; } return [x, y]; };
+  const drawRail = () => {
+    if (!hs || !rail.length) return [];
+    const [wx, wy] = offIn(hsWin, hs);
+    hsLines.setAttribute('viewBox', `0 0 ${hs.offsetWidth} ${hs.offsetHeight}`);
+    hsLines.innerHTML = rail.map((s, i) => {
+      const [sx, sy] = offIn(s, hs), x0 = sx + s.offsetWidth, y0 = sy + s.offsetHeight / 2, x1 = wx + 196 + 30, y1 = wy + 140 + i * 60;
+      return `<path d="M${x0} ${y0} C${x0 + 60} ${y0}, ${x1 - 80} ${y1}, ${x1} ${y1}"/>`;
+    }).join('') + rail.map(() => '<circle r="3" opacity="0"/>').join('');
+    return $$('path', hsLines);
   };
-  if (motion) setInterval(towerTick, 900);
-
-  // live automation card cycles through recent runs
-  const flowEvents = [['Deal marked won → onboarding project created, Priya assigned', 4], ['Invoice 2287 paid → milestone closed, Omar notified', 3], ['Task 2 days late → owner’s lead told in chat', 2], ['Kickoff booked → agenda drafted and shared', 3]];
-  let flowI = 0;
-  setInterval(() => {
-    if (!heroVis.on || document.hidden || !motion) return;
-    const [text, n] = flowEvents[++flowI % flowEvents.length];
-    G.timeline().to('#hcFlowText', { opacity: 0, y: -6, duration: 0.25 })
-      .add(() => { $('#hcFlowText').textContent = text; $('#hcFlowTime').textContent = now(); $$('.hc-steps i').forEach((s, i) => s.classList.toggle('on', false)); $('.hc-steps').innerHTML = '<i></i>'.repeat(n); })
-      .fromTo('#hcFlowText', { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.4 })
-      .add(() => $$('.hc-steps i').forEach((s, i) => setTimeout(() => s.classList.add('on'), 180 * i)));
-  }, 5200);
-  $('#hcAiYes').addEventListener('click', () => {
-    $('#hcAiText').textContent = 'Done. Lena will get a reminder the moment Design QA closes (demo: nothing was sent).';
-    $('.hc-act').innerHTML = '<span class="ui-chip">Reminder set</span>';
+  let railPaths = drawRail();
+  const heroVis = visibleFlag($('.hero'));
+  let heroArrived = false;
+  const heroIn = () => {
+    fillNumbers();
+    if (!motion) { heroArrived = true; return; }
+    const tl = G.timeline({ defaults: { ease: EASE }, onComplete: () => { heroArrived = true; } });
+    tl.from('.nav-bar > *', { y: -16, opacity: 0, duration: 0.9, stagger: 0.06 }, 0)
+      .from('.eyebrow', { y: 14, opacity: 0, duration: 0.8 }, 0.05)
+      .from('.hero-title .ln > span', { yPercent: 112, rotate: 3, transformOrigin: '0% 100%', duration: 1.3, stagger: 0.1 }, 0.1)
+      .from('.hero-sub', { y: 24, opacity: 0, duration: 1 }, 0.45)
+      .from('.hero-cta > *', { y: 18, opacity: 0, duration: 0.9, stagger: 0.07 }, 0.55)
+      .from('.film-btn', { y: 18, opacity: 0, duration: 0.9 }, 0.68)
+      .from('#heroStage', { y: 140, opacity: 0, duration: 1.6, ease: 'expo.out' }, 0.5)
+      .from('#hsWin .app-nav > *', { x: -10, opacity: 0, duration: 0.6, stagger: 0.04 }, 1.0)
+      .from('#hsWin .ov-kpis > *', { y: 14, opacity: 0, duration: 0.7, stagger: 0.06 }, 1.05)
+      .from('#hsWin .tl-bar', { scaleX: 0, duration: 1.1, stagger: 0.07, ease: 'power3.inOut' }, 1.15)
+      .from('#hsWin .fe', { x: 14, opacity: 0, duration: 0.6, stagger: 0.06 }, 1.2)
+      .from('#hsRail .hs-src', { x: -50, opacity: 0, duration: 0.9, stagger: 0.08 }, 1.25)
+      .from('#hsAuto', { x: 50, y: -10, opacity: 0, duration: 1 }, 1.35)
+      .from('.hs-chart', { y: 50, opacity: 0, duration: 1 }, 1.45)
+      .from('#hsCopilot', { y: 60, opacity: 0, duration: 1 }, 1.55)
+      .add(() => {
+        railPaths.forEach(p => { const len = p.getTotalLength(); G.fromTo(p, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut', onComplete: () => { p.style.strokeDasharray = ''; } }); });
+        const l = $('#hsSparkL'), len = l.getTotalLength();
+        G.fromTo(l, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut' });
+        G.from('#hsSparkA', { opacity: 0, duration: 1, delay: 0.5 });
+      }, 1.5);
+  };
+  heroIn();
+  // signals leave each tool in turn and arrive in the workspace; the tool's card lights as it sends
+  if (motion) {
+    const dots = $$('circle', hsLines);
+    railPaths.forEach((p, i) => {
+      const o = { k: 0 }, len = () => p.getTotalLength();
+      G.to(o, { k: 1, duration: 1.5, ease: 'power1.inOut', repeat: -1, repeatDelay: 2.6, delay: 2.6 + i * 0.95,
+        onStart: () => rail[i].animate([{ borderColor: 'rgba(201,243,107,.8)' }, { borderColor: 'rgba(214,228,238,.14)' }], { duration: 900 }),
+        onRepeat: () => rail[i].animate([{ borderColor: 'rgba(201,243,107,.8)' }, { borderColor: 'rgba(214,228,238,.14)' }], { duration: 900 }),
+        onUpdate: () => { if (!heroVis.on) return; const pt = p.getPointAtLength(len() * o.k); dots[i].setAttribute('cx', pt.x); dots[i].setAttribute('cy', pt.y); dots[i].setAttribute('opacity', o.k < 0.05 ? o.k / 0.05 : o.k > 0.94 ? (1 - o.k) / 0.06 : 1); } });
+    });
+  }
+  // the automation panel runs its rule on a loop and posts each result into the activity feed
+  const steps = $$('#hsSteps .as'), feed = $('#hwFeed'), autoState = $('#hsAutoState');
+  const posts = [
+    ['i-target', 'ic-blue', '<b>Deal won</b> · Acme Freight moved to onboarding'],
+    ['i-folder', 'ic-blue', '<b>Project created</b> · Acme Freight onboarding, 14 tasks'],
+    ['i-users', 'ic-green', '<b>Owner assigned</b> · Priya R. has the most room'],
+    ['i-cal', 'ic-amber', '<b>Kickoff booked</b> · Tue 10:00 with Acme']
+  ];
+  let stepI = 0;
+  const postFeed = ([ic, cls, html]) => {
+    const row = document.createElement('div');
+    row.className = 'fe is-new';
+    row.innerHTML = `<span class="ic ${cls}">${icon(ic, 12)}</span><p>${html}</p><time>${now()}</time>`;
+    feed.prepend(row);
+    while (feed.children.length > 5) feed.lastElementChild.remove();
+    if (motion) G.from(row, { height: 0, opacity: 0, paddingTop: 0, paddingBottom: 0, duration: 0.6, ease: 'power3.out' });
+    setTimeout(() => row.classList.remove('is-new'), 2400);
+  };
+  const tickAuto = () => {
+    if (!heroVis.on || document.hidden || !heroArrived) return;
+    if (stepI === steps.length) { steps.forEach(s => s.classList.remove('on', 'go')); autoState.textContent = 'Running'; autoState.className = 'ui-chip run'; stepI = 0; return; }
+    steps.forEach((s, k) => s.classList.toggle('go', k === stepI + 1));
+    steps[stepI].classList.add('on'); steps[stepI].classList.remove('go');
+    postFeed(posts[stepI]);
+    stepI++;
+    if (stepI === steps.length) { autoState.textContent = 'Completed'; autoState.className = 'ui-chip done'; }
+  };
+  if (motion) setInterval(tickAuto, 1700); else steps.forEach(s => s.classList.add('on'));
+  $('#hsAiYes').addEventListener('click', () => {
+    $('#hsAiText').textContent = 'Done. Lena gets a reminder the moment Design QA closes. (Demo: nothing was sent.)';
+    $('#hsAiAct').innerHTML = '<span class="ui-chip done">Reminder set</span>';
     toast('Reminder set for Lena in this demo', 'i-spark');
   });
-  $('#hcAiNo').addEventListener('click', () => {
-    $('#hcAiText').textContent = 'Dismissed. Copilot will check the launch timeline again tomorrow.';
-    $('.hc-act').innerHTML = '';
-  });
-  // subtle depth: layers shift a few pixels with the pointer
+  $('#hsAiNo').addEventListener('click', () => { $('#hsAiText').textContent = 'Dismissed. Copilot will check the launch timeline again tomorrow.'; $('#hsAiAct').innerHTML = ''; });
+  // pointer depth: the floating panels drift a few pixels; the stage flattens as you scroll into the page
   if (motion && finePointer) {
-    const layers = $$('#heroStage [data-depth]');
+    const layers = [['#hsAuto', 10], ['#hsCopilot', 14], ['.hs-chart', 8], ['#hsRail', 6]];
     $('.hero').addEventListener('mousemove', e => {
+      if (!heroArrived) return;
       const nx = e.clientX / innerWidth - 0.5, ny = e.clientY / innerHeight - 0.5;
-      layers.forEach(l => G.to(l, { x: -nx * 6 * l.dataset.depth, y: -ny * 5 * l.dataset.depth, duration: 1, ease: 'power3.out', overwrite: 'auto' }));
+      layers.forEach(([s, d]) => G.to(s, { x: -nx * d, y: -ny * d * 0.8, duration: 1.1, ease: 'power3.out', overwrite: 'auto' }));
     });
-    G.to('.tower', { yPercent: 6, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
-    G.to('.hero-copy', { yPercent: -10, opacity: 0.4, ease: 'none', scrollTrigger: { trigger: '.hero', start: '30% top', end: 'bottom top', scrub: true } });
   }
+  const mmHero = motion ? G.matchMedia() : null;
+  mmHero?.add('(min-width: 961px)', () => {
+    G.set('#stageTilt', { rotateX: 16, scale: 0.93, transformOrigin: '50% 0%' });
+    G.to('#stageTilt', { rotateX: 0, scale: 1, ease: 'none', scrollTrigger: { trigger: '#heroStage', start: 'top 85%', end: 'top 12%', scrub: 0.8 } });
+    G.to('.hero-inner', { yPercent: -18, opacity: 0.25, ease: 'none', scrollTrigger: { trigger: '.hero', start: '12% top', end: '55% top', scrub: true } });
+    return () => G.set('#stageTilt', { clearProps: 'transform' });
+  });
+  addEventListener('load', () => { railPaths = drawRail(); });
+
+  /* ================= film modal: the 36-second product film ================= */
+  const modal = $('#filmModal'), full = $('#filmFull');
+  let filmReturn = null;
+  const openFilm = () => {
+    filmReturn = document.activeElement; closeAllDD?.(); modal.hidden = false; lenis?.stop();
+    if (motion) G.fromTo('.film-box', { y: 30, opacity: 0, scale: 0.97 }, { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: EASE });
+    full.play().catch(() => {});
+    $('#filmClose').focus();
+  };
+  const closeFilm = () => { if (modal.hidden) return; full.pause(); modal.hidden = true; lenis?.start(); filmReturn?.focus?.(); };
+  document.addEventListener('click', e => { if (e.target.closest('[data-film]')) { e.preventDefault(); openFilm(); } });
+  $('#filmClose').addEventListener('click', closeFilm);
+  modal.addEventListener('click', e => { if (e.target === modal) closeFilm(); });
+  modal.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { e.stopPropagation(); closeFilm(); }
+    if (e.key === 'Tab') { const f = [$('#filmClose'), full]; const i = f.indexOf(document.activeElement); e.preventDefault(); f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus(); }
+  });
+
 
   /* ================= nav ================= */
   const nav = $('#nav'), progress = $('.progress span'), ind = $('.nav-ind');
@@ -331,7 +409,7 @@
     const max = document.documentElement.scrollHeight - innerHeight;
     progress.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
     const under = themed.find(s => { const r = s.getBoundingClientRect(); return r.top <= 40 && r.bottom > 40; });
-    nav.classList.toggle('is-dark', !!under && (under.dataset.theme === 'dark' || under.tagName === 'FOOTER') && $('#mnav').hidden);
+    nav.classList.toggle('is-light', !!under && under.dataset.theme !== 'dark' && $('#mnav').hidden);
     let active = -1;
     navMap.forEach(([id, i]) => { const r = $('#' + id).getBoundingClientRect(); if (r.top < innerHeight * 0.5 && r.bottom > innerHeight * 0.5) active = i; });
     const it = navItems[active];
@@ -382,36 +460,66 @@
     });
   }
 
-  /* ================= why: statement lights up as you read ================= */
-  const why = $('#whyStatement');
-  why.setAttribute('aria-label', why.textContent);
-  why.innerHTML = why.textContent.split(' ').map(w => `<span class="sw" aria-hidden="true">${esc(w)}</span>`).join(' ');
-  if (motion) {
-    G.to('#whyStatement .sw', { opacity: 1, stagger: 0.05, ease: 'none', scrollTrigger: { trigger: '#whyStatement', start: 'top 80%', end: 'bottom 45%', scrub: 0.6 } });
-    G.fromTo('.why-mask', { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', ease: 'expo.inOut', duration: 1.5, scrollTrigger: { trigger: '.why-media', start: 'top 80%', once: true } });
-    G.fromTo('.why-mask img', { scale: 1.18 }, { scale: 1.04, duration: 1.8, ease: 'expo.out', scrollTrigger: { trigger: '.why-media', start: 'top 80%', once: true } });
-    G.fromTo('.why-mask img', { yPercent: -8 }, { yPercent: 4, ease: 'none', scrollTrigger: { trigger: '.why-media', start: 'top bottom', end: 'bottom top', scrub: true } });
-    $$('.glyph').forEach(g => $$('rect, path, circle', g).forEach(p => { const len = p.getTotalLength?.() || 100; p.style.strokeDasharray = len; p.style.strokeDashoffset = len; }));
-    whenSeen($('.why-rail'), () => {
-      G.to('.glyph *', { strokeDashoffset: 0, duration: 1.4, stagger: 0.04, ease: 'power2.inOut' });
-      G.from('.why-rail li', { y: 24, opacity: 0, duration: 1, stagger: 0.08, ease: EASE });
-    }, 0.3);
+  /* ================= system: the statement lights up as you read it ================= */
+  const stmt = $('#statement');
+  stmt.setAttribute('aria-label', stmt.textContent);
+  stmt.innerHTML = stmt.textContent.split(' ').map(w => `<span class="sw" aria-hidden="true">${esc(w)}</span>`).join(' ');
+  if (motion) G.to('#statement .sw', { opacity: 1, stagger: 0.05, ease: 'none', scrollTrigger: { trigger: '#statement', start: 'top 82%', end: 'bottom 50%', scrub: 0.6 } });
+
+  /* ================= five working parts: an expanding selector that advances on its own ================= */
+  const partEls = $$('#parts .part');
+  let partI = 0, partAuto = true, partTw = null;
+  const partsVis = visibleFlag($('#parts'), 0.3);
+  function setPart(i, user) {
+    if (user) partAuto = false;
+    partI = i;
+    partEls.forEach((p, k) => { p.classList.toggle('is-on', k === i); p.setAttribute('aria-selected', k === i); p.tabIndex = k === i ? 0 : -1; });
+    partTw?.kill();
+    $$('.part-bar', $('#parts')).forEach(b => { b.style.transform = 'scaleX(0)'; });
+    if (motion) {
+      G.from($$('.pv-card', partEls[i]), { y: 18, opacity: 0, scale: 0.96, duration: 0.8, stagger: 0.08, delay: 0.35, ease: EASE, overwrite: 'auto' });
+      if (partAuto) partTw = G.fromTo($('.part-bar', partEls[i]), { scaleX: 0 }, { scaleX: 1, duration: 6, ease: 'none', paused: !partsVis.on, onComplete: () => { if (partAuto) setPart((partI + 1) % partEls.length); } });
+    }
   }
+  partEls.forEach((p, k) => {
+    p.addEventListener('click', () => setPart(k, true));
+    if (finePointer) { let t; p.addEventListener('mouseenter', () => { t = setTimeout(() => { if (partI !== k) setPart(k, true); }, 260); }); p.addEventListener('mouseleave', () => clearTimeout(t)); }
+  });
+  $('#parts').addEventListener('keydown', e => {
+    if (!['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'].includes(e.key)) return;
+    e.preventDefault();
+    const n = (partI + (/Right|Down/.test(e.key) ? 1 : -1) + partEls.length) % partEls.length;
+    setPart(n, true); partEls[n].focus();
+  });
+  setPart(0);
+  new IntersectionObserver(([e]) => { if (partTw) e.isIntersecting ? partTw.play() : partTw.pause(); }, { threshold: 0.3 }).observe($('#parts'));
+
+  /* ================= problem: the photograph opens out to full bleed as you scroll ================= */
+  const mmPage = motion ? G.matchMedia() : null;
+  mmPage?.add('(min-width: 961px)', () => {
+    const tl = G.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '#problem', start: 'top top', end: 'bottom bottom', scrub: 0.6 } });
+    tl.fromTo('#problemMedia', { clipPath: 'inset(16% 20% 16% 20% round 28px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 0.5 }, 0)
+      .fromTo('#problemMedia img', { scale: 1.18 }, { scale: 1, duration: 0.6 }, 0)
+      .from('.problem-copy', { y: 60, opacity: 0.2, duration: 0.3 }, 0.05)
+      .from('#gaps .gap', { y: 30, opacity: 0, scale: 0.94, duration: 0.12, stagger: 0.09 }, 0.42)
+      .to({}, { duration: 0.15 });
+  });
+
 
   /* ================= SEQUENCE 1: scattered → connected ================= */
   const TILES = [
-    { ic: 'i-mail', t: 'Email', m: '23 unread', p: 'RE: RE: FW: launch date??', f: 'Launch date confirmed · Nov 20', x: 40, y: 40, r: -4, slot: 0 },
-    { ic: 'i-msg', t: '#launch chat', m: '14 new', p: 'Who owns the vendor contract?', f: 'Vendor contract · owner Maya', x: 380, y: 10, r: 3, slot: 1 },
-    { ic: 'i-sheet', t: 'Tracker_v3.xlsx', m: '5 editors', p: 'Design QA: "Done?"', f: 'Design QA · 8 of 11 screens', x: 740, y: 50, r: 4, slot: 2 },
-    { ic: 'i-cal', t: 'Calendar', m: '4 syncs', p: 'Launch sync (again) 16:30', f: 'Status meeting not needed', x: 20, y: 300, r: 2, slot: 3 },
-    { ic: 'i-users', t: 'Team chat', m: '3 asks', p: 'Is anyone free to review?', f: 'Omar has 18 h free this week', x: 760, y: 300, r: -3, slot: 4 },
-    { ic: 'i-target', t: 'CRM', m: 'stale', p: 'Acme Freight: closed won?', f: 'Acme Freight · onboarding open', x: 150, y: 500, r: -2, slot: 5 },
-    { ic: 'i-card', t: 'Invoices', m: '1 overdue', p: 'Invoice 2291 · 3 days late', f: 'Invoice 2291 · reminder sent', x: 640, y: 510, r: 5, slot: 6 }
+    { lg: 'gmail', c: '#EA4335', t: 'Email', m: '23 unread', p: 'RE: RE: FW: launch date??', f: 'Launch date confirmed · Nov 20', x: 30, y: 40, r: -4, slot: 0 },
+    { lg: 'slack', c: '#4A154B', t: '#launch', m: '14 new', p: 'Who owns the vendor contract?', f: 'Vendor contract · owner Maya', x: 380, y: 6, r: 3, slot: 1 },
+    { lg: 'googledrive', c: '#4285F4', t: 'Tracker_v3.xlsx', m: '5 editors', p: 'Design QA: "Done?"', f: 'Design QA · 8 of 11 screens', x: 746, y: 46, r: 4, slot: 2 },
+    { lg: 'googlecalendar', c: '#4285F4', t: 'Calendar', m: '4 syncs', p: 'Launch sync (again) 16:30', f: 'Status meeting not needed', x: 10, y: 290, r: 2, slot: 3 },
+    { lg: 'zoom', c: '#0B5CFF', t: 'Standup notes', m: '3 asks', p: 'Is anyone free to review?', f: 'Omar has 18 h free this week', x: 766, y: 296, r: -3, slot: 4 },
+    { lg: 'hubspot', c: '#FF7A59', t: 'CRM', m: 'stale', p: 'Acme Freight: closed won?', f: 'Acme Freight · onboarding open', x: 140, y: 500, r: -2, slot: 5 },
+    { lg: 'stripe', c: '#635BFF', t: 'Invoices', m: '1 overdue', p: 'Invoice 2291 · 3 days late', f: 'Invoice 2291 · reminder sent', x: 630, y: 506, r: 5, slot: 6 }
   ];
   const cx = $('#cx'), cxTiles = $('#cxTiles'), HUB = [490, 310];
-  cxTiles.innerHTML = TILES.map((t, i) => `<div class="cx-tile" data-i="${i}" style="left:${t.x}px;top:${t.y}px"><div class="th"><span class="ti">${icon(t.ic, 13)}</span><b>${t.t}</b><em>${t.m}</em></div><p data-raw="${esc(t.p)}" data-filed="${esc(t.f)}">${esc(t.p)}</p></div>`).join('');
+  cxTiles.innerHTML = TILES.map((t, i) => `<div class="cx-tile" data-i="${i}" style="left:${t.x}px;top:${t.y}px"><div class="th"><span class="lg"><i style="--c:${t.c};--logo:url('assets/logos/${t.lg}.svg')"></i></span><b>${t.t}</b><em>${t.m}</em></div><p data-raw="${esc(t.p)}" data-filed="${esc(t.f)}">${esc(t.p)}</p></div>`).join('');
   const tileEls = $$('.cx-tile', cxTiles);
-  $('#cxPaths').innerHTML = TILES.map(t => { const sx = t.x + 98, sy = t.y + 40, mx = (sx + HUB[0]) / 2 + (sy - HUB[1]) * 0.2, my = (sy + HUB[1]) / 2 - (sx - HUB[0]) * 0.12; return `<path d="M${sx} ${sy} Q${mx} ${my} ${HUB[0]} ${HUB[1]}"/>`; }).join('');
+  $('#cxPaths').innerHTML = TILES.map(t => { const sx = t.x + 102, sy = t.y + 40, mx = (sx + HUB[0]) / 2 + (sy - HUB[1]) * 0.2, my = (sy + HUB[1]) / 2 - (sx - HUB[0]) * 0.12; return `<path d="M${sx} ${sy} Q${mx} ${my} ${HUB[0]} ${HUB[1]}"/>`; }).join('');
   $('#cxPulses').innerHTML = TILES.map(() => '<circle r="4" opacity="0"/>').join('');
   const cxPaths = $$('#cxPaths path'), cxDots = $$('#cxPulses circle');
   const fileTile = (el, on) => {
@@ -419,7 +527,6 @@
     const p = $('p', el), em = $('em', el);
     p.textContent = on ? p.dataset.filed : p.dataset.raw;
     em.textContent = on ? 'filed' : TILES[+el.dataset.i].m;
-    // the message is rewritten as it is filed: the new text slides in rather than snapping
     if (motion && !cx.classList.contains('is-static')) G.fromTo([p, em], { opacity: 0, y: 5 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.04, delay: +el.dataset.i * 0.03, ease: EASE, overwrite: 'auto' });
   };
   const staticConnect = () => {
@@ -442,33 +549,30 @@
     if (cx.classList.contains('is-static')) { cx.classList.remove('is-static'); tileEls.forEach(el => { cxTiles.appendChild(el); fileTile(el, false); }); delete $('#connectStage .fit').dataset.auto; layoutFits(); }
     const lens = cxPaths.map(p => p.getTotalLength());
     cxPaths.forEach((p, i) => { p.style.strokeDasharray = lens[i]; p.style.strokeDashoffset = lens[i]; });
-    // where each tile lands inside the workspace (unscaled coordinates)
+    // where each tile lands inside the workspace; layout offsets ignore the workspace's own scale-in
     const target = i => {
-      // layout offsets ignore transforms, so this holds while the workspace is still scaling in
       const slot = $(`.cxw-slot[data-slot="${TILES[i].slot}"]`), tile = tileEls[i];
-      let x = 0, y = 0;
-      for (let el = slot; el && el !== cx; el = el.offsetParent) { x += el.offsetLeft; y += el.offsetTop; }
+      const [x, y] = offIn(slot, cx);
       return [x + (slot.offsetWidth - tile.offsetWidth) / 2 - TILES[i].x, y + (slot.offsetHeight - tile.offsetHeight) / 2 - TILES[i].y];
     };
-    G.set('#cxWs', { opacity: 0, scale: 0.94, y: 20 });
+    G.set('#cxWs', { opacity: 0, scale: 0.94, y: 24 });
     const filed = { v: false };
     const tl = G.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '#connect', start: 'top top', end: 'bottom bottom', scrub: 0.7, invalidateOnRefresh: true,
       onUpdate: self => {
         setCxStep(self.progress);
         const on = self.progress > 0.56;
         if (on !== filed.v) { filed.v = on; tileEls.forEach(el => fileTile(el, on)); }
-        // pulses travel the lines while the rules are running
-        const k = (self.progress - 0.3) / 0.22;
+        const k = (self.progress - 0.28) / 0.26;
         cxDots.forEach((d, i) => {
           if (k <= 0 || k >= 1) { d.setAttribute('opacity', 0); return; }
           const q = (k * 2.4 + i * 0.13) % 1, pt = cxPaths[i].getPointAtLength(lens[i] * q);
           d.setAttribute('cx', pt.x); d.setAttribute('cy', pt.y); d.setAttribute('opacity', 1);
         });
       } } });
-    tl.fromTo(tileEls, { opacity: 0, scale: 0.85, rotation: (i) => TILES[i].r * 2 }, { opacity: 1, scale: 1, rotation: (i) => TILES[i].r, duration: 0.12, stagger: 0.012 }, 0)
-      .fromTo('#cxHub', { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.08 }, 0.16)
-      .to(cxPaths, { strokeDashoffset: 0, duration: 0.14, stagger: 0.01 }, 0.16)
-      .to(tileEls, { y: (i) => (i % 2 ? -10 : 10), duration: 0.2 }, 0.3)
+    tl.fromTo(tileEls, { opacity: 0, scale: 0.8, y: (i) => (i % 2 ? -30 : 30), rotation: (i) => TILES[i].r * 2.5 }, { opacity: 1, scale: 1, y: 0, rotation: (i) => TILES[i].r, duration: 0.13, stagger: 0.013 }, 0)
+      .fromTo('#cxHub', { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.08 }, 0.16)
+      .to(cxPaths, { strokeDashoffset: 0, duration: 0.14, stagger: 0.01 }, 0.17)
+      .to(tileEls, { y: (i) => (i % 2 ? -12 : 12), duration: 0.2 }, 0.3)
       .to('#cxWs', { opacity: 1, scale: 1, y: 0, duration: 0.12 }, 0.5)
       .to(tileEls, { x: i => target(i)[0], y: i => target(i)[1], rotation: 0, duration: 0.16, stagger: 0.012, ease: 'power2.inOut' }, 0.52)
       .to(cxPaths, { opacity: 0, duration: 0.06 }, 0.56)
@@ -477,6 +581,7 @@
       .to({}, { duration: 0.12 }, 0.88);
     return () => { cxDots.forEach(d => d.setAttribute('opacity', 0)); };
   });
+
 
   /* ================= SEQUENCE 2: product tour ================= */
   const app = $('#app'), tourArts = $$('#tourSteps article'), VIEWS = tourArts.map(a => a.dataset.v);
@@ -557,7 +662,7 @@
     const line = a => a.map((c, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(c.v).toFixed(1)}`).join(' ');
     const ticks = [0, 1, 2, 3].map(k => lo + (hi - lo) * k / 3), n = cur.length - 1;
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-    svg.innerHTML = '<defs><linearGradient id="tcFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3557F5" stop-opacity=".2"/><stop offset="1" stop-color="#3557F5" stop-opacity="0"/></linearGradient></defs>'
+    svg.innerHTML = '<defs><linearGradient id="tcFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9F36B" stop-opacity=".16"/><stop offset="1" stop-color="#C9F36B" stop-opacity="0"/></linearGradient></defs>'
       + ticks.map(t => `<line class="gl" x1="${pad.l}" x2="${W - pad.r}" y1="${y(t)}" y2="${y(t)}"/><text class="lb" x="${pad.l - 8}" y="${y(t) + 4}" text-anchor="end">$${Math.round(t / 1000)}k</text>`).join('')
       + cur.map((c, i) => i % 2 === 1 || i === n ? `<text class="lb" x="${x(i)}" y="${H - 6}" text-anchor="${i === n ? 'end' : 'middle'}">${c.short}</text>` : '').join('')
       + `<path class="pv" d="${line(prev)}"/><path class="ar" fill="url(#tcFill)" d="${line(cur)} L${x(n)} ${pad.t + ih} L${x(0)} ${pad.t + ih} Z"/><path class="ln" d="${line(cur)}"/>`
@@ -745,8 +850,8 @@
   };
   const last7 = { rev: periodValue('revenue', 7), revPrev: periodValue('revenue', 7, 7), runs: periodValue('runs', 7), ontime: periodValue('ontime', 7) };
   const ANSWERS = {
-    risk: () => ({ text: 'Two of the four projects need attention this week. <b>Q4 product launch</b> is at risk: Design QA has 3 screens left and the launch email waits on it. <b>Support hiring</b> is behind, with interviews booked past the target date.', card: `<div class="card">${[['Q4 product launch', 62, 'var(--amber)', 'At risk'], ['Support hiring', 30, 'var(--red)', 'Behind'], ['Website relaunch', 42, 'var(--green)', 'On track'], ['Acme Freight onboarding', 88, 'var(--green)', 'On track']].map(r => `<div class="card-row"><span>${r[0]}</span><span class="bar" style="--c:${r[2]}"><i style="width:${r[1]}%"></i></span><small>${r[3]}</small></div>`).join('')}</div>`, src: ['Design QA task', 'Launch timeline', 'Hiring board'] }),
-    load: () => ({ text: '<b>Priya R.</b> is booked for 37 hours across 3 projects, about 92% of capacity. <b>Omar A.</b> has the most room at 18 hours. Moving “Pricing page build” from Priya to Omar would bring her to roughly 78%.', card: `<div class="card">${[['Priya R.', 92, 'var(--amber)', '37 h'], ['Lena K.', 70, 'var(--blue)', '28 h'], ['Maya O.', 58, 'var(--blue)', '23 h'], ['Jonas T.', 50, 'var(--blue)', '20 h'], ['Omar A.', 45, 'var(--green)', '18 h']].map(r => `<div class="card-row"><span>${r[0]}</span><span class="bar" style="--c:${r[2]}"><i style="width:${r[1]}%"></i></span><small>${r[3]}</small></div>`).join('')}<div class="card-act"><button class="ui-btn ui-btn-primary" type="button" data-cp-act="Reassignment drafted in this demo. Nothing changed for real.">Draft the move</button><button class="ui-btn" type="button" data-cp-act="Kept as is.">Keep as is</button></div></div>`, src: ['Calendars', 'Task estimates'] }),
+    risk: () => ({ text: 'Two of the four projects need attention this week. <b>Q4 product launch</b> is at risk: Design QA has 3 screens left and the launch email waits on it. <b>Support hiring</b> is behind, with interviews booked past the target date.', card: `<div class="card">${[['Q4 product launch', 62, 'var(--warn)', 'At risk'], ['Support hiring', 30, 'var(--bad)', 'Behind'], ['Website relaunch', 42, 'var(--aqua)', 'On track'], ['Acme Freight onboarding', 88, 'var(--aqua)', 'On track']].map(r => `<div class="card-row"><span>${r[0]}</span><span class="bar" style="--c:${r[2]}"><i style="width:${r[1]}%"></i></span><small>${r[3]}</small></div>`).join('')}</div>`, src: ['Design QA task', 'Launch timeline', 'Hiring board'] }),
+    load: () => ({ text: '<b>Priya R.</b> is booked for 37 hours across 3 projects, about 92% of capacity. <b>Omar A.</b> has the most room at 18 hours. Moving “Pricing page build” from Priya to Omar would bring her to roughly 78%.', card: `<div class="card">${[['Priya R.', 92, 'var(--warn)', '37 h'], ['Lena K.', 70, 'var(--lime)', '28 h'], ['Maya O.', 58, 'var(--lime)', '23 h'], ['Jonas T.', 50, 'var(--lime)', '20 h'], ['Omar A.', 45, 'var(--aqua)', '18 h']].map(r => `<div class="card-row"><span>${r[0]}</span><span class="bar" style="--c:${r[2]}"><i style="width:${r[1]}%"></i></span><small>${r[3]}</small></div>`).join('')}<div class="card-act"><button class="ui-btn ui-btn-primary" type="button" data-cp-act="Reassignment drafted in this demo. Nothing changed for real.">Draft the move</button><button class="ui-btn" type="button" data-cp-act="Kept as is.">Keep as is</button></div></div>`, src: ['Calendars', 'Task estimates'] }),
     week: () => { const d = pctDelta(last7.rev, last7.revPrev); return { text: `In the last 7 days the workspace recognised <b>${money(last7.rev)}</b> in revenue, ${d >= 0 ? 'up' : 'down'} ${Math.abs(d).toFixed(1)}% on the week before. On-time delivery averaged <b>${last7.ontime.toFixed(1)}%</b> and automations ran <b>${fmt(last7.runs)}</b> times. One blocker remains: Design QA on the launch.`, card: '', src: ['Analytics', 'Automation log', 'Q4 launch'] }; },
     auto: q => {
       const m = q.match(/when (.+?),\s*(.+)$/i);
@@ -819,7 +924,7 @@
   /* ================= ANALYTICS ================= */
   const an = { m: 'revenue', r: 30, t: 'line' };
   const anChart = $('#anChart'), anTip = $('#anTip');
-  const PROJ = [['Q4 product launch', 'var(--blue)'], ['Website relaunch', 'var(--amber)'], ['Acme Freight onboarding', 'var(--green)'], ['Support and retainers', '#4D5468']];
+  const PROJ = [['Q4 product launch', 'var(--lime)'], ['Website relaunch', 'var(--warn)'], ['Acme Freight onboarding', 'var(--aqua)'], ['Support and retainers', '#B8C4CE']];
   const SHARE = { revenue: [0.31, 0.22, 0.29, 0.18], runs: [0.26, 0.41, 0.33, 0] };
   const OFFSET = { ontime: [-6.5, 1.8, 3.4, 1.1], cycle: [1.4, -0.3, -0.9, -0.2] };
   function renderKpis() {
@@ -1056,14 +1161,6 @@
     state.focus?.();
   });
 
-  /* ================= footer grid ================= */
-  const fg = $('#footGrid');
-  const fgN = () => (innerWidth <= 600 ? 16 : innerWidth <= 960 ? 24 : 48) * 4;
-  fg.innerHTML = '<i></i>'.repeat(fgN());
-  const fgVis = visibleFlag(fg);
-  if (motion) setInterval(() => { if (!fgVis.on || document.hidden) return; const c = $$('i', fg); for (let k = 0; k < 3; k++) { const el = c[Math.floor(Math.random() * c.length)]; el.className = Math.random() > 0.3 ? 'on' : 'on-b'; setTimeout(() => { el.className = ''; }, 1400 + Math.random() * 1800); } }, 400);
-  fg.addEventListener('mouseover', e => { if (e.target.tagName === 'I') { e.target.className = 'on'; setTimeout(() => { e.target.className = ''; }, 900); } });
-
   /* ================= command palette ================= */
   const pal = $('#palette'), palQ = $('#palQ'), palList = $('#palList');
   const cmds = [
@@ -1071,7 +1168,8 @@
     { t: 'Run the onboarding automation', k: 'Demo', run: () => { $('[data-wf="onboard"]').click(); goTo('#workflows'); setTimeout(runWF, 1300); } },
     { t: 'Ask Copilot what is at risk', k: 'Demo', run: () => { goTo('#copilot'); setTimeout(() => ask('Which projects are at risk this week?'), 1100); } },
     { t: 'Show 12 months of revenue', k: 'Demo', run: () => { an.m = 'revenue'; an.r = 365; setSeg($('#anMetric'), $('[data-m="revenue"]')); setSeg($('#anRange'), $('[data-r="365"]')); goTo('#analytics'); anDrawn = true; renderAn(); } },
-    { t: 'Request a demo', k: 'Action', run: () => { goTo('#demo'); setTimeout(() => $('#fName').focus({ preventScroll: true }), 1200); } }
+    { t: 'Watch the product film', k: 'Media', run: () => openFilm() },
+    { t: 'Book a demo', k: 'Action', run: () => { goTo('#demo'); setTimeout(() => $('#fName').focus({ preventScroll: true }), 1200); } }
   ];
   let palSel = 0, palItems = cmds, palReturn;
   const renderPal = () => {
@@ -1097,80 +1195,114 @@
   });
   document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); pal.hidden ? openPal() : closePal(); } });
 
+  /* ================= feature films: chapters that play in turn ================= */
+  const FILMS = [['projects', 'Projects'], ['workflow', 'Workflow automation'], ['copilot', 'Copilot'], ['analytics', 'Analytics']];
+  const chaps = $$('#chapters .chap'), filmV = $('#filmV'), filmBtn = $('#filmToggle');
+  let filmI = 0, filmPaused = !motion, filmSeen = false;
+  const setToggle = () => { const playing = !filmV.paused; filmBtn.innerHTML = icon(playing ? 'i-pause' : 'i-play', 14); filmBtn.setAttribute('aria-label', playing ? 'Pause film' : 'Play film'); };
+  function setFilm(i, user) {
+    filmI = i;
+    chaps.forEach((c, k) => { c.classList.toggle('is-on', k === i); c.setAttribute('aria-selected', k === i); c.tabIndex = k === i ? 0 : -1; $('.chap-prog i', c).style.transform = 'scaleX(0)'; });
+    const [key, label] = FILMS[i];
+    $('#filmLabel').textContent = label;
+    filmV.setAttribute('aria-label', `Feature film: ${label}`);
+    const swap = () => {
+      filmV.poster = `assets/film/${key}.jpg`;
+      $('source', filmV).src = `assets/film/${key}.mp4`;
+      filmV.load();
+      if (user) filmPaused = false;
+      if (!filmPaused && filmSeen) filmV.play().catch(() => {});
+      if (motion) G.fromTo(filmV, { opacity: 0, scale: 1.02 }, { opacity: 1, scale: 1, duration: 0.6, ease: EASE });
+    };
+    if (motion && filmV.currentSrc) G.to(filmV, { opacity: 0, duration: 0.25, onComplete: swap }); else swap();
+  }
+  chaps.forEach((c, k) => c.addEventListener('click', () => setFilm(k, true)));
+  $('#chapters').addEventListener('keydown', e => {
+    if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+    e.preventDefault();
+    const n = (filmI + (/Down|Right/.test(e.key) ? 1 : -1) + chaps.length) % chaps.length;
+    setFilm(n, true); chaps[n].focus();
+  });
+  filmBtn.addEventListener('click', () => { if (filmV.paused) { filmPaused = false; filmV.play().catch(() => {}); } else { filmPaused = true; filmV.pause(); } });
+  filmV.addEventListener('play', setToggle); filmV.addEventListener('pause', setToggle);
+  filmV.addEventListener('timeupdate', () => { if (filmV.duration) $('.chap-prog i', chaps[filmI]).style.transform = `scaleX(${filmV.currentTime / filmV.duration})`; });
+  filmV.addEventListener('ended', () => setFilm((filmI + 1) % FILMS.length));
+  new IntersectionObserver(([e]) => {
+    filmSeen = e.isIntersecting;
+    if (filmSeen && !filmPaused) filmV.play().catch(() => {}); else if (!filmSeen) filmV.pause();
+  }, { threshold: 0.4 }).observe($('.screen'));
+  setToggle();
+
   /* ================= section entrances: one language, different gestures ================= */
   if (motion) {
-    // headings rise word by word from a mask
-    $$('.sec-head .h2, .tour-copy .h2, .cop-copy .h2, .faq-head .h2, .demo-h').forEach(h => {
+    // headings rise word by word out of a mask
+    $$('.sec-head .h2, .tour-copy .h2, .cop-copy .h2, .faq-head .h2, .demo-h, .cx-copy .h2, .problem-copy .h2').forEach(h => {
       const parts = [];
       h.childNodes.forEach(n => {
-        const words = n.textContent.split(/(\s+)/);
         const wrapCls = n.nodeType === 1 ? n.className : '';
-        words.forEach(w => parts.push(/^\s+$/.test(w) ? ' ' : w ? `<span class="w-mask"><span${wrapCls ? ` class="${wrapCls}"` : ''}>${esc(w)}</span></span>` : ''));
+        n.textContent.split(/(\s+)/).forEach(w => parts.push(/^\s+$/.test(w) ? ' ' : w ? `<span class="w-mask"><span${wrapCls ? ` class="${wrapCls}"` : ''}>${esc(w)}</span></span>` : ''));
       });
       h.setAttribute('aria-label', h.textContent);
       h.innerHTML = parts.join('');
       $$('.w-mask', h).forEach(w => w.setAttribute('aria-hidden', 'true'));
-      const tw = G.from($$('.w-mask > span', h), { yPercent: 105, duration: 1.1, stagger: 0.035, ease: EASE, paused: true });
+      const tw = G.from($$('.w-mask > span', h), { yPercent: 110, rotate: 2, transformOrigin: '0% 100%', duration: 1.15, stagger: 0.04, ease: EASE, paused: true });
       whenSeen(h, () => tw.play(), 0.4);
     });
     const reveal = (sel, kind = '') => $$(sel).forEach(el => el.setAttribute('data-reveal', kind));
-    reveal('.sec-tag'); reveal('.sec-sub'); reveal('.cop-can li'); reveal('.demo-note'); reveal('.wfb-tabs button', 'left'); reveal('.cases-list button', 'left');
-    reveal('.int-side'); reveal('.faq details'); reveal('.demo-copy > p'); reveal('.demo-steps li'); reveal('.foot-cols > div'); reveal('.foot-brand');
+    reveal('main .sec-tag'); reveal('main .sec-sub'); reveal('.cop-can li'); reveal('.demo-note'); reveal('.wfb-tabs button', 'left'); reveal('.cases-list button', 'left');
+    reveal('.int-side'); reveal('.faq details'); reveal('.demo-copy > p'); reveal('.demo-steps li'); reveal('.foot-cols > div'); reveal('.foot-brand'); reveal('.chap', 'left'); reveal('.films-note');
     const q = []; let qt;
     const io = new IntersectionObserver(es => {
       es.forEach(e => { if (e.isIntersecting) { q.push(e.target); io.unobserve(e.target); } });
-      clearTimeout(qt); qt = setTimeout(() => { q.forEach(el => el.classList.add('is-in')); if (q.length) G.to(q.splice(0), { opacity: 1, x: 0, y: 0, scale: 1, duration: 1, stagger: 0.07, ease: EASE, overwrite: 'auto' }); }, 20);
+      clearTimeout(qt); qt = setTimeout(() => { q.forEach(el => el.classList.add('is-in')); if (q.length) G.to(q.splice(0), { opacity: 1, x: 0, y: 0, duration: 1, stagger: 0.07, ease: EASE, overwrite: 'auto' }); }, 20);
     }, { rootMargin: '0px 0px -8% 0px' });
     $$('[data-reveal]').forEach(el => io.observe(el));
-    document.addEventListener('focusin', e => { const r = e.target.closest('[data-reveal]'); if (r && +getComputedStyle(r).opacity < 1) { io.unobserve(r); G.to(r, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.3 }); } });
-    // product surfaces each arrive their own way
-    const intoView = (el, from, th = 0.15) => { const tw = G.from(el, { ...from, paused: true }); whenSeen($(el).parentElement, () => tw.play(), th); };
-    intoView('.wfb-app', { y: 70, opacity: 0, rotateX: 8, transformPerspective: 1600, transformOrigin: '50% 0', duration: 1.3, ease: EASE });
-    intoView('.chat', { x: 60, opacity: 0, duration: 1.2, ease: EASE });
-    intoView('.an', { clipPath: 'inset(0% 0% 100% 0% round 14px)', duration: 1.4, ease: 'expo.inOut' }, 0.05);
-    intoView('.case', { y: 50, opacity: 0, duration: 1.2, ease: EASE });
+    document.addEventListener('focusin', e => { const r = e.target.closest('[data-reveal]'); if (r && +getComputedStyle(r).opacity < 1) { io.unobserve(r); G.to(r, { opacity: 1, x: 0, y: 0, duration: 0.3 }); } });
+    // product surfaces each arrive with their own gesture: tilt up, slide, unmask, scale
+    const intoView = (el, from, th = 0.15) => { if (!$(el)) return; const tw = G.from(el, { ...from, paused: true }); whenSeen($(el).parentElement, () => tw.play(), th); };
+    intoView('.wfb-app', { y: 80, opacity: 0, rotateX: 10, transformPerspective: 1600, transformOrigin: '50% 0', duration: 1.4, ease: EASE });
+    intoView('.chat', { x: 70, opacity: 0, duration: 1.2, ease: EASE });
+    intoView('.an', { clipPath: 'inset(0% 0% 100% 0% round 14px)', duration: 1.5, ease: 'expo.inOut' }, 0.05);
+    intoView('.case', { y: 60, opacity: 0, duration: 1.2, ease: EASE });
     intoView('.int-detail', { y: 40, opacity: 0, duration: 1.1, ease: EASE });
-    intoView('.demo-form', { y: 60, opacity: 0, scale: 0.98, duration: 1.2, ease: EASE });
+    intoView('.demo-form', { y: 70, opacity: 0, rotate: 1.5, duration: 1.3, ease: EASE });
+    intoView('.screen', { y: 80, opacity: 0, scale: 0.94, duration: 1.4, ease: EASE });
+    whenSeen($('#parts'), () => G.from('#parts .part', { y: 60, opacity: 0, duration: 1.1, stagger: 0.07, ease: EASE }), 0.2);
     whenSeen($('#intTiles'), () => G.from('#intTiles li', { y: 20, opacity: 0, duration: 0.7, stagger: 0.03, ease: EASE }), 0.1);
   }
 
-  /* ================= pointer layer: light, hover links, reactive grids (fine pointers only) ================= */
+  /* ================= pointer layer (fine pointers only) ================= */
   if (motion && finePointer) {
     root.classList.add('spot-on');
-    $$('.int-tiles, .wfb-tabs, .why-rail, .cases-list, .cop-can, .demo-steps, .allv').forEach(g => g.addEventListener('pointermove', e => {
-      const el = e.target.closest('.int-tiles button, .wfb-tabs button, .why-rail li, .cases-list button, .allc');
+    $$('.int-tiles, .wfb-tabs, .cases-list, .allv, .chapters').forEach(g => g.addEventListener('pointermove', e => {
+      const el = e.target.closest('.int-tiles button, .wfb-tabs button, .cases-list button, .allc, .chap');
       if (!el) return;
       if (!el.hasAttribute('data-spot')) el.setAttribute('data-spot', '');
       const r = el.getBoundingClientRect(), k = r.width / el.offsetWidth || 1;
       el.style.setProperty('--mx', `${(e.clientX - r.left) / k}px`); el.style.setProperty('--my', `${(e.clientY - r.top) / k}px`);
     }));
-    // dark sections carry a wide, faint light that trails the pointer
-    $$('main > section[data-theme="dark"]').forEach(s => {
-      s.classList.add('spot-sec');
-      let raf = 0, ex = 0, ey = 0;
-      s.addEventListener('pointermove', e => { ex = e.clientX; ey = e.clientY; if (raf) return; raf = requestAnimationFrame(() => { raf = 0; const r = s.getBoundingClientRect(); s.style.setProperty('--sx', `${ex - r.left}px`); s.style.setProperty('--sy', `${ey - r.top}px`); }); });
-    });
-    // tower windows light under the pointer, then fade back to what they were doing
-    towerGrid.addEventListener('pointerover', e => { const c = e.target; if (c.tagName !== 'I') return; c.classList.add('hov'); setTimeout(() => c.classList.remove('hov'), 650); });
+    // lime buttons carry a soft highlight that follows the pointer
+    $$('.btn-lime').forEach(b => b.addEventListener('pointermove', e => { const r = b.getBoundingClientRect(); b.style.setProperty('--bx', `${e.clientX - r.left}px`); b.style.setProperty('--by', `${e.clientY - r.top}px`); }));
     // hovering a workflow step lights every edge connected to it
     wfNodesEl.addEventListener('pointerover', e => { const n = e.target.closest('.wn'); $$('path', wfEdges).forEach(p => p.classList.toggle('is-near', !!n && (p.dataset.a === n.dataset.id || p.dataset.b === n.dataset.id))); });
     wfNodesEl.addEventListener('pointerleave', () => $$('path.is-near', wfEdges).forEach(p => p.classList.remove('is-near')));
-    // the why-rail glyphs redraw when you point at them
-    $$('.why-rail li').forEach(li => li.addEventListener('mouseenter', () => { const parts = $$('svg *', li); parts.forEach(p => { const len = p.getTotalLength?.() || 100; G.fromTo(p, { strokeDashoffset: len }, { strokeDashoffset: 0, duration: 0.9, ease: 'power2.inOut', overwrite: true }); }); }));
+    // the filmed screen leans toward the pointer
+    const scr = $('.screen');
+    scr.addEventListener('mousemove', e => { const r = scr.getBoundingClientRect(); G.to(scr, { rotateY: ((e.clientX - r.left) / r.width - 0.5) * 4, rotateX: -((e.clientY - r.top) / r.height - 0.5) * 3, transformPerspective: 1600, duration: 0.8, ease: 'power3.out', overwrite: 'auto' }); });
+    scr.addEventListener('mouseleave', () => G.to(scr, { rotateY: 0, rotateX: 0, duration: 1, ease: 'power3.out', overwrite: 'auto' }));
   }
 
   /* ================= scroll layer: progress-linked details ================= */
   if (motion) {
-    // the dark workflow panel rises over the light section above it as it scrolls in
     mm.add('(min-width: 961px)', () => {
-      G.fromTo('#workflows .wfb-frame', { y: 60 }, { y: 0, ease: 'none', scrollTrigger: { trigger: '#workflows', start: 'top bottom', end: 'top 20%', scrub: 0.6 } });
-      G.fromTo('.cases-grid .case-pics', { yPercent: 6 }, { yPercent: -6, ease: 'none', scrollTrigger: { trigger: '#solutions', start: 'top bottom', end: 'bottom top', scrub: true } });
-      // the footer grid settles in row by row as the page ends
-      G.from('#footGrid i', { opacity: 0, scale: 0.3, ease: 'none', stagger: { grid: 'auto', from: 'start', amount: 1 }, scrollTrigger: { trigger: '#footGrid', start: 'top 95%', end: 'bottom 75%', scrub: 0.8 } });
+      G.fromTo('#workflows .wfb-frame', { y: 70 }, { y: 0, ease: 'none', scrollTrigger: { trigger: '#workflows', start: 'top bottom', end: 'top 20%', scrub: 0.6 } });
+      G.fromTo('.case-pics', { yPercent: 6 }, { yPercent: -6, ease: 'none', scrollTrigger: { trigger: '#solutions', start: 'top bottom', end: 'bottom top', scrub: true } });
+      G.fromTo('.an', { scale: 0.96 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '#analytics', start: 'top 80%', end: 'top 10%', scrub: 0.6 } });
     });
-    // KPI tiles in the hero answer the pointer with a small lift of their figures
-    $$('#heroWs .hw-kpis > *').forEach(k => k.addEventListener('mouseenter', () => G.fromTo($('b', k), { y: 0 }, { y: -3, duration: 0.25, yoyo: true, repeat: 1, ease: 'power2.out' })));
+    // the footer wordmark rises letter by letter as the page ends
+    G.from('#footWord span', { yPercent: 100, opacity: 0, ease: 'none', stagger: 0.08, scrollTrigger: { trigger: '#footWord', start: 'top 98%', end: 'bottom 90%', scrub: 0.8 } });
   }
+
 
   if (ST) { addEventListener('load', () => { layoutFits(); placePills(); ST.refresh(); }); document.fonts?.ready.then(() => { layoutFits(); placePills(); ST.refresh(); }); }
 })();
