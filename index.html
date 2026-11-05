@@ -45,6 +45,7 @@
     <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2.5-6.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
     <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5l9.5 16.5h-19z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 10v4.5M12 17.2v.3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
     <symbol id="i-branch" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="6" cy="18" r="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="18" cy="9" r="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6 8.5v7M18 11.5c0 3-4 3.5-10.5 5" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7.5 5h3v14h-3zM13.5 5h3v14h-3z" fill="currentColor"/></symbol>
   </defs>
 </svg>
 
@@ -167,10 +168,10 @@
               <div class="hw-main">
                 <div class="hw-head"><h3>This week</h3><span class="crumb">Nov 3 – 7</span><span class="ui-chip live">Live · sample data</span></div>
                 <div class="ov-kpis">
-                  <div><span>Revenue, 30 days</span><b id="hwRev">$0</b><em class="kd" id="hwRevD"></em></div>
-                  <div><span>On-time delivery</span><b id="hwOn">0%</b><em class="kd" id="hwOnD"></em></div>
-                  <div><span>Avg. cycle time</span><b id="hwCycle">0 d</b><em class="kd">sample</em></div>
-                  <div><span>Automation runs</span><b id="hwRuns">0</b><em class="kd">last 30 days</em></div>
+                  <div><span>Revenue, 30 days</span><b id="hwRev"><08.8k</b><em class="kd" id="hwRevD">+4.7% vs prior</em></div>
+                  <div><span>On-time delivery</span><b id="hwOn">93.0%</b><em class="kd" id="hwOnD">+0.3 pts</em></div>
+                  <div><span>Avg. cycle time</span><b id="hwCycle">3.9 d</b><em class="kd">sample</em></div>
+                  <div><span>Automation runs</span><b id="hwRuns">57</b><em class="kd">last 30 days</em></div>
                 </div>
                 <div class="hw-cols">
                   <div class="tl" id="hwTl">
@@ -206,7 +207,7 @@
           </div>
           <div class="ui hs-panel hs-chart" aria-hidden="true">
             <div class="pnl-h"><span class="ic ic-green"><svg width="13" height="13"><use href="#i-chart"/></svg></span><b>Revenue · 12 weeks</b><span class="ui-chip">Sample</span></div>
-            <div class="big-num"><span id="hsRev">$0</span><small id="hsRevD"></small></div>
+            <div class="big-num"><span id="hsRev">$554.1k</span><small id="hsRevD">+5.9% vs prior 12 wks</small></div>
             <svg class="spark" viewBox="0 0 270 74" preserveAspectRatio="none"><path class="ar" id="hsSparkA"/><path class="ln" id="hsSparkL"/></svg>
           </div>
           <div class="ui hs-panel hs-copilot" id="hsCopilot">
@@ -232,49 +233,27 @@
   <div class="parts" id="parts" role="tablist" aria-label="The five working parts of VELTRIX">
     <button class="part is-on" role="tab" aria-selected="true" type="button" data-part="0">
       <span class="part-n">01</span><span class="part-ic"><svg width="20" height="20"><use href="#i-folder"/></svg></span>
-      <span class="part-vis" aria-hidden="true">
-        <span class="pv-card" style="left:0;top:10px;width:220px"><span class="ph">In progress <span>2</span></span><b>Design QA, onboarding flow</b><span class="kp" style="display:block;margin:8px 0"><i style="width:73%"></i></span><span class="tg tg-blue">8 of 11 screens</span></span>
-        <span class="pv-card" style="left:240px;top:44px;width:210px"><span class="ph">Done <span>3</span></span><b style="text-decoration:line-through;color:var(--on-3)">Vendor contract</b><br><span class="tg tg-green" style="margin-top:8px">Closed by rule</span></span>
-        <span class="pv-card" style="left:90px;top:150px;width:250px"><span class="ph">Owner</span><span style="display:flex;gap:8px;align-items:center"><i class="av av-3">PR</i><b>Priya R.</b><span class="tg" style="margin-left:auto">Due Thu</span></span></span>
-      </span>
+      <span class="part-vis" aria-hidden="true"><img class="part-thumb" src="assets/img/thumb-projects.jpg" alt="" width="400" height="600" loading="lazy"><img class="part-img" src="assets/img/part-projects.jpg" alt="" width="1520" height="880" loading="lazy"></span>
       <h3>Projects</h3><p>Boards and timelines over the same tasks. Move a card and every view, report and rule follows.</p><span class="part-bar"></span>
     </button>
     <button class="part" role="tab" aria-selected="false" type="button" data-part="1">
       <span class="part-n">02</span><span class="part-ic"><svg width="20" height="20"><use href="#i-flow"/></svg></span>
-      <span class="part-vis" aria-hidden="true">
-        <span class="pv-card" style="left:0;top:20px;width:190px"><span class="ph">When</span><b>Deal marked won</b></span>
-        <span class="pv-card" style="left:220px;top:0;width:220px"><span class="ph">Then</span><b>Open onboarding project</b></span>
-        <span class="pv-card" style="left:220px;top:90px;width:220px"><span class="ph">And</span><b>Assign owner with most room</b></span>
-        <span class="pv-card" style="left:40px;top:150px;width:260px"><span class="ph">Last run</span><span style="display:flex;gap:8px;align-items:center"><span class="ui-chip done">Completed</span><span style="color:var(--on-3);font:500 11px var(--mono)">1.8 s · 4 steps</span></span></span>
-      </span>
+      <span class="part-vis" aria-hidden="true"><img class="part-thumb" src="assets/img/thumb-automations.jpg" alt="" width="400" height="600" loading="lazy"><img class="part-img" src="assets/img/part-automations.jpg" alt="" width="1520" height="880" loading="lazy"></span>
       <h3>Automations</h3><p>Rules written in plain language that move work between people and tools, with a log of every run.</p><span class="part-bar"></span>
     </button>
     <button class="part" role="tab" aria-selected="false" type="button" data-part="2">
       <span class="part-n">03</span><span class="part-ic"><svg width="20" height="20"><use href="#i-spark"/></svg></span>
-      <span class="part-vis" aria-hidden="true">
-        <span class="pv-card" style="right:0;top:0;background:var(--lime);color:var(--g1);border-color:var(--lime)"><b>Which project is most at risk?</b></span>
-        <span class="pv-card" style="left:0;top:64px;width:360px"><b style="color:var(--lime)">Q4 product launch.</b> Design QA has 3 screens left and the launch email waits on it.</span>
-        <span class="pv-card" style="left:40px;top:170px"><span class="ph" style="margin:0">Sources · Design QA task · Launch timeline</span></span>
-      </span>
+      <span class="part-vis" aria-hidden="true"><img class="part-thumb" src="assets/img/thumb-copilot.jpg" alt="" width="400" height="600" loading="lazy"><img class="part-img" src="assets/img/part-copilot.jpg" alt="" width="1520" height="880" loading="lazy"></span>
       <h3>Copilot</h3><p>Ask about your operations and get an answer that points to the work it came from. It drafts; people approve.</p><span class="part-bar"></span>
     </button>
     <button class="part" role="tab" aria-selected="false" type="button" data-part="3">
       <span class="part-n">04</span><span class="part-ic"><svg width="20" height="20"><use href="#i-chart"/></svg></span>
-      <span class="part-vis" aria-hidden="true">
-        <span class="pv-card" style="left:0;top:0;width:200px"><span class="ph">Revenue · 30 days</span><b style="font:600 24px var(--fd);letter-spacing:-.03em" data-kpi="rev30">$0</b></span>
-        <span class="pv-card" style="left:220px;top:30px;width:200px"><span class="ph">On-time delivery</span><b style="font:600 24px var(--fd);letter-spacing:-.03em" data-kpi="ontime30">0%</b></span>
-        <span class="pv-card" style="left:60px;top:120px;width:330px;height:110px"><svg viewBox="0 0 300 80" style="width:100%;height:80px" preserveAspectRatio="none"><path d="M0 64 L30 58 L60 62 L90 44 L120 48 L150 34 L180 38 L210 22 L240 28 L270 12 L300 16" fill="none" stroke="#C9F36B" stroke-width="2"/></svg></span>
-      </span>
+      <span class="part-vis" aria-hidden="true"><img class="part-thumb" src="assets/img/thumb-analytics.jpg" alt="" width="400" height="600" loading="lazy"><img class="part-img" src="assets/img/part-analytics.jpg" alt="" width="1520" height="880" loading="lazy"></span>
       <h3>Analytics</h3><p>Revenue, delivery, cycle time and workload, calculated from the tasks and invoices themselves rather than exported.</p><span class="part-bar"></span>
     </button>
     <button class="part" role="tab" aria-selected="false" type="button" data-part="4">
       <span class="part-n">05</span><span class="part-ic"><svg width="20" height="20"><use href="#i-link"/></svg></span>
-      <span class="part-vis" aria-hidden="true">
-        <span class="pv-card" style="left:0;top:10px;display:flex;gap:10px;align-items:center"><span class="lg"><i style="--c:#FF7A59;--logo:url('assets/logos/hubspot.svg')"></i></span><b>HubSpot</b></span>
-        <span class="pv-card" style="left:170px;top:60px;display:flex;gap:10px;align-items:center"><span class="lg"><i style="--c:#4A154B;--logo:url('assets/logos/slack.svg')"></i></span><b>Slack</b></span>
-        <span class="pv-card" style="left:20px;top:120px;display:flex;gap:10px;align-items:center"><span class="lg"><i style="--c:#635BFF;--logo:url('assets/logos/stripe.svg')"></i></span><b>Stripe</b></span>
-        <span class="pv-card" style="left:220px;top:170px;display:flex;gap:10px;align-items:center"><span class="lg"><i style="--c:#181717;--logo:url('assets/logos/github.svg')"></i></span><b>GitHub</b></span>
-      </span>
+      <span class="part-vis" aria-hidden="true"><img class="part-thumb" src="assets/img/thumb-integrations.jpg" alt="" width="400" height="600" loading="lazy"><img class="part-img" src="assets/img/part-integrations.jpg" alt="" width="1520" height="880" loading="lazy"></span>
       <h3>Integrations</h3><p>Keep the tools your team already uses. VELTRIX is built to connect to them, so data arrives where the work is.</p><span class="part-bar"></span>
     </button>
   </div>
@@ -373,7 +352,7 @@
             <div class="app-top"><span class="crumb">Northbeam <svg width="12" height="12"><use href="#i-chev"/></svg> <b id="appCrumb">Overview</b></span><span class="people"><span class="av av-1">MO</span><span class="av av-2">LK</span><span class="av av-4">JT</span><span class="av av-5">OA</span></span></div>
             <div class="views">
               <div class="v is-on" data-v="overview">
-                <div class="ov-kpis"><div><span>Revenue, 30 days</span><b data-kpi="rev30">$0</b></div><div><span>On-time delivery</span><b data-kpi="ontime30">0%</b></div><div><span>Avg. cycle time</span><b data-kpi="cycle30">0 d</b></div><div><span>Automation runs</span><b data-kpi="runs30">0</b></div></div>
+                <div class="ov-kpis"><div><span>Revenue, 30 days</span><b data-kpi="rev30"><08.8k</b></div><div><span>On-time delivery</span><b data-kpi="ontime30">93.0%</b></div><div><span>Avg. cycle time</span><b data-kpi="cycle30">3.9 d</b></div><div><span>Automation runs</span><b data-kpi="runs30">57</b></div></div>
                 <div class="ov-grid">
                   <div class="panel"><p class="ph">Projects</p>
                     <div class="pl"><i class="pd pd-blue"></i><span>Q4 product launch</span><em class="s-warn">At risk</em><small>62%</small></div>
@@ -412,7 +391,7 @@
                 </div>
               </div>
               <div class="v" data-v="analytics">
-                <div class="an-mini"><div class="anm-h"><b>Revenue, last 12 weeks</b><span data-kpi="rev84">$0</span></div><svg viewBox="0 0 600 220" class="anm-chart" id="tourChart" aria-hidden="true"></svg></div>
+                <div class="an-mini"><div class="anm-h"><b>Revenue, last 12 weeks</b><span data-kpi="rev84">$554.1k</span></div><svg viewBox="0 0 600 220" class="anm-chart" id="tourChart" aria-hidden="true"></svg></div>
               </div>
               <div class="v" data-v="team">
                 <div class="tm">
@@ -431,7 +410,7 @@
                   <button type="button" class="allc" data-go="projects"><svg width="16" height="16"><use href="#i-folder"/></svg><b>Projects</b><small>8 tasks this week</small></button>
                   <button type="button" class="allc" data-go="workflows"><svg width="16" height="16"><use href="#i-flow"/></svg><b>Workflows</b><small>3 rules on</small></button>
                   <button type="button" class="allc" data-go="copilot"><svg width="16" height="16"><use href="#i-spark"/></svg><b>Copilot</b><small>1 suggestion</small></button>
-                  <button type="button" class="allc" data-go="analytics"><svg width="16" height="16"><use href="#i-chart"/></svg><b>Analytics</b><small data-kpi="rev30">$0</small></button>
+                  <button type="button" class="allc" data-go="analytics"><svg width="16" height="16"><use href="#i-chart"/></svg><b>Analytics</b><small data-kpi="rev30"><08.8k</small></button>
                   <button type="button" class="allc" data-go="team"><svg width="16" height="16"><use href="#i-users"/></svg><b>Team</b><small>1 person over 90%</small></button>
                   <div class="allv-core"><span class="brand-mark"><i></i><i></i><i></i><i></i><i></i></span></div>
                 </div>
@@ -445,7 +424,7 @@
 </section>
 
 <!-- ============ FILMS: feature explorer ============ -->
-<section class="sec films" id="films" data-name="Feature films" data-theme="dark">
+<section class="sec films lift" id="films" data-name="Feature films" data-theme="dark">
   <canvas class="sfield" id="filmsField" aria-hidden="true" style="opacity:.4"></canvas>
   <div class="sec-head" style="position:relative;z-index:1">
     <div>
@@ -474,7 +453,7 @@
   </div>
 </section>
 
-<section class="sec wfb" id="workflows" data-name="Workflows">
+<section class="sec wfb lift" id="workflows" data-name="Workflows">
   <div class="sec-head">
     <div>
       <p class="sec-tag">Workflow automation</p>
@@ -506,7 +485,7 @@
   </div>
 </section>
 
-<section class="sec copilot" id="copilot" data-name="Copilot" data-theme="dark">
+<section class="sec copilot lift" id="copilot" data-name="Copilot" data-theme="dark">
   <div class="cop-grid">
     <div class="cop-copy">
       <p class="sec-tag">Copilot</p>
@@ -539,7 +518,7 @@
   </div>
 </section>
 
-<section class="sec analytics" id="analytics" data-name="Analytics">
+<section class="sec analytics lift" id="analytics" data-name="Analytics">
   <div class="sec-head">
     <div>
       <p class="sec-tag">Analytics</p>
@@ -568,22 +547,22 @@
         </div>
       </div>
     </div>
-    <div class="an-kpis" id="anKpis"></div>
+    <div class="an-kpis" id="anKpis"><div data-k="revenue" class="is-on"><span>Revenue</span><b data-v="208820">$208.8k</b><em class="up">+4.7% vs previous 30 days</em></div><div data-k="ontime"><span>On-time delivery</span><b data-v="93.01422569498355">93.0%</b><em class="up">+0.3 pts vs previous 30 days</em></div><div data-k="cycle"><span>Cycle time</span><b data-v="3.9031093772640064">3.9 d</b><em class="up">-0.1 d vs previous 30 days</em></div><div data-k="runs"><span>Automation runs</span><b data-v="57">57</b><em class="up">+3.6% vs previous 30 days</em></div></div>
     <div class="an-body">
       <div class="an-chart" id="anChart"><div class="an-tip" id="anTip"></div></div>
-      <aside class="an-side" id="anSide"></aside>
+      <aside class="an-side" id="anSide"><h3>By project</h3><div class="bd"><i class="pd" style="background:var(--lime)"></i><span>Q4 product launch</span><b>$64.7k</b><span class="bd-bar"><i style="background: var(--lime); transform: scale(0.31, 1); translate: none; rotate: none; scale: none;"></i></span></div><div class="bd"><i class="pd" style="background:var(--warn)"></i><span>Website relaunch</span><b>$45.9k</b><span class="bd-bar"><i style="background: var(--warn); transform: scale(0.22, 1); translate: none; rotate: none; scale: none;"></i></span></div><div class="bd"><i class="pd" style="background:var(--aqua)"></i><span>Acme Freight onboarding</span><b>$60.6k</b><span class="bd-bar"><i style="background: var(--aqua); transform: scale(0.29, 1); translate: none; rotate: none; scale: none;"></i></span></div><div class="bd"><i class="pd" style="background:#B8C4CE"></i><span>Support and retainers</span><b>$37.6k</b><span class="bd-bar"><i style="background: rgb(184, 196, 206); transform: scale(0.18, 1); translate: none; rotate: none; scale: none;"></i></span></div><div class="bd bd-total"><i></i><span>Total, all projects</span><b>$208.8k</b></div><div class="an-insight"><b><svg width="13" height="13"><use href="#i-spark"></use></svg>Insight</b>Best day in this range: Oct 15 at $9,248.</div></aside>
     </div>
-    <p class="an-foot">Sample dataset for the Northbeam demo workspace. Not customer data.</p>
+    <p class="an-foot">Sample dataset for the Northbeam demo workspace, as of Nov 4, 2026. Not customer data. Hover the chart for exact values.</p>
   </div>
 </section>
 
-<section class="sec integr" id="integrations" data-name="Integrations" data-theme="dark">
+<section class="sec integr lift" id="integrations" data-name="Integrations" data-theme="dark">
   <div class="sec-head">
     <div>
       <p class="sec-tag">Integrations</p>
       <h2 class="h2">Keep your tools. <span class="hl">Connect the gaps.</span></h2>
     </div>
-    <p class="sec-sub">The connectors below show the kinds of tools VELTRIX is designed to work with. Availability of specific connectors is to be confirmed.</p>
+    <p class="sec-sub">Every connector carries its status. None is confirmed as available yet: the tools below illustrate what VELTRIX is designed to connect, and each will be marked available once it ships.</p>
   </div>
   <div class="int-grid">
     <div class="int-side">
@@ -591,6 +570,7 @@
       <div class="int-cats" role="group" aria-label="Category" id="intCats"></div>
     </div>
     <div class="int-main">
+      <div class="int-legend" id="intLegend" aria-label="Connector status"></div>
       <ul class="int-tiles" id="intTiles"></ul>
       <p class="int-empty" id="intEmpty" hidden>No tools match that search.</p>
     </div>
@@ -598,7 +578,7 @@
   </div>
 </section>
 
-<section class="sec cases" id="solutions" data-name="Solutions">
+<section class="sec cases lift" id="solutions" data-name="Solutions">
   <div class="sec-head">
     <div>
       <p class="sec-tag">Solutions</p>
@@ -614,12 +594,82 @@
       <button role="tab" aria-selected="false" data-case="3" aria-controls="casePanel"><span class="cl-n">04</span><span class="cl-t">Field and logistics</span><span class="cl-s">Jobs, crews, invoices</span></button>
     </div>
     <div class="case" id="casePanel" role="tabpanel" aria-label="Use case">
-      <figure class="case-pic"><div class="case-pics" id="casePics">
-        <img src="assets/img/studio.jpg" alt="A studio table with white chairs by tall windows" width="1200" height="1500" loading="lazy" class="is-on">
-        <img src="assets/img/clients.jpg" alt="People at cafe tables in front of bright windows, in black and white" width="1200" height="1500" loading="lazy">
-        <img src="assets/img/console.jpg" alt="A hand adjusting faders on a mixing console" width="1200" height="1500" loading="lazy">
-        <img src="assets/img/traffic.jpg" alt="City traffic and building lights at night, blurred" width="1200" height="1500" loading="lazy">
-      </div></figure>
+      <figure class="case-pic" aria-hidden="true"><div class="case-fit"><div class="fit" data-w="600" data-h="560"><div class="cscenes" id="caseScenes">
+  <div class="cscene is-on" data-c="0">
+    <svg class="sc-link" viewBox="0 0 600 560"><path d="M412 118 C 520 140, 520 250, 470 300"/></svg>
+    <div class="sc-card" style="left:30px;top:28px;width:380px">
+      <span class="ui-chip">Client project · Halden Studio</span>
+      <h4>Brand refresh</h4>
+      <div class="sc-row"><span class="sc-chk on"></span><span class="t">Phase 1 · Discovery</span><small>Approved</small></div>
+      <div class="sc-row"><span class="sc-chk on"></span><span class="t">Phase 2 · Design system</span><span class="ui-chip done">Approved by client</span></div>
+      <div class="sc-row"><span class="sc-chk"></span><span class="t">Phase 3 · Build</span><small>Opens Mon</small></div>
+      <div class="sc-row"><span class="sc-chk"></span><span class="t">Phase 4 · Launch</span><small>Dec 12</small></div>
+    </div>
+    <div class="sc-card hot" style="left:200px;top:300px;width:370px">
+      <div class="pnl-h"><span class="ic ic-blue"><svg width="13" height="13"><use href="#i-card"/></svg></span><b>Invoice drafted by rule</b><span class="ui-chip">Draft</span></div>
+      <div class="big-num"><span data-count="12400" data-fmt="usd">$12,400</span> <small>Phase 2</small></div>
+      <p class="pnl-p">INV-0412 · Halden Studio · due in 14 days</p>
+      <div class="pnl-act"><span class="ui-btn ui-btn-primary">Review and send</span><span class="ui-btn">Edit</span></div>
+    </div>
+    <div class="sc-card" style="left:30px;top:494px;width:300px;padding:11px 14px"><div class="pnl-h"><span class="ic ic-amber"><svg width="12" height="12"><use href="#i-flow"/></svg></span><span style="font-size:12px;color:var(--on-2)">Phase approved → draft invoice</span></div></div>
+  </div>
+  <div class="cscene" data-c="1">
+    <svg class="sc-link" viewBox="0 0 600 560"><path d="M300 366 C 300 400, 380 380, 400 392"/></svg>
+    <div class="sc-card" style="left:30px;top:24px;width:410px">
+      <div class="pnl-h"><span class="lg"><i style="--c:#FF7A59;--logo:url('assets/logos/hubspot.svg')"></i></span><b>Deal won · Acme Freight</b><span class="ui-chip done">Rule ran</span></div>
+      <h4 style="margin-top:12px">Acme Freight onboarding</h4>
+      <div class="sc-row"><span class="sc-chk on"></span><span class="t">Welcome email sent</span><small>Day 0</small></div>
+      <div class="sc-row"><span class="sc-chk on"></span><span class="t">Owner assigned · Priya R.</span><i class="av av-3">PR</i></div>
+      <div class="sc-row"><span class="sc-chk on"></span><span class="t">Data import checklist shared</span><small>Day 1</small></div>
+      <div class="sc-row"><span class="sc-chk"></span><span class="t">Kickoff call</span><small>Tue 10:00</small></div>
+      <span class="kp" style="display:block;margin-top:12px"><i class="sc-grow" style="width:60%"></i></span>
+    </div>
+    <div class="sc-card hot" style="left:250px;top:392px;width:320px">
+      <div class="pnl-h"><span class="ic ic-green"><svg width="13" height="13"><use href="#i-cal"/></svg></span><b>Kickoff booked</b><span class="ui-chip">Tue</span></div>
+      <p class="pnl-p">10:00 – 10:45 · Priya R., Omar A. and two contacts at Acme Freight</p>
+    </div>
+    <div class="sc-card" style="left:40px;top:430px;padding:11px 14px"><span class="ui-chip run">Renewal in 60 days</span></div>
+  </div>
+  <div class="cscene" data-c="2">
+    <svg class="sc-link" viewBox="0 0 600 560"><path d="M440 300 C 520 320, 520 360, 470 384"/></svg>
+    <div class="sc-card" style="left:30px;top:24px;width:410px">
+      <span class="ui-chip">Recurring · every month-end</span>
+      <div style="display:flex;align-items:center;gap:18px;margin-top:12px">
+        <svg class="sc-ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="10"/><circle class="sc-arc" cx="50" cy="50" r="42" fill="none" stroke="#C9F36B" stroke-width="10" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="94" transform="rotate(-90 50 50)"/><text x="50" y="57" text-anchor="middle" font-family="Sora" font-weight="600" font-size="20" fill="#EDF1F3"><tspan data-count="9" data-fmt="int">9</tspan>/14</text></svg>
+        <div><h4 style="margin:0 0 6px">October close</h4><small style="color:var(--on-3);font:500 11.5px var(--mono)">Due Nov 5 · 2 blocked</small></div>
+      </div>
+      <div class="sc-row"><span class="sc-chk on"></span><span class="t">Bank reconciliation</span><small>Omar</small></div>
+      <div class="sc-row"><span class="sc-chk on"></span><span class="t">Accruals booked</span><small>Omar</small></div>
+      <div class="sc-row"><span class="sc-chk bad"></span><span class="t">Vendor invoices, 3 missing</span><span class="s-bad">Blocked</span></div>
+      <div class="sc-row"><span class="sc-chk bad"></span><span class="t">Payroll journal</span><span class="s-bad">Blocked</span></div>
+    </div>
+    <div class="sc-card hot" style="left:170px;top:384px;width:400px">
+      <div class="pnl-h"><span class="ic ic-amber"><svg width="13" height="13"><use href="#i-spark"/></svg></span><b>Copilot · weekly summary</b></div>
+      <p class="pnl-p">Close is 64% done. Two items are blocked on missing vendor invoices; finance has been told which ones.</p>
+    </div>
+  </div>
+  <div class="cscene" data-c="3">
+    <svg class="sc-link" viewBox="0 0 600 560"><path d="M150 112 C 120 170, 150 220, 190 252"/></svg>
+    <div class="sc-card" style="left:24px;top:24px;width:552px">
+      <span class="ui-chip">Crew schedule · this week</span>
+      <h4>Jobs by crew</h4>
+      <div class="sc-grid">
+        <div></div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div>
+        <div>Crew A</div><div style="grid-column:span 2"><span class="sc-job" style="background:var(--lime)">#2291 · Harbor St</span></div><div><span class="sc-job" style="background:var(--aqua)">#2294</span></div><div></div><div><span class="sc-job" style="background:#B8C4CE">#2301</span></div>
+        <div>Crew B</div><div><span class="sc-job" style="background:var(--aqua)">#2288</span></div><div></div><div style="grid-column:span 2"><span class="sc-job" style="background:var(--warn)">#2296 · Depot refit</span></div><div></div>
+        <div>Crew C</div><div></div><div style="grid-column:span 3"><span class="sc-job" style="background:var(--lime)">#2299 · North yard install</span></div><div></div>
+      </div>
+    </div>
+    <div class="sc-card hot" style="left:40px;top:252px;width:330px">
+      <div class="pnl-h"><span class="ic ic-blue"><svg width="13" height="13"><use href="#i-check"/></svg></span><b>Job #2291 complete</b><span class="ui-chip done">Rule ran</span></div>
+      <p class="pnl-p">Photos and sign-off uploaded by Crew A · 15:42</p>
+      <div class="sc-row" style="margin-top:8px"><span class="t">Invoice raised</span><b data-count="3860" data-fmt="usd">$3,860</b></div>
+      <div class="sc-row"><span class="t">Customer updated</span><small>SMS + email</small></div>
+    </div>
+    <div class="sc-card" style="left:320px;top:470px;padding:11px 14px"><span class="ui-chip run">2 jobs need a crew Thu</span></div>
+  </div>
+  <p class="sc-lbl">VELTRIX · sample workspace</p>
+</div></div></div></figure>
       <div class="case-body" id="caseBody"></div>
     </div>
   </div>
@@ -643,7 +693,7 @@
   </div>
 </section>
 
-<section class="sec demo" id="demo" data-name="Book a demo" data-theme="dark">
+<section class="sec demo lift" id="demo" data-name="Book a demo" data-theme="dark">
   <canvas class="sfield" id="demoField" aria-hidden="true"></canvas>
   <div class="demo-grid">
     <div class="demo-copy">
@@ -655,7 +705,7 @@
         <li><b>You see it run</b><span>A walkthrough with that workflow running.</span></li>
       </ol>
     </div>
-    <form class="ui demo-form" id="demoForm" novalidate>
+    <form class="ui demo-form" id="demoForm" novalidate data-endpoint="">
       <div class="row2">
         <div class="field"><label for="fName">Full name</label><input id="fName" name="name" autocomplete="name" required><small class="err" id="fName-err"></small></div>
         <div class="field"><label for="fEmail">Work email</label><input id="fEmail" name="email" type="email" autocomplete="email" required><small class="err" id="fEmail-err"></small></div>
@@ -696,7 +746,7 @@
   <div class="foot-bot">
     <span>© 2026 VELTRIX. Company and legal details to be added before launch.</span>
     <span>All product data shown is sample data. Third-party logos belong to their owners and are shown for illustration only; no partnership is implied.</span>
-    <span>Photos via Unsplash: Vladimir Kudinov, Breather, Adam Przewoski, Drew Patrick Miller, Israel Sundseth. Logos: Simple Icons.</span>
+    <span>Photography via Unsplash. Product scenes are VELTRIX interface renders with sample data. Logo marks via Simple Icons.</span>
   </div>
 </footer>
 

@@ -56,7 +56,8 @@
 
   /* ================= DATA: one seeded sample dataset ================= */
   const DAYS = 730;
-  const today = new Date(); today.setHours(0, 0, 0, 0);
+  // the sample workspace is a snapshot taken on one fixed day, so every figure is stable and can also ship in the HTML
+  const today = new Date(2026, 10, 4);
   const DATA = (() => {
     const r = seeded(20261104);
     const rows = [];
@@ -477,7 +478,7 @@
     partTw?.kill();
     $$('.part-bar', $('#parts')).forEach(b => { b.style.transform = 'scaleX(0)'; });
     if (motion) {
-      G.from($$('.pv-card', partEls[i]), { y: 18, opacity: 0, scale: 0.96, duration: 0.8, stagger: 0.08, delay: 0.35, ease: EASE, overwrite: 'auto' });
+      G.fromTo($('.part-img', partEls[i]), { scale: 1.14, clipPath: 'inset(8% 8% 8% 8% round 14px)' }, { scale: 1, clipPath: 'inset(0% 0% 0% 0% round 14px)', duration: 1.1, delay: 0.15, ease: EASE, overwrite: 'auto' });
       if (partAuto) partTw = G.fromTo($('.part-bar', partEls[i]), { scaleX: 0 }, { scaleX: 1, duration: 6, ease: 'none', paused: !partsVis.on, onComplete: () => { if (partAuto) setPart((partI + 1) % partEls.length); } });
     }
   }
@@ -926,7 +927,7 @@
   const anChart = $('#anChart'), anTip = $('#anTip');
   const PROJ = [['Q4 product launch', 'var(--lime)'], ['Website relaunch', 'var(--warn)'], ['Acme Freight onboarding', 'var(--aqua)'], ['Support and retainers', '#B8C4CE']];
   const SHARE = { revenue: [0.31, 0.22, 0.29, 0.18], runs: [0.26, 0.41, 0.33, 0] };
-  const OFFSET = { ontime: [-6.5, 1.8, 3.4, 1.1], cycle: [1.4, -0.3, -0.9, -0.2] };
+  const OFFSET = { ontime: [-6.4, 1.8, 3.4, 1.2], cycle: [1.4, -0.3, -0.9, -0.2] };
   function renderKpis() {
     $('#anKpis').innerHTML = Object.entries(METRICS).map(([k, M]) => {
       const v = periodValue(k, an.r), pv = periodValue(k, an.r, an.r);
@@ -946,11 +947,19 @@
   function renderSide() {
     const M = METRICS[an.m], v = periodValue(an.m, an.r);
     let rows;
-    if (SHARE[an.m]) rows = PROJ.map((p, i) => [p[0], p[1], v * SHARE[an.m][i], SHARE[an.m][i]]).filter(r => r[3] > 0);
+    // totals are split into whole units (largest remainder), so the parts always add up to the headline figure
+    const split = (total, shares) => {
+      const raw = shares.map(s => total * s), out = raw.map(Math.floor);
+      let left = Math.round(total) - out.reduce((a, b) => a + b, 0);
+      raw.map((r, i) => [r - Math.floor(r), i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (left > 0 && shares[i] > 0) { out[i]++; left--; } });
+      return out;
+    };
+    if (SHARE[an.m]) { const parts = split(v, SHARE[an.m]); rows = PROJ.map((p, i) => [p[0], p[1], parts[i], SHARE[an.m][i]]).filter(r => r[3] > 0); }
     else rows = PROJ.map((p, i) => [p[0], p[1], v + OFFSET[an.m][i], (v + OFFSET[an.m][i]) / (an.m === 'ontime' ? 100 : 8)]);
     const b = buckets(an.m, an.r), best = b.reduce((a, x) => (M.better === 'up' ? x.v > a.v : x.v < a.v) ? x : a, b[0]);
     const unit = an.r <= 30 ? 'day' : an.r === 90 ? 'week' : 'month';
-    $('#anSide').innerHTML = `<h3>By project</h3>${rows.map(r => `<div class="bd"><i class="pd" style="background:${r[1]}"></i><span>${r[0]}</span><b>${M.format(r[2])}</b><span class="bd-bar"><i style="background:${r[1]};transform:scaleX(${clamp(r[3], 0.04, 1)})"></i></span></div>`).join('')}<div class="an-insight"><b>${icon('i-spark', 13)}Insight</b>Best ${unit} in this range: ${best.label} at ${M.format(best.v)}.</div>`;
+    const totalRow = `<div class="bd bd-total"><i></i><span>${M.agg === 'sum' ? 'Total, all projects' : 'Average, all projects'}</span><b>${M.format(v)}</b></div>`;
+    $('#anSide').innerHTML = `<h3>By project</h3>${rows.map(r => `<div class="bd"><i class="pd" style="background:${r[1]}"></i><span>${r[0]}</span><b>${M.format(r[2])}</b><span class="bd-bar"><i style="background:${r[1]};transform:scaleX(${clamp(r[3], 0.04, 1)})"></i></span></div>`).join('')}${totalRow}<div class="an-insight"><b>${icon('i-spark', 13)}Insight</b>Best ${unit} in this range: ${best.label} at ${M.format(best.v)}.</div>`;
     if (motion) G.from('#anSide .bd-bar i', { scaleX: 0, duration: 0.9, stagger: 0.06, ease: EASE });
   }
   let lastShape = null;
@@ -1025,13 +1034,37 @@
     { t: 'Field and logistics', p: 'Jobs, crews and invoices move fast and change often. One workspace keeps the schedule, the people and the billing in step.', w: ['Jobs scheduled against crew availability', 'Status updates from the field into one board', 'Invoices raised the day a job closes'], r: '<b>When</b> a job is marked complete, <b>then</b> raise the invoice and update the customer.', m: ['Projects', 'Team', 'Automations'] }
   ];
   let caseIdx = -1;
+  // each use case is a live scene: the old one lifts away, the new one lands card by card,
+  // its checks tick, the connector draws from cause to result and the figures count up
+  const scenes = $$('#caseScenes .cscene');
+  const fmtCount = (el, v) => { el.textContent = el.dataset.fmt === 'usd' ? '$' + Math.round(v).toLocaleString('en-US') : String(Math.round(v)); };
+  function playScene(i, prev) {
+    const next = scenes[i], old = scenes[prev];
+    if (!motion) { scenes.forEach((s, k) => s.classList.toggle('is-on', k === i)); return; }
+    if (old && old !== next) G.to($$('.sc-card', old), { y: -28, opacity: 0, scale: 0.97, duration: 0.35, stagger: 0.04, ease: 'power2.in', overwrite: true, onComplete: () => { if (scenes[caseIdx] === old) return; old.classList.remove('is-on'); G.set($$('.sc-card', old), { clearProps: 'transform,opacity,boxShadow' }); } });
+    const delay = old && old !== next ? 0.3 : 0;
+    G.delayedCall(delay, () => {
+      if (scenes[caseIdx] !== next) return;
+      G.killTweensOf($$('.sc-card', next));
+      next.classList.add('is-on');
+      const cards = $$('.sc-card', next), link = $('.sc-link path', next), len = link.getTotalLength();
+      const tl = G.timeline({ defaults: { ease: EASE } });
+      tl.fromTo(cards, { y: 46, opacity: 0, rotate: k => (k % 2 ? 2.5 : -2.5), scale: 0.95 }, { y: 0, opacity: 1, rotate: 0, scale: 1, duration: 0.9, stagger: 0.12 }, 0)
+        .fromTo($$('.sc-row', next), { x: -10, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, stagger: 0.05 }, 0.25)
+        .fromTo($$('.sc-chk.on, .sc-chk.bad', next), { scale: 0 }, { scale: 1, duration: 0.45, stagger: 0.08, ease: 'back.out(3)' }, 0.45)
+        .fromTo(link, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 0.8, ease: 'power2.inOut' }, 0.5)
+        .fromTo($$('.sc-job', next), { scaleX: 0 }, { scaleX: 1, transformOrigin: '0% 50%', duration: 0.7, stagger: 0.05, ease: 'power3.out' }, 0.3)
+        .fromTo($$('.sc-grow', next), { width: '0%' }, { width: '60%', duration: 1, ease: 'power3.out' }, 0.5)
+        .fromTo($$('.sc-arc', next), { attr: { 'stroke-dashoffset': 263.9 } }, { attr: { 'stroke-dashoffset': 94 }, duration: 1.2, ease: 'power3.out' }, 0.4)
+        .fromTo($$('.sc-card.hot', next), { boxShadow: '0 0 0 1px rgba(201,243,107,0), 0 0 0px rgba(201,243,107,0)' }, { boxShadow: '0 0 0 1px rgba(201,243,107,.55), 0 0 40px rgba(201,243,107,.18)', duration: 0.8, ease: 'power2.out' }, 0.9);
+      $$('[data-count]', next).forEach(el => { const o = { v: 0 }; tl.to(o, { v: +el.dataset.count, duration: 1.1, ease: 'power3.out', onUpdate: () => fmtCount(el, o.v) }, 0.6); });
+    });
+  }
   function selectCase(i) {
     if (i === caseIdx) return;
     const prev = caseIdx; caseIdx = i;
     $$('#casesList button').forEach((b, k) => { b.classList.toggle('is-on', k === i); b.setAttribute('aria-selected', k === i); b.tabIndex = k === i ? 0 : -1; });
-    const imgs = $$('#casePics img');
-    imgs.forEach((im, k) => { im.classList.toggle('is-on', k === i); im.classList.toggle('is-out', k === prev); });
-    setTimeout(() => imgs[prev]?.classList.remove('is-out'), 950);
+    playScene(i, prev);
     const c = CASES[i], body = $('#caseBody');
     const fill = () => { body.innerHTML = `<h3>${c.t}</h3><p>${c.p}</p><div class="case-block"><h4>What it organises</h4><ul class="case-list">${c.w.map(x => `<li>${x}</li>`).join('')}</ul></div><div class="case-block"><h4>Example automation</h4><p class="case-rule">${c.r}</p></div><div class="case-mods">${c.m.map(x => `<span class="tg tg-blue">${x}</span>`).join('')}</div>`; };
     if (prev < 0 || !motion) return fill();
@@ -1047,7 +1080,6 @@
   });
   selectCase(0);
   // hidden case photos are clipped, so lazy loading never starts them: fetch all four once the section is near
-  new IntersectionObserver(([e], o) => { if (!e.isIntersecting) return; o.disconnect(); $$('#casePics img').forEach(i => { i.loading = 'eager'; }); }, { rootMargin: '600px 0px' }).observe($('#solutions'));
 
   /* ================= INTEGRATIONS ================= */
   const CATS = { all: 'All', comms: 'Communication', sales: 'CRM and sales', finance: 'Finance', eng: 'Engineering', docs: 'Docs and files', people: 'People' };
@@ -1072,13 +1104,17 @@
     ['Google Calendar', 'people', '#4285F4', ['Deadlines on calendars', 'Availability for workload'], 'googlecalendar'],
     ['Greenhouse', 'people', '#24A47F', ['Offers trigger onboarding rules'], 'greenhouse']
   ];
+  // Connector status. Nothing is confirmed yet, so every tool is 'illustrative'. When a connector ships, add
+  // 'available' or 'planned' as a sixth field on its row above and the tiles, legend and detail panel update.
+  const STATUS = { available: ['Available', 'Live and supported today.'], planned: ['Planned', 'On the roadmap; not available yet.'], illustrative: ['Illustrative', 'Shown to explain the kind of tool VELTRIX is designed to connect. Not confirmed as available.'] };
+  const stOf = a => a[5] || 'illustrative';
   let intCat = 'all', intSel = 0;
   const logo = a => `<span class="int-logo" aria-hidden="true"><i class="${['zoom', 'zoho'].includes(a[4]) ? 'wide' : ''}" style="--c:${a[2]};--logo:url('assets/logos/${a[4]}.svg')"></i></span>`;
   $('#intCats').innerHTML = Object.entries(CATS).map(([k, l]) => `<button type="button" data-cat="${k}" aria-pressed="${k === 'all'}" class="${k === 'all' ? 'is-on' : ''}">${l}<span>${k === 'all' ? APPS.length : APPS.filter(a => a[1] === k).length}</span></button>`).join('');
   function renderInt(animate = true) {
     const q = $('#intQ').value.trim().toLowerCase();
     const list = APPS.map((a, i) => [a, i]).filter(([a]) => (intCat === 'all' || a[1] === intCat) && (!q || a[0].toLowerCase().includes(q) || a[3].join(' ').toLowerCase().includes(q)));
-    $('#intTiles').innerHTML = list.map(([a, i]) => `<li><button type="button" data-i="${i}" aria-pressed="${i === intSel}">${logo(a)}<span><b>${a[0]}</b><small>${CATS[a[1]]}</small></span></button></li>`).join('');
+    $('#intTiles').innerHTML = list.map(([a, i]) => `<li><button type="button" data-i="${i}" aria-pressed="${i === intSel}">${logo(a)}<span><b>${a[0]}</b><small>${CATS[a[1]]}</small><em class="st st-${stOf(a)}">${STATUS[stOf(a)][0]}</em></span></button></li>`).join('');
     $('#intEmpty').hidden = list.length > 0;
     if (list.length && !list.some(([, i]) => i === intSel)) showInt(list[0][1]);
     if (animate && motion) G.from('#intTiles li', { y: 14, opacity: 0, duration: 0.5, stagger: 0.025, ease: EASE });
@@ -1087,7 +1123,8 @@
     intSel = i;
     const a = APPS[i];
     $$('#intTiles button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.i === i));
-    $('#intDetail').innerHTML = `<div class="id-h">${logo(a)}<div><b>${a[0]}</b><small>${CATS[a[1]]} · example connector</small></div></div><ul class="id-sync">${a[3].map(s => `<li>${icon('i-check', 13)}<span>${s}</span></li>`).join('')}</ul><p class="id-note">Shown to illustrate how VELTRIX connects to tools like ${a[0]}. Connector availability is to be confirmed.</p>`;
+    const st = stOf(a);
+    $('#intDetail').innerHTML = `<div class="id-h">${logo(a)}<div><b>${a[0]}</b><small>${CATS[a[1]]}</small></div></div><p class="id-status st-${st}"><em class="st st-${st}">${STATUS[st][0]}</em>${STATUS[st][1]}</p><h4 class="id-h4">${st === 'available' ? 'What it syncs' : 'What a connector like this would sync'}</h4><ul class="id-sync">${a[3].map(s => `<li>${icon('i-check', 13)}<span>${s}</span></li>`).join('')}</ul><p class="id-note">${a[0]} is a trademark of its owner. Shown for illustration; no partnership is implied.</p>`;
     if (motion) {
       G.from('#intDetail > *', { y: 8, opacity: 0, duration: 0.4, stagger: 0.05, ease: EASE, overwrite: 'auto' });
       G.from('#intDetail .int-logo', { scale: 0.6, rotate: -12, duration: 0.7, ease: 'back.out(2.2)' });
@@ -1097,6 +1134,7 @@
   $('#intTiles').addEventListener('click', e => { const b = e.target.closest('button[data-i]'); if (b) showInt(+b.dataset.i); });
   $('#intCats').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; intCat = b.dataset.cat; $$('#intCats button').forEach(x => { x.classList.toggle('is-on', x === b); x.setAttribute('aria-pressed', x === b); }); renderInt(); });
   $('#intQ').addEventListener('input', () => renderInt(false));
+  $('#intLegend').innerHTML = Object.entries(STATUS).map(([k, v]) => `<span><em class="st st-${k}">${v[0]}</em>${APPS.filter(x => stOf(x) === k).length}</span>`).join('');
   renderInt(false); showInt(0);
 
   /* ================= FAQ ================= */
@@ -1155,6 +1193,23 @@
     await sleep(700);
     const interests = $$('.chips [aria-pressed="true"]', form).map(b => b.textContent);
     const rows = [['Name', $('#fName').value], ['Work email', $('#fEmail').value], ['Company', $('#fCompany').value], ['Team size', selVal], ['Interests', interests.join(', ') || 'None selected'], ['Notes', $('#fMsg').value || 'None']];
+    // a real form service is connected by setting data-endpoint on the form (for example a Formspree or own API URL)
+    const endpoint = form.dataset.endpoint;
+    if (endpoint) {
+      btn.querySelector('span').textContent = 'Sending…'; state.textContent = 'Sending your request…';
+      try {
+        const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(Object.fromEntries(rows)) });
+        if (!res.ok) throw new Error(res.status);
+        state.className = 'form-state is-sent';
+        state.innerHTML = `<b>Request sent.</b>Thanks, ${esc($('#fName').value.split(' ')[0])}. The team will reply to ${esc($('#fEmail').value)} to arrange your walkthrough.`;
+        form.reset(); selVal = ''; $('#sizeVal').textContent = 'Choose a size'; selBtn.classList.add('is-empty'); $$('.chips button', form).forEach(b => b.setAttribute('aria-pressed', 'false'));
+      } catch {
+        state.className = 'form-state is-bad';
+        state.textContent = 'The request could not be sent. Please try again in a moment.';
+      }
+      btn.disabled = false; btn.querySelector('span').textContent = 'Request a demo';
+      return;
+    }
     state.className = 'form-state is-unsent';
     state.innerHTML = `<b>Not sent. This form isn't connected to a backend yet.</b>Your entries are valid. Once a form service is connected, this is what would be submitted:<dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>`;
     btn.disabled = false; btn.querySelector('span').textContent = 'Request a demo';
@@ -1196,27 +1251,44 @@
   document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); pal.hidden ? openPal() : closePal(); } });
 
   /* ================= feature films: chapters that play in turn ================= */
+  // Two stacked video layers: the current film keeps playing until the next one can play,
+  // then the two dissolve into each other, so a switch never shows a black frame.
   const FILMS = [['projects', 'Projects'], ['workflow', 'Workflow automation'], ['copilot', 'Copilot'], ['analytics', 'Analytics']];
-  const chaps = $$('#chapters .chap'), filmV = $('#filmV'), filmBtn = $('#filmToggle');
-  let filmI = 0, filmPaused = !motion, filmSeen = false;
+  const chaps = $$('#chapters .chap'), filmBtn = $('#filmToggle'), media = $('.screen-media');
+  const layerB = document.createElement('video');
+  layerB.muted = true; layerB.playsInline = true; layerB.preload = 'auto'; layerB.className = 'film-layer'; layerB.setAttribute('aria-hidden', 'true'); layerB.style.opacity = 0;
+  media.insertBefore(layerB, $('.screen-ctl', media));
+  let filmV = $('#filmV'), spare = layerB, filmI = 0, filmPaused = !motion, filmSeen = false, swapId = 0;
+  filmV.classList.add('film-layer');
   const setToggle = () => { const playing = !filmV.paused; filmBtn.innerHTML = icon(playing ? 'i-pause' : 'i-play', 14); filmBtn.setAttribute('aria-label', playing ? 'Pause film' : 'Play film'); };
+  const prog = () => $('.chap-prog i', chaps[filmI]);
   function setFilm(i, user) {
     filmI = i;
     chaps.forEach((c, k) => { c.classList.toggle('is-on', k === i); c.setAttribute('aria-selected', k === i); c.tabIndex = k === i ? 0 : -1; $('.chap-prog i', c).style.transform = 'scaleX(0)'; });
     const [key, label] = FILMS[i];
-    $('#filmLabel').textContent = label;
-    filmV.setAttribute('aria-label', `Feature film: ${label}`);
-    const swap = () => {
-      filmV.poster = `assets/film/${key}.jpg`;
-      $('source', filmV).src = `assets/film/${key}.mp4`;
-      filmV.load();
-      if (user) filmPaused = false;
-      if (!filmPaused && filmSeen) filmV.play().catch(() => {});
-      if (motion) G.fromTo(filmV, { opacity: 0, scale: 1.02 }, { opacity: 1, scale: 1, duration: 0.6, ease: EASE });
+    if (user) filmPaused = false;
+    if (motion) G.fromTo('#filmLabel', { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: EASE, onStart: () => { $('#filmLabel').textContent = label; } });
+    else $('#filmLabel').textContent = label;
+    const id = ++swapId, next = spare, prev = filmV;
+    next.poster = `assets/film/${key}.jpg`;
+    next.src = `assets/film/${key}.mp4`;
+    next.load();
+    const reveal = () => {
+      if (id !== swapId) return;              // a newer switch has taken over
+      next.currentTime = 0;
+      if (!filmPaused && filmSeen) next.play().catch(() => {});
+      next.setAttribute('aria-label', `Feature film: ${label}`); next.removeAttribute('aria-hidden');
+      prev.setAttribute('aria-hidden', 'true'); prev.removeAttribute('aria-label');
+      filmV = next; spare = prev; setToggle();
+      if (motion) {
+        G.set(next, { zIndex: 1 }); G.set(prev, { zIndex: 0 });
+        G.fromTo(next, { opacity: 0, scale: 1.035 }, { opacity: 1, scale: 1, duration: 0.7, ease: 'power2.out', overwrite: true });
+        G.to(prev, { opacity: 0, duration: 0.7, ease: 'power2.out', overwrite: true, onComplete: () => { if (prev !== filmV) prev.pause(); } });
+      } else { next.style.opacity = 1; prev.style.opacity = 0; prev.pause(); }
     };
-    if (motion && filmV.currentSrc) G.to(filmV, { opacity: 0, duration: 0.25, onComplete: swap }); else swap();
+    if (next.readyState >= 3) reveal(); else next.addEventListener('canplay', reveal, { once: true });
   }
-  chaps.forEach((c, k) => c.addEventListener('click', () => setFilm(k, true)));
+  chaps.forEach((c, k) => c.addEventListener('click', () => { if (k !== filmI) setFilm(k, true); }));
   $('#chapters').addEventListener('keydown', e => {
     if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
     e.preventDefault();
@@ -1224,9 +1296,12 @@
     setFilm(n, true); chaps[n].focus();
   });
   filmBtn.addEventListener('click', () => { if (filmV.paused) { filmPaused = false; filmV.play().catch(() => {}); } else { filmPaused = true; filmV.pause(); } });
-  filmV.addEventListener('play', setToggle); filmV.addEventListener('pause', setToggle);
-  filmV.addEventListener('timeupdate', () => { if (filmV.duration) $('.chap-prog i', chaps[filmI]).style.transform = `scaleX(${filmV.currentTime / filmV.duration})`; });
-  filmV.addEventListener('ended', () => setFilm((filmI + 1) % FILMS.length));
+  [filmV, layerB].forEach(v => {
+    v.addEventListener('play', () => { if (v === filmV) setToggle(); });
+    v.addEventListener('pause', () => { if (v === filmV) setToggle(); });
+    v.addEventListener('timeupdate', () => { if (v === filmV && v.duration) prog().style.transform = `scaleX(${v.currentTime / v.duration})`; });
+    v.addEventListener('ended', () => { if (v === filmV) setFilm((filmI + 1) % FILMS.length); });
+  });
   new IntersectionObserver(([e]) => {
     filmSeen = e.isIntersecting;
     if (filmSeen && !filmPaused) filmV.play().catch(() => {}); else if (!filmSeen) filmV.pause();
@@ -1296,7 +1371,7 @@
   if (motion) {
     mm.add('(min-width: 961px)', () => {
       G.fromTo('#workflows .wfb-frame', { y: 70 }, { y: 0, ease: 'none', scrollTrigger: { trigger: '#workflows', start: 'top bottom', end: 'top 20%', scrub: 0.6 } });
-      G.fromTo('.case-pics', { yPercent: 6 }, { yPercent: -6, ease: 'none', scrollTrigger: { trigger: '#solutions', start: 'top bottom', end: 'bottom top', scrub: true } });
+      G.fromTo('#caseScenes', { y: 24 }, { y: -24, ease: 'none', scrollTrigger: { trigger: '#solutions', start: 'top bottom', end: 'bottom top', scrub: true } });
       G.fromTo('.an', { scale: 0.96 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '#analytics', start: 'top 80%', end: 'top 10%', scrub: 0.6 } });
     });
     // the footer wordmark rises letter by letter as the page ends
