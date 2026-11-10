@@ -146,7 +146,8 @@
     const phone = innerWidth <= 600;
     fits.forEach(f => {
       const box = f.parentElement, narrow = phone && !!f.dataset.wm;
-      const w = narrow ? +f.dataset.wm : +f.dataset.w, h = +f.dataset.h;
+      const tablet = !phone && innerWidth <= 960 && !!f.dataset.wt;   // a mid-size design for tablets, used only below 961px
+      const w = narrow ? +f.dataset.wm : tablet ? +f.dataset.wt : +f.dataset.w, h = +f.dataset.h;
       const cs = getComputedStyle(box);
       const avail = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
       let s = Math.min(1, avail / w);
@@ -155,7 +156,7 @@
       if (scroll) s = +f.dataset.min;
       box.classList.toggle('fit-scroll', scroll);
       f.style.width = `${w}px`;
-      f.style.height = (narrow || f.dataset.auto) ? 'auto' : `${h}px`;
+      f.style.height = (narrow || tablet || f.dataset.auto) ? 'auto' : `${h}px`;
       f.style.setProperty('--s', s);
       box.style.setProperty('--sw', `${w * s}px`);
       box.style.height = `${f.offsetHeight * s + (scroll ? 14 : 0)}px`;
@@ -199,15 +200,15 @@
       if (dots) ctx.drawImage(dots, 0, 0, W, H);
       if (light && px > -999) {
         const g = ctx.createRadialGradient(px, py, 0, px, py, 260);
-        g.addColorStop(0, 'rgba(201,243,107,.09)'); g.addColorStop(1, 'rgba(201,243,107,0)');
+        g.addColorStop(0, 'rgba(184,243,107,.09)'); g.addColorStop(1, 'rgba(184,243,107,0)');
         ctx.fillStyle = g; ctx.fillRect(px - 260, py - 260, 520, 520);
       }
       list.forEach(s => {
         const tail = 150, x1 = s.h ? s.p : s.lane, y1 = s.h ? s.lane : s.p, x0 = s.h ? s.p - tail * s.dir : s.lane, y0 = s.h ? s.lane : s.p - tail * s.dir;
         const g = ctx.createLinearGradient(x0, y0, x1, y1);
-        g.addColorStop(0, 'rgba(201,243,107,0)'); g.addColorStop(1, 'rgba(201,243,107,.6)');
+        g.addColorStop(0, 'rgba(184,243,107,0)'); g.addColorStop(1, 'rgba(184,243,107,.6)');
         ctx.strokeStyle = g; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
-        ctx.fillStyle = '#C9F36B'; ctx.shadowColor = 'rgba(201,243,107,.9)'; ctx.shadowBlur = 10;
+        ctx.fillStyle = '#B8F36B'; ctx.shadowColor = 'rgba(184,243,107,.9)'; ctx.shadowBlur = 10;
         ctx.beginPath(); ctx.arc(x1, y1, 2, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0;
       });
     };
@@ -224,7 +225,7 @@
       if (!W || !H) return;
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
       dots = document.createElement('canvas'); dots.width = canvas.width; dots.height = canvas.height;
-      const d = dots.getContext('2d'); d.scale(dpr, dpr); d.fillStyle = 'rgba(214,228,238,.12)';
+      const d = dots.getContext('2d'); d.scale(dpr, dpr); d.fillStyle = 'rgba(196,197,201,.12)';
       for (let x = gap / 2; x < W; x += gap) for (let y = gap / 2; y < H; y += gap) d.fillRect(x - 0.75, y - 0.75, 1.5, 1.5);
       list = list.map(s => ({ ...s, span: s.h ? W : H }));
       paint();
@@ -244,51 +245,114 @@
   addEventListener('resize', () => { clearTimeout(fieldT); fieldT = setTimeout(() => fields.forEach(f => f.size()), 200); });
 
   /* ================= numbers: every figure comes from DATA ================= */
+  // The hero dashboard, the tour, analytics and Copilot all read the same sample dataset,
+  // so a figure shown in one place always matches the same figure anywhere else.
+  const signed = (d, unit = '%') => { const r = Math.round(d * 10) / 10; return `${r > 0 ? '+' : r < 0 ? '−' : ''}${Math.abs(r).toFixed(1)}${unit}`; };   // a change that rounds to zero reads 0.0, never −0.0
+  const fullMoney = v => `$${Math.round(v).toLocaleString('en-US')}`;
+  const shortDate = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  // a delta chip: the arrow shows direction, the colour shows whether that direction is good
+  const setDelta = (id, text, dirUp, good) => { const el = $(id); if (!el) return; el.className = `kpi-d ${good ? (dirUp ? 'up' : 'good-down') : (dirUp ? 'bad-up' : 'down')}`; el.innerHTML = `<i></i><b>${text}</b>`; };
+  // KPI cards for the chosen period (7, 30 or 90 days), each compared with the period before it
+  function renderHeroKpis(days, animate) {
+    const span = `prior ${days} days`, v = k => periodValue(k, days), pv = k => periodValue(k, days, days), dur = animate ? 0.9 : 1.6;
+    countTo($('#hwRev'), v('revenue') / 1000, { format: x => x.toFixed(1), dur });
+    const dR = pctDelta(v('revenue'), pv('revenue')); setDelta('#hwRevD', signed(dR), dR >= 0, dR >= 0);
+    countTo($('#hwOn'), v('ontime'), { format: x => x.toFixed(1), dur });
+    const dOn = v('ontime') - pv('ontime'); setDelta('#hwOnD', signed(dOn, ' pts'), dOn >= 0, dOn >= 0);
+    countTo($('#hwCycle'), v('cycle'), { format: x => x.toFixed(1), dur });
+    const dCy = v('cycle') - pv('cycle'); setDelta('#hwCycleD', signed(dCy, ' d'), dCy >= 0, dCy <= 0);   // a shorter cycle is the good direction
+    countTo($('#hwRuns'), v('runs'), { dur });
+    const dRu = pctDelta(v('runs'), pv('runs')); setDelta('#hwRunsD', signed(dRu), dRu >= 0, dRu >= 0);
+    $$('#hsWin .kpi-vs').forEach(el => { el.textContent = `vs ${span}`; });
+    const rows = windowRows(days);
+    $('#dbDates span').textContent = `${shortDate(rows[0].d)} – ${shortDate(rows[rows.length - 1].d)}, ${rows[rows.length - 1].d.getFullYear()}`;
+    // seven bars: the period split into seven equal slices, the latest slice lit
+    [['#kbRev', 'revenue'], ['#kbOn', 'ontime'], ['#kbCycle', 'cycle'], ['#kbRuns', 'runs']].forEach(([sel, key]) => {
+      const el = $(sel); if (!el) return;
+      const parts = Array.from({ length: 7 }, (_, i) => aggregate(rows.slice(Math.round(i * rows.length / 7), Math.round((i + 1) * rows.length / 7)), key));
+      const lo = Math.min(...parts), hi = Math.max(...parts);
+      el.innerHTML = parts.map(x => `<i style="height:${(30 + 70 * ((x - lo) / (hi - lo || 1))).toFixed(0)}%"></i>`).join('');
+    });
+    if (animate && motion) G.from('#hsWin .kpi-mini i', { scaleY: 0, transformOrigin: '50% 100%', duration: 0.5, stagger: 0.012, ease: EASE });
+  }
+  // revenue by week: a smooth line through the last 12 weekly totals
+  let hc = null;
+  function drawHeroChart() {
+    const w12 = buckets('revenue', 84), p12 = buckets('revenue', 84, 84), n = w12.length;
+    const tot = w12.reduce((s, b) => s + b.v, 0), ptot = p12.reduce((s, b) => s + b.v, 0), d = pctDelta(tot, ptot);
+    countTo($('#hsRev'), tot, { format: fullMoney, dur: 1.8 });
+    const dEl = $('#hsRevD'); dEl.textContent = `${signed(d)} vs the 12 weeks before`; dEl.classList.toggle('down', d < 0);
+    const vals = w12.map(b => b.v), step = 5000;
+    const lo = Math.floor(Math.min(...vals) * 0.9 / step) * step, hi = Math.ceil(Math.max(...vals) * 1.06 / step) * step;
+    const X = i => i / (n - 1) * 400, Y = v => (hi - v) / (hi - lo) * 100;
+    const pts = vals.map((v, i) => [X(i), Y(v)]);
+    const curve = pts.map(([x, y], i) => {                                    // Catmull-Rom → cubic Bézier
+      if (!i) return `M${x} ${y}`;
+      const p0 = pts[i - 2] || pts[i - 1], p1 = pts[i - 1], p3 = pts[i + 1] || pts[i];
+      return `C${(p1[0] + (x - p0[0]) / 6).toFixed(2)} ${(p1[1] + (y - p0[1]) / 6).toFixed(2)} ${(x - (p3[0] - p1[0]) / 6).toFixed(2)} ${(y - (p3[1] - p1[1]) / 6).toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)}`;
+    }).join(' ');
+    $('#hcLn').setAttribute('d', curve); $('#hcAr').setAttribute('d', `${curve} L400 100 L0 100 Z`);
+    const area = $('#hcArea'); area.querySelectorAll('.db-gl-l').forEach(g => g.remove());
+    const ticks = []; for (let t = lo; t <= hi + 1; t += step * Math.ceil((hi - lo) / step / 4)) ticks.push(t);
+    ticks.forEach(t => area.insertAdjacentHTML('afterbegin', `<i class="db-gl-l" style="top:${Y(t).toFixed(2)}%"></i>`));
+    $('#hcY').innerHTML = ticks.map(t => `<span style="top:${Y(t).toFixed(2)}%">$${t / 1000}K</span>`).join('');
+    $('#hcX').innerHTML = w12.map((b, i) => (n - 1 - i) % 2 === 0 ? `<span data-i="${i}" style="left:${(i / (n - 1) * 100).toFixed(2)}%">${b.short}</span>` : '').join('');
+    hc = { w12, n, X, Y };
+    markWeek(n - 1);
+  }
+  function markWeek(i) {
+    if (!hc) return;
+    const mk = $('#hcMk'), top = `${hc.Y(hc.w12[i].v).toFixed(2)}%`;
+    mk.style.left = `${(i / (hc.n - 1) * 100).toFixed(2)}%`;
+    mk.querySelector('.db-mk-l').style.top = top; mk.querySelector('.db-mk-d').style.top = top;
+    const t = $('#hcTip'); t.style.top = top; t.textContent = `${hc.w12[i].label} · ${fullMoney(hc.w12[i].v)}`;
+    mk.classList.toggle('flip', i > hc.n / 2);
+    $$('#hcX span').forEach(s => s.classList.toggle('on', +s.dataset.i === i));
+  }
+  // on-time delivery band: for each of the last 12 weeks, the lowest and highest daily on-time rate
+  let hb = null;
+  function drawBand() {
+    const rows = windowRows(84), weeks = Array.from({ length: 12 }, (_, w) => rows.slice(w * 7, w * 7 + 7));
+    const top = weeks.map(w => Math.max(...w.map(r => r.ontime))), bot = weeks.map(w => Math.min(...w.map(r => r.ontime))), avg = weeks.map(w => aggregate(w, 'ontime'));
+    const lo = Math.floor(Math.min(...bot)) - 1, hi = Math.ceil(Math.max(...top)) + 1;
+    const X = i => i / 11 * 600, Y = v => 92 - (v - lo) / (hi - lo) * 84;
+    const line = a => a.map((v, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(v).toFixed(2)}`).join(' ');
+    const band = `${line(top)} ${bot.map((v, i) => [i, v]).reverse().map(([i, v]) => `L${X(i).toFixed(1)} ${Y(v).toFixed(2)}`).join(' ')} Z`;
+    $('#hsBandBg').setAttribute('d', band); $('#hsBandClip').setAttribute('d', band);
+    $('#hsBandTop').setAttribute('d', line(top)); $('#hsBandBot').setAttribute('d', line(bot));
+    $('#hsOn').textContent = `${K.ontime30.toFixed(1)}%`;
+    $('#hsBest').textContent = `${Math.max(...avg).toFixed(1)}%`;
+    $('#hsLow').textContent = `${Math.min(...bot).toFixed(1)}%`;
+    hb = { top, bot, avg, weeks, Y };
+    markBand(8);
+  }
+  function markBand(i) {
+    if (!hb) return;
+    const box = $('#hsBand'), h = box.clientHeight || 100, py = v => hb.Y(v) / 100 * h;
+    const mk = $('#hsBandMk'), t = py(hb.top[i]), b = py(hb.bot[i]);
+    mk.style.left = `${(i / 11 * 100).toFixed(2)}%`;
+    mk.querySelector('.db-vd1').style.top = `${t - 3.5}px`;
+    mk.querySelector('.db-vl').style.cssText = `top:${t}px;height:${Math.max(0, b - t)}px`;
+    mk.querySelector('.db-vd2').style.top = `${b - 3.5}px`;
+    const pill = $('#hsBandPill'); pill.style.top = `${(t + b) / 2}px`;
+    pill.textContent = `Week of ${shortDate(hb.weeks[i][0].d)} · ${hb.avg[i].toFixed(1)}%`;
+    pill.style.transform = `translate(${i < 2 ? '-12%' : i > 9 ? '-88%' : '-50%'}, -50%)`;
+  }
   function fillNumbers() {
-    const fmtD = d => `${d >= 0 ? '+' : ''}${d.toFixed(1)}%`;
-    countTo($('#hwRev'), K.rev30, { format: money, dur: 1.6 });
-    $('#hwRevD').textContent = `${fmtD(pctDelta(K.rev30, K.revPrev))} vs prior`;
-    $('#hwRevD').classList.toggle('up', K.rev30 >= K.revPrev);
-    countTo($('#hwOn'), K.ontime30, { format: v => `${v.toFixed(1)}%`, dur: 1.6 });
-    const dOn = K.ontime30 - K.ontimePrev;
-    $('#hwOnD').textContent = `${dOn >= 0 ? '+' : ''}${dOn.toFixed(1)} pts`;
-    $('#hwOnD').classList.toggle('up', dOn >= 0);
-    countTo($('#hwCycle'), K.cycle30, { format: v => `${v.toFixed(1)} d`, dur: 1.6 });
-    countTo($('#hwRuns'), K.runs30, { dur: 1.6 });
-    const w12 = buckets('revenue', 84).slice(-12), p12 = buckets('revenue', 84, 84).slice(-12);
-    const t12 = w12.reduce((s, b) => s + b.v, 0), tp = p12.reduce((s, b) => s + b.v, 0);
-    countTo($('#hsRev'), t12, { format: money, dur: 1.8 });
-    $('#hsRevD').textContent = `${fmtD(pctDelta(t12, tp))} vs prior 12 wks`;
+    renderHeroKpis(30, false);
+    drawHeroChart();
+    drawBand();
     const vals = { rev30: money(K.rev30), ontime30: `${K.ontime30.toFixed(1)}%`, cycle30: `${K.cycle30.toFixed(1)} d`, runs30: fmt(K.runs30), rev84: money(K.rev84) };
     $$('[data-kpi]').forEach(el => { el.textContent = vals[el.dataset.kpi]; });
     $$('.wfr small').forEach((s, i) => { if (i < 3) s.textContent = s.textContent.replace(/ran \d+ times/, `ran ${ruleRuns[i]} times`); });
-    // the 12-week sparkline in the hero
-    const pts = w12.map(b => b.v), max = Math.max(...pts), min = Math.min(...pts) * 0.92;
-    const d = pts.map((v, i) => `${i ? 'L' : 'M'}${(i / (pts.length - 1) * 270).toFixed(1)} ${(70 - (v - min) / (max - min) * 62).toFixed(1)}`).join(' ');
-    $('#hsSparkL').setAttribute('d', d); $('#hsSparkA').setAttribute('d', `${d} L270 74 L0 74 Z`);
   }
 
-  /* ================= hero: entrance, live workspace, signal lines ================= */
-  const hs = $('#hs'), hsLines = $('#hsLines'), rail = $$('#hsRail .hs-src'), hsWin = $('#hsWin');
-  // lines from each connected tool into the workspace window, measured from layout (transforms ignored)
+  /* ================= hero: entrance and the dashboard controls ================= */
   const offIn = (el, anc) => { let x = 0, y = 0; for (let n = el; n && n !== anc; n = n.offsetParent) { x += n.offsetLeft; y += n.offsetTop; } return [x, y]; };
-  const drawRail = () => {
-    if (!hs || !rail.length) return [];
-    const [wx, wy] = offIn(hsWin, hs);
-    hsLines.setAttribute('viewBox', `0 0 ${hs.offsetWidth} ${hs.offsetHeight}`);
-    hsLines.innerHTML = rail.map((s, i) => {
-      const [sx, sy] = offIn(s, hs), x0 = sx + s.offsetWidth, y0 = sy + s.offsetHeight / 2, x1 = wx + 196 + 30, y1 = wy + 140 + i * 60;
-      return `<path d="M${x0} ${y0} C${x0 + 60} ${y0}, ${x1 - 80} ${y1}, ${x1} ${y1}"/>`;
-    }).join('') + rail.map(() => '<circle r="3" opacity="0"/>').join('');
-    return $$('path', hsLines);
-  };
-  let railPaths = drawRail();
-  const heroVis = visibleFlag($('.hero'));
-  let heroArrived = false;
   const heroIn = () => {
     fillNumbers();
-    if (!motion) { heroArrived = true; return; }
-    const tl = G.timeline({ defaults: { ease: EASE }, onComplete: () => { heroArrived = true; } });
+    if (!motion) return;
+    const tl = G.timeline({ defaults: { ease: EASE } });
     tl.from('.nav-bar > *', { y: -16, opacity: 0, duration: 0.9, stagger: 0.06 }, 0)
       .from('.eyebrow', { y: 14, opacity: 0, duration: 0.8 }, 0.05)
       .from('.hero-title .ln > span', { yPercent: 112, rotate: 3, transformOrigin: '0% 100%', duration: 1.3, stagger: 0.1 }, 0.1)
@@ -296,76 +360,33 @@
       .from('.hero-cta > *', { y: 18, opacity: 0, duration: 0.9, stagger: 0.07 }, 0.55)
       .from('.film-btn', { y: 18, opacity: 0, duration: 0.9 }, 0.68)
       .from('#heroStage', { y: 140, opacity: 0, duration: 1.6, ease: 'expo.out' }, 0.5)
-      .from('#hsWin .app-nav > *', { x: -10, opacity: 0, duration: 0.6, stagger: 0.04 }, 1.0)
-      .from('#hsWin .ov-kpis > *', { y: 14, opacity: 0, duration: 0.7, stagger: 0.06 }, 1.05)
-      .from('#hsWin .tl-bar', { scaleX: 0, duration: 1.1, stagger: 0.07, ease: 'power3.inOut' }, 1.15)
-      .from('#hsWin .fe', { x: 14, opacity: 0, duration: 0.6, stagger: 0.06 }, 1.2)
-      .from('#hsRail .hs-src', { x: -50, opacity: 0, duration: 0.9, stagger: 0.08 }, 1.25)
-      .from('#hsAuto', { x: 50, y: -10, opacity: 0, duration: 1 }, 1.35)
-      .from('.hs-chart', { y: 50, opacity: 0, duration: 1 }, 1.45)
-      .from('#hsCopilot', { y: 60, opacity: 0, duration: 1 }, 1.55)
+      // inside the dashboard only: content settles in after the frame arrives
+      .from('#hsWin .db-nav > span', { x: -8, opacity: 0, duration: 0.6, stagger: 0.035 }, 1.0)
+      .from('#hsWin .kpi', { y: 12, opacity: 0, duration: 0.7, stagger: 0.06 }, 1.05)
+      .from('#hsWin .db-card', { y: 14, opacity: 0, duration: 0.8, stagger: 0.07 }, 1.15)
+      .from('#hsWin .kpi-mini i', { scaleY: 0, transformOrigin: '50% 100%', duration: 0.7, stagger: 0.01, ease: 'power3.out' }, 1.3)
       .add(() => {
-        railPaths.forEach(p => { const len = p.getTotalLength(); G.fromTo(p, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut', onComplete: () => { p.style.strokeDasharray = ''; } }); });
-        const l = $('#hsSparkL'), len = l.getTotalLength();
-        G.fromTo(l, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut' });
-        G.from('#hsSparkA', { opacity: 0, duration: 1, delay: 0.5 });
-      }, 1.5);
+        const l = $('#hcLn'); if (!l) return;
+        const len = l.getTotalLength();
+        G.fromTo(l, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut', onComplete: () => { l.style.strokeDasharray = ''; } });
+        G.from(['#hcAr', '#hcMk', '#hsBandMk'], { opacity: 0, duration: 1, delay: 0.5 });
+      }, 1.35);
   };
   heroIn();
-  // signals leave each tool in turn and arrive in the workspace; the tool's card lights as it sends
-  if (motion) {
-    const dots = $$('circle', hsLines);
-    railPaths.forEach((p, i) => {
-      const o = { k: 0 }, len = () => p.getTotalLength();
-      G.to(o, { k: 1, duration: 1.5, ease: 'power1.inOut', repeat: -1, repeatDelay: 2.6, delay: 2.6 + i * 0.95,
-        onStart: () => rail[i].animate([{ borderColor: 'rgba(201,243,107,.8)' }, { borderColor: 'rgba(214,228,238,.14)' }], { duration: 900 }),
-        onRepeat: () => rail[i].animate([{ borderColor: 'rgba(201,243,107,.8)' }, { borderColor: 'rgba(214,228,238,.14)' }], { duration: 900 }),
-        onUpdate: () => { if (!heroVis.on) return; const pt = p.getPointAtLength(len() * o.k); dots[i].setAttribute('cx', pt.x); dots[i].setAttribute('cy', pt.y); dots[i].setAttribute('opacity', o.k < 0.05 ? o.k / 0.05 : o.k > 0.94 ? (1 - o.k) / 0.06 : 1); } });
-    });
-  }
-  // the automation panel runs its rule on a loop and posts each result into the activity feed
-  const steps = $$('#hsSteps .as'), feed = $('#hwFeed'), autoState = $('#hsAutoState');
-  const posts = [
-    ['i-target', 'ic-blue', '<b>Deal won</b> · Acme Freight moved to onboarding'],
-    ['i-folder', 'ic-blue', '<b>Project created</b> · Acme Freight onboarding, 14 tasks'],
-    ['i-users', 'ic-green', '<b>Owner assigned</b> · Priya R. has the most room'],
-    ['i-cal', 'ic-amber', '<b>Kickoff booked</b> · Tue 10:00 with Acme']
-  ];
-  let stepI = 0;
-  const postFeed = ([ic, cls, html]) => {
-    const row = document.createElement('div');
-    row.className = 'fe is-new';
-    row.innerHTML = `<span class="ic ${cls}">${icon(ic, 12)}</span><p>${html}</p><time>${now()}</time>`;
-    feed.prepend(row);
-    while (feed.children.length > 5) feed.lastElementChild.remove();
-    if (motion) G.from(row, { height: 0, opacity: 0, paddingTop: 0, paddingBottom: 0, duration: 0.6, ease: 'power3.out' });
-    setTimeout(() => row.classList.remove('is-new'), 2400);
-  };
-  const tickAuto = () => {
-    if (!heroVis.on || document.hidden || !heroArrived) return;
-    if (stepI === steps.length) { steps.forEach(s => s.classList.remove('on', 'go')); autoState.textContent = 'Running'; autoState.className = 'ui-chip run'; stepI = 0; return; }
-    steps.forEach((s, k) => s.classList.toggle('go', k === stepI + 1));
-    steps[stepI].classList.add('on'); steps[stepI].classList.remove('go');
-    postFeed(posts[stepI]);
-    stepI++;
-    if (stepI === steps.length) { autoState.textContent = 'Completed'; autoState.className = 'ui-chip done'; }
-  };
-  if (motion) setInterval(tickAuto, 1700); else steps.forEach(s => s.classList.add('on'));
-  $('#hsAiYes').addEventListener('click', () => {
-    $('#hsAiText').textContent = 'Done. Lena gets a reminder the moment Design QA closes. (Demo: nothing was sent.)';
-    $('#hsAiAct').innerHTML = '<span class="ui-chip done">Reminder set</span>';
-    toast('Reminder set for Lena in this demo', 'i-spark');
-  });
-  $('#hsAiNo').addEventListener('click', () => { $('#hsAiText').textContent = 'Dismissed. Copilot will check the launch timeline again tomorrow.'; $('#hsAiAct').innerHTML = ''; });
-  // pointer depth: the floating panels drift a few pixels; the stage flattens as you scroll into the page
-  if (motion && finePointer) {
-    const layers = [['#hsAuto', 10], ['#hsCopilot', 14], ['.hs-chart', 8], ['#hsRail', 6]];
-    $('.hero').addEventListener('mousemove', e => {
-      if (!heroArrived) return;
-      const nx = e.clientX / innerWidth - 0.5, ny = e.clientY / innerHeight - 0.5;
-      layers.forEach(([s, d]) => G.to(s, { x: -nx * d, y: -ny * d * 0.8, duration: 1.1, ease: 'power3.out', overwrite: 'auto' }));
-    });
-  }
+  // KPI period
+  $$('#dbRange button').forEach(b => b.addEventListener('click', () => {
+    $$('#dbRange button').forEach(x => { x.classList.toggle('is-on', x === b); x.setAttribute('aria-pressed', x === b); });
+    renderHeroKpis(+b.dataset.days, true);
+  }));
+  // charts: hover to read a week; leaving returns to the resting week
+  const cfPlot = $('#hcArea'), bandBox = $('#hsBand');
+  $('#hcPlot')?.addEventListener('pointermove', e => { if (!hc) return; const r = cfPlot.getBoundingClientRect(); markWeek(clamp(Math.round((e.clientX - r.left) / r.width * (hc.n - 1)), 0, hc.n - 1)); });
+  $('#hcPlot')?.addEventListener('pointerleave', () => hc && markWeek(hc.n - 1));
+  bandBox?.addEventListener('pointermove', e => { const r = bandBox.getBoundingClientRect(); markBand(clamp(Math.round((e.clientX - r.left) / r.width * 11), 0, 11)); });
+  bandBox?.addEventListener('pointerleave', () => markBand(8));
+  addEventListener('resize', () => hb && markBand(8));
+  $('#dbBell').addEventListener('click', () => toast('2 unread: Design QA flagged as the launch blocker; Invoice 2287 paid', 'i-bell'));
+  $('#dbNew').addEventListener('click', () => toast('Creating projects isn’t available in this demo', 'i-folder'));
   const mmHero = motion ? G.matchMedia() : null;
   mmHero?.add('(min-width: 961px)', () => {
     G.set('#stageTilt', { rotateX: 16, scale: 0.93, transformOrigin: '50% 0%' });
@@ -373,7 +394,6 @@
     G.to('.hero-inner', { yPercent: -18, opacity: 0.25, ease: 'none', scrollTrigger: { trigger: '.hero', start: '12% top', end: '55% top', scrub: true } });
     return () => G.set('#stageTilt', { clearProps: 'transform' });
   });
-  addEventListener('load', () => { railPaths = drawRail(); });
 
   /* ================= film modal: the 36-second product film ================= */
   const modal = $('#filmModal'), full = $('#filmFull');
@@ -628,7 +648,7 @@
       const o = { k: 0 };
       allvTweens.push(G.to(o, { k: 1, duration: 1.4, ease: 'power1.inOut', repeat: -1, repeatDelay: 1.6, delay: 1.1 + i * 0.5,
         onUpdate: () => { const pt = paths[i].getPointAtLength(lens[i] * o.k); d.setAttribute('cx', pt.x); d.setAttribute('cy', pt.y); d.setAttribute('opacity', o.k < 0.06 ? o.k / 0.06 : o.k > 0.92 ? (1 - o.k) / 0.08 : 1); },
-        onRepeat: () => G.fromTo(core, { boxShadow: '0 0 0 10px rgba(53,87,245,.22)' }, { boxShadow: '0 0 0 10px rgba(228,233,255,1)', duration: 0.8, ease: 'power2.out' }) }));
+        onRepeat: () => G.fromTo(core, { boxShadow: '0 0 0 10px rgba(184,243,107,.22)' }, { boxShadow: '0 0 0 10px rgba(184,243,107,0)', duration: 0.8, ease: 'power2.out' }) }));
     });
   }
   function showTourStep(idx, scroll) {
@@ -663,7 +683,7 @@
     const line = a => a.map((c, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(c.v).toFixed(1)}`).join(' ');
     const ticks = [0, 1, 2, 3].map(k => lo + (hi - lo) * k / 3), n = cur.length - 1;
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-    svg.innerHTML = '<defs><linearGradient id="tcFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9F36B" stop-opacity=".16"/><stop offset="1" stop-color="#C9F36B" stop-opacity="0"/></linearGradient></defs>'
+    svg.innerHTML = '<defs><linearGradient id="tcFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B8F36B" stop-opacity=".16"/><stop offset="1" stop-color="#B8F36B" stop-opacity="0"/></linearGradient></defs>'
       + ticks.map(t => `<line class="gl" x1="${pad.l}" x2="${W - pad.r}" y1="${y(t)}" y2="${y(t)}"/><text class="lb" x="${pad.l - 8}" y="${y(t) + 4}" text-anchor="end">$${Math.round(t / 1000)}k</text>`).join('')
       + cur.map((c, i) => i % 2 === 1 || i === n ? `<text class="lb" x="${x(i)}" y="${H - 6}" text-anchor="${i === n ? 'end' : 'middle'}">${c.short}</text>` : '').join('')
       + `<path class="pv" d="${line(prev)}"/><path class="ar" fill="url(#tcFill)" d="${line(cur)} L${x(n)} ${pad.t + ih} L${x(0)} ${pad.t + ih} Z"/><path class="ln" d="${line(cur)}"/>`
@@ -925,7 +945,7 @@
   /* ================= ANALYTICS ================= */
   const an = { m: 'revenue', r: 30, t: 'line' };
   const anChart = $('#anChart'), anTip = $('#anTip');
-  const PROJ = [['Q4 product launch', 'var(--lime)'], ['Website relaunch', 'var(--warn)'], ['Acme Freight onboarding', 'var(--aqua)'], ['Support and retainers', '#B8C4CE']];
+  const PROJ = [['Q4 product launch', 'var(--lime)'], ['Website relaunch', 'var(--warn)'], ['Acme Freight onboarding', 'var(--aqua)'], ['Support and retainers', '#C4C5C9']];
   const SHARE = { revenue: [0.31, 0.22, 0.29, 0.18], runs: [0.26, 0.41, 0.33, 0] };
   const OFFSET = { ontime: [-6.4, 1.8, 3.4, 1.2], cycle: [1.4, -0.3, -0.9, -0.2] };
   function renderKpis() {
@@ -1056,7 +1076,7 @@
         .fromTo($$('.sc-job', next), { scaleX: 0 }, { scaleX: 1, transformOrigin: '0% 50%', duration: 0.7, stagger: 0.05, ease: 'power3.out' }, 0.3)
         .fromTo($$('.sc-grow', next), { width: '0%' }, { width: '60%', duration: 1, ease: 'power3.out' }, 0.5)
         .fromTo($$('.sc-arc', next), { attr: { 'stroke-dashoffset': 263.9 } }, { attr: { 'stroke-dashoffset': 94 }, duration: 1.2, ease: 'power3.out' }, 0.4)
-        .fromTo($$('.sc-card.hot', next), { boxShadow: '0 0 0 1px rgba(201,243,107,0), 0 0 0px rgba(201,243,107,0)' }, { boxShadow: '0 0 0 1px rgba(201,243,107,.55), 0 0 40px rgba(201,243,107,.18)', duration: 0.8, ease: 'power2.out' }, 0.9);
+        .fromTo($$('.sc-card.hot', next), { boxShadow: '0 0 0 1px rgba(184,243,107,0), 0 0 0px rgba(184,243,107,0)' }, { boxShadow: '0 0 0 1px rgba(184,243,107,.55), 0 0 40px rgba(184,243,107,.18)', duration: 0.8, ease: 'power2.out' }, 0.9);
       $$('[data-count]', next).forEach(el => { const o = { v: 0 }; tl.to(o, { v: +el.dataset.count, duration: 1.1, ease: 'power3.out', onUpdate: () => fmtCount(el, o.v) }, 0.6); });
     });
   }
@@ -1352,6 +1372,12 @@
     $$('.int-tiles, .wfb-tabs, .cases-list, .allv, .chapters').forEach(g => g.addEventListener('pointermove', e => {
       const el = e.target.closest('.int-tiles button, .wfb-tabs button, .cases-list button, .allc, .chap');
       if (!el) return;
+      if (!el.hasAttribute('data-spot')) el.setAttribute('data-spot', '');
+      const r = el.getBoundingClientRect(), k = r.width / el.offsetWidth || 1;
+      el.style.setProperty('--mx', `${(e.clientX - r.left) / k}px`); el.style.setProperty('--my', `${(e.clientY - r.top) / k}px`);
+    }));
+    // the large graphite cards get the same soft light under the pointer
+    $$('.part, .case').forEach(el => el.addEventListener('pointermove', e => {
       if (!el.hasAttribute('data-spot')) el.setAttribute('data-spot', '');
       const r = el.getBoundingClientRect(), k = r.width / el.offsetWidth || 1;
       el.style.setProperty('--mx', `${(e.clientX - r.left) / k}px`); el.style.setProperty('--my', `${(e.clientY - r.top) / k}px`);

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VELTRIX · Connect the work. Automate the handoffs. See it all, live.</title>
 <meta name="description" content="VELTRIX is an AI-assisted operations workspace that brings projects, workflow automation, team conversation and business analytics together, so work moves between people and tools without anyone chasing it.">
-<meta name="theme-color" content="#0C1217">
+<meta name="theme-color" content="#0D0E10">
 <meta property="og:title" content="VELTRIX · Connect the work. Automate the handoffs. See it all, live.">
 <meta property="og:description" content="One AI-assisted workspace for projects, automations, team conversation and analytics.">
 <meta property="og:image" content="assets/film/overview.jpg">
@@ -46,6 +46,10 @@
     <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5l9.5 16.5h-19z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 10v4.5M12 17.2v.3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
     <symbol id="i-branch" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="6" cy="18" r="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="18" cy="9" r="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6 8.5v7M18 11.5c0 3-4 3.5-10.5 5" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7.5 5h3v14h-3zM13.5 5h3v14h-3z" fill="currentColor"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0112 0v5l1.5 2h-15zM10 20.5a2 2 0 004 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <linearGradient id="hcFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B8F36B" stop-opacity=".16"/><stop offset="1" stop-color="#B8F36B" stop-opacity="0"/></linearGradient>
+    <linearGradient id="kpiFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B8F36B" stop-opacity=".22"/><stop offset="1" stop-color="#B8F36B" stop-opacity="0"/></linearGradient>
   </defs>
 </svg>
 
@@ -140,80 +144,113 @@
   <div class="hero-stage" id="heroStage">
     <div class="stage-glow" aria-hidden="true"></div>
     <div class="stage-tilt" id="stageTilt">
-      <div class="fit" data-w="1200" data-h="720" data-wm="340">
+      <div class="fit" data-w="1200" data-h="720" data-wm="340" data-wt="760">
         <div class="hs" id="hs">
-          <svg class="hs-lines" id="hsLines" aria-hidden="true"></svg>
-          <div class="hs-rail" id="hsRail" aria-label="Connected tools, illustrative">
-            <div class="hs-src" data-src="0"><span class="lg"><i style="--c:#FF7A59;--logo:url('assets/logos/hubspot.svg')"></i></span><span><b>HubSpot</b><small>Deal won · Acme</small></span></div>
-            <div class="hs-src" data-src="1"><span class="lg"><i style="--c:#4A154B;--logo:url('assets/logos/slack.svg')"></i></span><span><b>Slack</b><small>#launch · 3 new</small></span></div>
-            <div class="hs-src" data-src="2"><span class="lg"><i style="--c:#635BFF;--logo:url('assets/logos/stripe.svg')"></i></span><span><b>Stripe</b><small>Invoice 2287 paid</small></span></div>
-            <div class="hs-src" data-src="3"><span class="lg"><i style="--c:#4285F4;--logo:url('assets/logos/googlecalendar.svg')"></i></span><span><b>Calendar</b><small>Kickoff · Tue 10:00</small></span></div>
-          </div>
-
-          <div class="ui hs-win" id="hsWin" aria-hidden="true">
-            <div class="win-top"><span class="dots"><i></i><i></i><i></i></span><span class="crumb">Northbeam <svg width="12" height="12"><use href="#i-chev"/></svg> <b>Operations</b></span><span class="win-search"><svg width="13" height="13"><use href="#i-search"/></svg>Search or ask Copilot <kbd>⌘K</kbd></span><span class="people"><span class="av av-1">MO</span><span class="av av-2">LK</span><span class="av av-3">PR</span><span class="av av-5">OA</span></span></div>
-            <div class="hw">
-              <aside class="app-side">
-                <div class="app-ws"><span class="app-ws-logo">N</span><div><b>Northbeam</b><small>Sample workspace</small></div></div>
-                <div class="app-nav">
-                  <span class="navi is-on"><svg width="15" height="15"><use href="#i-grid"/></svg>Overview</span>
-                  <span class="navi"><svg width="15" height="15"><use href="#i-folder"/></svg>Projects</span>
-                  <span class="navi"><svg width="15" height="15"><use href="#i-flow"/></svg>Workflows<em>3</em></span>
-                  <span class="navi"><svg width="15" height="15"><use href="#i-spark"/></svg>Copilot</span>
-                  <span class="navi"><svg width="15" height="15"><use href="#i-chart"/></svg>Analytics</span>
-                  <span class="navi"><svg width="15" height="15"><use href="#i-users"/></svg>Team</span>
-                </div>
-                <div class="app-side-foot"><span class="av av-3">PR</span><div><b>Priya R.</b><small>Operations lead</small></div></div>
-              </aside>
-              <div class="hw-main">
-                <div class="hw-head"><h3>This week</h3><span class="crumb">Nov 3 – 7</span><span class="ui-chip live">Live · sample data</span></div>
-                <div class="ov-kpis">
-                  <div><span>Revenue, 30 days</span><b id="hwRev"><08.8k</b><em class="kd" id="hwRevD">+4.7% vs prior</em></div>
-                  <div><span>On-time delivery</span><b id="hwOn">93.0%</b><em class="kd" id="hwOnD">+0.3 pts</em></div>
-                  <div><span>Avg. cycle time</span><b id="hwCycle">3.9 d</b><em class="kd">sample</em></div>
-                  <div><span>Automation runs</span><b id="hwRuns">57</b><em class="kd">last 30 days</em></div>
-                </div>
-                <div class="hw-cols">
-                  <div class="tl" id="hwTl">
-                    <div class="tl-days"><span>Project</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span></div>
-                    <div class="tl-row"><span><i class="pd pd-blue"></i>Q4 product launch</span><div class="tl-track"><i class="tl-bar" style="left:4%;width:66%;background:var(--lime)">Design QA · 8/11</i></div></div>
-                    <div class="tl-row"><span><i class="pd pd-amber"></i>Website relaunch</span><div class="tl-track"><i class="tl-bar" style="left:22%;width:48%;background:var(--warn)">Pricing page</i></div></div>
-                    <div class="tl-row"><span><i class="pd pd-green"></i>Acme onboarding</span><div class="tl-track"><i class="tl-bar" style="left:40%;width:56%;background:var(--aqua)">Kickoff → setup</i></div></div>
-                    <div class="tl-row"><span><i class="pd pd-red"></i>Support hiring</span><div class="tl-track"><i class="tl-bar" style="left:8%;width:30%;background:var(--bad)">Interviews</i></div></div>
-                    <div class="tl-row"><span><i class="pd pd-blue"></i>Month-end close</span><div class="tl-track"><i class="tl-bar" style="left:60%;width:38%;background:#B8C4CE">Checklist</i></div></div>
-                    <i class="tl-now" style="left:calc(140px + 14px + (100% - 168px) * .5)"></i>
-                  </div>
-                  <div class="feed"><p class="ph">Activity <span>Today</span></p><div id="hwFeed">
-                    <div class="fe"><span class="ic ic-blue"><svg width="12" height="12"><use href="#i-flow"/></svg></span><p><b>Rule ran</b> · onboarding project opened for Acme Freight</p><time>09:12</time></div>
-                    <div class="fe"><span class="ic ic-amber"><svg width="12" height="12"><use href="#i-spark"/></svg></span><p><b>Copilot</b> flagged Design QA as the launch blocker</p><time>09:40</time></div>
-                    <div class="fe"><span class="ic ic-green"><svg width="12" height="12"><use href="#i-card"/></svg></span><p><b>Invoice 2287</b> paid · milestone closed</p><time>10:05</time></div>
-                    <div class="fe"><span class="ic"><svg width="12" height="12"><use href="#i-msg"/></svg></span><p><b>Lena</b> commented on Launch email</p><time>10:31</time></div>
-                    <div class="fe"><span class="ic ic-blue"><svg width="12" height="12"><use href="#i-users"/></svg></span><p><b>Omar</b> took over Pricing page build</p><time>11:02</time></div>
-                  </div></div>
+          <div class="ui db" id="hsWin" aria-label="VELTRIX overview dashboard with sample data">
+            <aside class="db-side">
+              <div class="db-brand"><span class="db-logo"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></span><span class="db-brand-t"><b>VELTRIX</b><small>Northbeam</small></span><span class="db-switch" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M3.5 4.5 6 2l2.5 2.5M3.5 7.5 6 10l2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <button class="db-sside" type="button" data-open-palette><svg width="14" height="14" aria-hidden="true"><use href="#i-search"/></svg><span>Search…</span><kbd class="db-kbd">Ctrl K</kbd></button>
+              <p class="db-gl">Main</p>
+              <nav class="db-nav" aria-label="Workspace views">
+                <span class="is-on"><svg width="15" height="15" aria-hidden="true"><use href="#i-grid"/></svg>Overview<svg class="db-chev" width="13" height="13" aria-hidden="true"><use href="#i-chev"/></svg></span>
+                <span><svg width="15" height="15" aria-hidden="true"><use href="#i-folder"/></svg>Projects</span>
+                <span><svg width="15" height="15" aria-hidden="true"><use href="#i-flow"/></svg>Workflows</span>
+                <span><svg width="15" height="15" aria-hidden="true"><use href="#i-spark"/></svg>Copilot</span>
+                <span><svg width="15" height="15" aria-hidden="true"><use href="#i-chart"/></svg>Analytics</span>
+                <span><svg width="15" height="15" aria-hidden="true"><use href="#i-users"/></svg>Team</span>
+              </nav>
+              <p class="db-gl">Others</p>
+              <nav class="db-nav" aria-label="Other views">
+                <span><svg width="15" height="15" aria-hidden="true"><use href="#i-link"/></svg>Integrations</span>
+                <span><svg width="15" height="15" aria-hidden="true"><use href="#i-msg"/></svg>Help center</span>
+              </nav>
+              <div class="db-goal-wrap">
+                <span class="db-stack s1" aria-hidden="true"></span><span class="db-stack s2" aria-hidden="true"></span>
+                <div class="db-goal">
+                  <b>Q4 product launch</b>
+                  <p>62% complete · due Fri, Nov 20</p>
+                  <span class="db-cap" aria-hidden="true"><i style="width:62%"></i></span>
+                  <a href="#tour">Open project</a>
                 </div>
               </div>
-            </div>
-          </div>
+              <div class="db-user" aria-hidden="true"><span class="db-avatar">P</span><span class="db-user-t"><b>Priya R.</b><small>Operations lead</small></span><svg width="14" height="14"><use href="#i-chev"/></svg></div>
+            </aside>
 
-          <div class="ui hs-panel hs-auto" id="hsAuto">
-            <div class="pnl-h"><span class="ic ic-blue"><svg width="13" height="13"><use href="#i-flow"/></svg></span><b>Rule running</b><span class="ui-chip run" id="hsAutoState">Running</span></div>
-            <p class="pnl-p">When a deal is won, open the onboarding project</p>
-            <div class="auto-steps" id="hsSteps">
-              <div class="as"><i></i>Deal won · Acme Freight</div>
-              <div class="as"><i></i>Project created from template</div>
-              <div class="as"><i></i>Owner assigned · Priya R.</div>
-              <div class="as"><i></i>Kickoff booked · Tue 10:00</div>
+            <div class="db-wrap">
+              <header class="db-top">
+                <nav class="db-crumbs" aria-label="Location"><svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 7 8 2.5 13.5 7v6.5H10V10H6v3.5H2.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><svg class="db-sep" width="13" height="13" aria-hidden="true"><use href="#i-chev"/></svg><b>Overview</b></nav>
+                <div class="db-seg" role="group" aria-label="KPI period" id="dbRange"><button type="button" data-days="7">Week</button><button type="button" data-days="30" class="is-on" aria-pressed="true">Month</button><button type="button" data-days="90">Quarter</button></div>
+                <span class="db-chip" id="dbDates"><svg width="14" height="14" aria-hidden="true"><use href="#i-cal"/></svg><span>Oct 6 – Nov 4, 2026</span></span>
+                <button class="db-ib" type="button" id="dbBell" aria-label="Notifications, 2 unread"><svg width="16" height="16" aria-hidden="true"><use href="#i-bell"/></svg><em aria-hidden="true"></em></button>
+                <button class="db-primary" type="button" id="dbNew"><svg width="14" height="14" aria-hidden="true"><use href="#i-plus"/></svg>New project</button>
+              </header>
+
+              <div class="db-main">
+                <div class="db-welcome"><h3>Good morning, Priya</h3><p>Here’s how operations are running. <span class="db-tag">Sample data</span></p></div>
+
+                <section class="db-kpis" aria-label="Key figures">
+                  <div class="kpi">
+                    <div class="kpi-h"><svg width="15" height="15" aria-hidden="true"><use href="#i-card"/></svg><span>Revenue</span><span class="kpi-more" aria-hidden="true"></span></div>
+                    <div class="kpi-in"><b class="kpi-num"><small>$</small><span id="hwRev">208.8</span><small>k</small></b><span class="kpi-mini" id="kbRev" aria-hidden="true"></span></div>
+                    <div class="kpi-f"><span class="kpi-vs">vs prior 30 days</span><span class="kpi-d up" id="hwRevD"><i></i><b>+4.7%</b></span></div>
+                  </div>
+                  <div class="kpi">
+                    <div class="kpi-h"><svg width="15" height="15" aria-hidden="true"><use href="#i-check"/></svg><span>On-time delivery</span><span class="kpi-more" aria-hidden="true"></span></div>
+                    <div class="kpi-in"><b class="kpi-num"><span id="hwOn">93.0</span><small>%</small></b><span class="kpi-mini" id="kbOn" aria-hidden="true"></span></div>
+                    <div class="kpi-f"><span class="kpi-vs">vs prior 30 days</span><span class="kpi-d up" id="hwOnD"><i></i><b>+0.3 pts</b></span></div>
+                  </div>
+                  <div class="kpi">
+                    <div class="kpi-h"><svg width="15" height="15" aria-hidden="true"><use href="#i-clock"/></svg><span>Avg. cycle time</span><span class="kpi-more" aria-hidden="true"></span></div>
+                    <div class="kpi-in"><b class="kpi-num"><span id="hwCycle">3.9</span><small>days</small></b><span class="kpi-mini" id="kbCycle" aria-hidden="true"></span></div>
+                    <div class="kpi-f"><span class="kpi-vs">vs prior 30 days</span><span class="kpi-d up" id="hwCycleD"><i></i><b>−0.1 d</b></span></div>
+                  </div>
+                  <div class="kpi">
+                    <div class="kpi-h"><svg width="15" height="15" aria-hidden="true"><use href="#i-flow"/></svg><span>Automation runs</span><span class="kpi-more" aria-hidden="true"></span></div>
+                    <div class="kpi-in"><b class="kpi-num"><span id="hwRuns">57</span><small>runs</small></b><span class="kpi-mini" id="kbRuns" aria-hidden="true"></span></div>
+                    <div class="kpi-f"><span class="kpi-vs">vs prior 30 days</span><span class="kpi-d up" id="hwRunsD"><i></i><b>+3.6%</b></span></div>
+                  </div>
+                </section>
+
+                <div class="db-row2">
+                  <section class="db-card db-panel" aria-label="Revenue by week">
+                    <div class="db-vh"><span>Revenue by week</span><span class="db-period">Last 12 weeks</span></div>
+                    <div class="db-amount"><span id="hsRev">$554,125</span><em class="db-amt-d" id="hsRevD">+5.9%</em></div>
+                    <div class="db-cf" id="hcPlot">
+                      <div class="db-cf-y" id="hcY" aria-hidden="true"></div>
+                      <div class="db-cf-plot" id="hcArea">
+                        <svg id="hcSvg" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="dbCfg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B8F36B" stop-opacity=".16"/><stop offset=".6" stop-color="#B8F36B" stop-opacity=".03"/><stop offset="1" stop-color="#B8F36B" stop-opacity="0"/></linearGradient></defs><path id="hcAr" fill="url(#dbCfg)"/><path id="hcLn" fill="none" stroke="#C9FF83" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>
+                        <div class="db-mk" id="hcMk" aria-hidden="true"><span class="db-mk-l"></span><span class="db-mk-d"></span><span class="db-mk-t" id="hcTip"></span></div>
+                      </div>
+                      <div class="db-cf-x" id="hcX" aria-hidden="true"></div>
+                    </div>
+                  </section>
+                  <section class="db-card db-panel" aria-label="On-time delivery range">
+                    <div class="db-vh"><span>On-time delivery range</span><span class="db-period">Last 12 weeks</span></div>
+                    <div class="db-amount"><span id="hsOn">93.0%</span><em class="db-amt-l">30-day average</em></div>
+                    <div class="db-vchart" id="hsBand">
+                      <svg viewBox="0 0 600 100" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="dbStripeG" x1="0" y1="0" x2="0" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#92949B" stop-opacity=".75"/><stop offset=".55" stop-color="#696B73" stop-opacity=".5"/><stop offset="1" stop-color="#363840" stop-opacity=".4"/></linearGradient><pattern id="dbStripes" width="7" height="100" patternUnits="userSpaceOnUse"><rect width="4" height="100" fill="url(#dbStripeG)"/></pattern><clipPath id="dbBandClip"><path id="hsBandClip"/></clipPath></defs><path id="hsBandBg" fill="#F5F5F5" fill-opacity=".03"/><rect width="600" height="100" fill="url(#dbStripes)" clip-path="url(#dbBandClip)"/><path id="hsBandTop" fill="none" stroke="#C4C5C9" stroke-opacity=".7" stroke-width="1.2" vector-effect="non-scaling-stroke"/><path id="hsBandBot" fill="none" stroke="#92949B" stroke-opacity=".35" stroke-width="1" vector-effect="non-scaling-stroke"/></svg>
+                      <div class="db-vm" id="hsBandMk" aria-hidden="true"><span class="db-vd db-vd1"></span><span class="db-vl"></span><span class="db-vd db-vd2"></span><span class="db-vpill" id="hsBandPill"></span></div>
+                    </div>
+                    <div class="db-tiles">
+                      <div class="db-tile"><span>Best week</span><b id="hsBest">95.1%</b></div>
+                      <div class="db-tile"><span>Lowest day</span><b id="hsLow">88.0%</b></div>
+                      <div class="db-tile"><span>Projects at risk</span><b>1 of 4</b></div>
+                    </div>
+                  </section>
+                </div>
+
+                <section class="db-card db-tx" aria-label="Active projects">
+                  <div class="db-vh"><span>Active projects</span><span class="db-tx-tools"><span class="db-tx-search"><svg width="13" height="13" aria-hidden="true"><use href="#i-search"/></svg><span>Search</span></span><span class="db-period">This month</span></span></div>
+                  <div class="db-table" role="table" aria-label="Active projects">
+                    <div class="db-tr db-th" role="row"><span role="columnheader">Project</span><span role="columnheader">Due</span><span role="columnheader">Area</span><span role="columnheader">Owner</span><span role="columnheader">Status</span><span role="columnheader" class="r">Progress</span></div>
+                    <div class="db-tr" role="row"><span role="cell" class="db-who"><i class="db-pav" style="--h:239">Q4</i><span><b>Q4 product launch</b><small>14 tasks · 1 blocker</small></span></span><span role="cell" class="db-dt">Nov 20, 2026<small>Friday</small></span><span role="cell"><em class="db-cat" style="--c:#C4C5C9">Launch</em></span><span role="cell">Priya R.</span><span role="cell" class="db-st"><i style="background:#E5B567"></i>At risk</span><span role="cell" class="r db-pct">62%</span></div>
+                    <div class="db-tr" role="row"><span role="cell" class="db-who"><i class="db-pav" style="--h:150">AF</i><span><b>Acme Freight onboarding</b><small>Client · 9 tasks</small></span></span><span role="cell" class="db-dt">Nov 13, 2026<small>Friday</small></span><span role="cell"><em class="db-cat" style="--c:#65C98A">Client</em></span><span role="cell">Priya R.</span><span role="cell" class="db-st"><i style="background:#65C98A"></i>On track</span><span role="cell" class="r db-pct">88%</span></div>
+                    <div class="db-tr" role="row"><span role="cell" class="db-who"><i class="db-pav" style="--h:200">WR</i><span><b>Website relaunch</b><small>Web · 22 tasks</small></span></span><span role="cell" class="db-dt">Dec 4, 2026<small>Friday</small></span><span role="cell"><em class="db-cat" style="--c:#82A9E8">Web</em></span><span role="cell">Lena K.</span><span role="cell" class="db-st"><i style="background:#65C98A"></i>On track</span><span role="cell" class="r db-pct">42%</span></div>
+                    <div class="db-tr" role="row"><span role="cell" class="db-who"><i class="db-pav" style="--h:40">SH</i><span><b>Support hiring</b><small>Hiring · 6 tasks</small></span></span><span role="cell" class="db-dt">Nov 27, 2026<small>Friday</small></span><span role="cell"><em class="db-cat" style="--c:#E5B567">Hiring</em></span><span role="cell">Jonas T.</span><span role="cell" class="db-st"><i style="background:#E87575"></i>Behind</span><span role="cell" class="r db-pct">30%</span></div>
+                  </div>
+                </section>
+              </div>
             </div>
-          </div>
-          <div class="ui hs-panel hs-chart" aria-hidden="true">
-            <div class="pnl-h"><span class="ic ic-green"><svg width="13" height="13"><use href="#i-chart"/></svg></span><b>Revenue · 12 weeks</b><span class="ui-chip">Sample</span></div>
-            <div class="big-num"><span id="hsRev">$554.1k</span><small id="hsRevD">+5.9% vs prior 12 wks</small></div>
-            <svg class="spark" viewBox="0 0 270 74" preserveAspectRatio="none"><path class="ar" id="hsSparkA"/><path class="ln" id="hsSparkL"/></svg>
-          </div>
-          <div class="ui hs-panel hs-copilot" id="hsCopilot">
-            <div class="pnl-h"><span class="ic ic-amber"><svg width="13" height="13"><use href="#i-spark"/></svg></span><b>Copilot</b><time>suggestion</time></div>
-            <p class="pnl-p" id="hsAiText">Design QA is 3 screens from done. If it closes today, the launch email can still go out Thursday.</p>
-            <div class="pnl-act" id="hsAiAct"><button class="ui-btn ui-btn-primary" type="button" id="hsAiYes">Remind Lena</button><button class="ui-btn" type="button" id="hsAiNo">Not now</button></div>
           </div>
         </div>
       </div>
@@ -223,7 +260,7 @@
 </section>
 
 <!-- ============ SYSTEM: one statement, five working parts ============ -->
-<section class="sec system" id="system" data-name="What VELTRIX is">
+<section class="sec system" id="system" data-name="What VELTRIX is" data-theme="dark">
   <div class="sec-head" style="margin-bottom:0">
     <div>
       <p class="sec-tag">What VELTRIX is</p>
@@ -260,7 +297,7 @@
 </section>
 
 <!-- ============ PROBLEM: full-bleed photograph ============ -->
-<section class="problem" id="problem" data-name="The problem">
+<section class="problem" id="problem" data-name="The problem" data-theme="dark">
   <div class="problem-pin">
     <div class="problem-media" id="problemMedia"><img src="assets/img/tower.jpg" alt="An office tower at night, every floor lit separately" width="2400" height="1500" loading="lazy"></div>
     <div class="problem-copy">
@@ -317,7 +354,7 @@
 </section>
 
 <!-- ============ SEQUENCE 2: product tour (pinned) ============ -->
-<section class="tour" id="tour" data-name="Product tour">
+<section class="tour" id="tour" data-name="Product tour" data-theme="dark">
   <div class="tour-pin">
     <div class="tour-copy">
       <p class="sec-tag">Product tour</p>
@@ -453,7 +490,7 @@
   </div>
 </section>
 
-<section class="sec wfb lift" id="workflows" data-name="Workflows">
+<section class="sec wfb lift" id="workflows" data-name="Workflows" data-theme="dark">
   <div class="sec-head">
     <div>
       <p class="sec-tag">Workflow automation</p>
@@ -518,7 +555,7 @@
   </div>
 </section>
 
-<section class="sec analytics lift" id="analytics" data-name="Analytics">
+<section class="sec analytics lift" id="analytics" data-name="Analytics" data-theme="dark">
   <div class="sec-head">
     <div>
       <p class="sec-tag">Analytics</p>
@@ -550,7 +587,7 @@
     <div class="an-kpis" id="anKpis"><div data-k="revenue" class="is-on"><span>Revenue</span><b data-v="208820">$208.8k</b><em class="up">+4.7% vs previous 30 days</em></div><div data-k="ontime"><span>On-time delivery</span><b data-v="93.01422569498355">93.0%</b><em class="up">+0.3 pts vs previous 30 days</em></div><div data-k="cycle"><span>Cycle time</span><b data-v="3.9031093772640064">3.9 d</b><em class="up">-0.1 d vs previous 30 days</em></div><div data-k="runs"><span>Automation runs</span><b data-v="57">57</b><em class="up">+3.6% vs previous 30 days</em></div></div>
     <div class="an-body">
       <div class="an-chart" id="anChart"><div class="an-tip" id="anTip"></div></div>
-      <aside class="an-side" id="anSide"><h3>By project</h3><div class="bd"><i class="pd" style="background:var(--lime)"></i><span>Q4 product launch</span><b>$64.7k</b><span class="bd-bar"><i style="background: var(--lime); transform: scale(0.31, 1); translate: none; rotate: none; scale: none;"></i></span></div><div class="bd"><i class="pd" style="background:var(--warn)"></i><span>Website relaunch</span><b>$45.9k</b><span class="bd-bar"><i style="background: var(--warn); transform: scale(0.22, 1); translate: none; rotate: none; scale: none;"></i></span></div><div class="bd"><i class="pd" style="background:var(--aqua)"></i><span>Acme Freight onboarding</span><b>$60.6k</b><span class="bd-bar"><i style="background: var(--aqua); transform: scale(0.29, 1); translate: none; rotate: none; scale: none;"></i></span></div><div class="bd"><i class="pd" style="background:#B8C4CE"></i><span>Support and retainers</span><b>$37.6k</b><span class="bd-bar"><i style="background: rgb(184, 196, 206); transform: scale(0.18, 1); translate: none; rotate: none; scale: none;"></i></span></div><div class="bd bd-total"><i></i><span>Total, all projects</span><b>$208.8k</b></div><div class="an-insight"><b><svg width="13" height="13"><use href="#i-spark"></use></svg>Insight</b>Best day in this range: Oct 15 at $9,248.</div></aside>
+      <aside class="an-side" id="anSide"><h3>By project</h3><div class="bd"><i class="pd" style="background:var(--lime)"></i><span>Q4 product launch</span><b>$64.7k</b><span class="bd-bar"><i style="background: var(--lime); transform: scale(0.31, 1); translate: none; rotate: none; scale: none;"></i></span></div><div class="bd"><i class="pd" style="background:var(--warn)"></i><span>Website relaunch</span><b>$45.9k</b><span class="bd-bar"><i style="background: var(--warn); transform: scale(0.22, 1); translate: none; rotate: none; scale: none;"></i></span></div><div class="bd"><i class="pd" style="background:var(--aqua)"></i><span>Acme Freight onboarding</span><b>$60.6k</b><span class="bd-bar"><i style="background: var(--aqua); transform: scale(0.29, 1); translate: none; rotate: none; scale: none;"></i></span></div><div class="bd"><i class="pd" style="background:#C4C5C9"></i><span>Support and retainers</span><b>$37.6k</b><span class="bd-bar"><i style="background: #C4C5C9; transform: scale(0.18, 1); translate: none; rotate: none; scale: none;"></i></span></div><div class="bd bd-total"><i></i><span>Total, all projects</span><b>$208.8k</b></div><div class="an-insight"><b><svg width="13" height="13"><use href="#i-spark"></use></svg>Insight</b>Best day in this range: Oct 15 at $9,248.</div></aside>
     </div>
     <p class="an-foot">Sample dataset for the Northbeam demo workspace, as of Nov 4, 2026. Not customer data. Hover the chart for exact values.</p>
   </div>
@@ -578,7 +615,7 @@
   </div>
 </section>
 
-<section class="sec cases lift" id="solutions" data-name="Solutions">
+<section class="sec cases lift" id="solutions" data-name="Solutions" data-theme="dark">
   <div class="sec-head">
     <div>
       <p class="sec-tag">Solutions</p>
@@ -635,7 +672,7 @@
     <div class="sc-card" style="left:30px;top:24px;width:410px">
       <span class="ui-chip">Recurring · every month-end</span>
       <div style="display:flex;align-items:center;gap:18px;margin-top:12px">
-        <svg class="sc-ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="10"/><circle class="sc-arc" cx="50" cy="50" r="42" fill="none" stroke="#C9F36B" stroke-width="10" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="94" transform="rotate(-90 50 50)"/><text x="50" y="57" text-anchor="middle" font-family="Sora" font-weight="600" font-size="20" fill="#EDF1F3"><tspan data-count="9" data-fmt="int">9</tspan>/14</text></svg>
+        <svg class="sc-ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="rgba(245,245,245,.08)" stroke-width="10"/><circle class="sc-arc" cx="50" cy="50" r="42" fill="none" stroke="#B8F36B" stroke-width="10" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="94" transform="rotate(-90 50 50)"/><text x="50" y="57" text-anchor="middle" font-family="Sora" font-weight="600" font-size="20" fill="#F5F5F5"><tspan data-count="9" data-fmt="int">9</tspan>/14</text></svg>
         <div><h4 style="margin:0 0 6px">October close</h4><small style="color:var(--on-3);font:500 11.5px var(--mono)">Due Nov 5 · 2 blocked</small></div>
       </div>
       <div class="sc-row"><span class="sc-chk on"></span><span class="t">Bank reconciliation</span><small>Omar</small></div>
@@ -655,7 +692,7 @@
       <h4>Jobs by crew</h4>
       <div class="sc-grid">
         <div></div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div>
-        <div>Crew A</div><div style="grid-column:span 2"><span class="sc-job" style="background:var(--lime)">#2291 · Harbor St</span></div><div><span class="sc-job" style="background:var(--aqua)">#2294</span></div><div></div><div><span class="sc-job" style="background:#B8C4CE">#2301</span></div>
+        <div>Crew A</div><div style="grid-column:span 2"><span class="sc-job" style="background:var(--lime)">#2291 · Harbor St</span></div><div><span class="sc-job" style="background:var(--aqua)">#2294</span></div><div></div><div><span class="sc-job" style="background:#C4C5C9">#2301</span></div>
         <div>Crew B</div><div><span class="sc-job" style="background:var(--aqua)">#2288</span></div><div></div><div style="grid-column:span 2"><span class="sc-job" style="background:var(--warn)">#2296 · Depot refit</span></div><div></div>
         <div>Crew C</div><div></div><div style="grid-column:span 3"><span class="sc-job" style="background:var(--lime)">#2299 · North yard install</span></div><div></div>
       </div>
@@ -675,7 +712,7 @@
   </div>
 </section>
 
-<section class="sec faq" id="faq" data-name="Questions">
+<section class="sec faq" id="faq" data-name="Questions" data-theme="dark">
   <div class="faq-wrap">
   <div class="faq-head">
     <p class="sec-tag">Questions</p>
