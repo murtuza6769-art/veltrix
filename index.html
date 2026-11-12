@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VELTRIX · Operations that hand off on time</title>
-<meta name="description" content="VELTRIX is an operations workspace for projects, automations, Copilot and reporting. When a deal is won, the project, the owner and the kickoff are set up before anyone asks.">
-<meta property="og:title" content="VELTRIX · Operations that hand off on time">
-<meta property="og:description" content="Projects, automations, Copilot and reporting on one record, so handoffs happen without anyone chasing them.">
+<title>VELTRIX · Every handoff, on the record</title>
+<meta name="description" content="VELTRIX connects projects, automations, Copilot and reporting. When a deal is won, the project, its owner and the kickoff are ready before anyone asks, and every step is on the record.">
+<meta property="og:title" content="VELTRIX · Every handoff, on the record">
+<meta property="og:description" content="Projects, automations, Copilot and reporting on one record, so the work moves between people without anyone chasing it.">
 <meta name="theme-color" content="#0A0A0A">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A0A0A'/%3E%3Cpath d='M9 10h6v6H9zM17 10h6v6h-6zM13 17h6v6h-6z' fill='%23F3F3F3'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,20 +53,20 @@
   <div class="nav-bar">
     <a class="brand" href="#top" aria-label="VELTRIX home"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span><span>VELTRIX</span></a>
     <nav class="nav-links" aria-label="Main">
-      <a href="#platform">Product</a>
-      <a href="#how">How it works</a>
+      <a href="#monday">Why</a>
+      <a href="#record">Product</a>
+      <a href="#works">How it works</a>
       <a href="#copilot">Copilot</a>
-      <a href="#integrations">Integrations</a>
-      <a href="#faq">FAQ</a>
+      <a href="#routes">Integrations</a>
     </nav>
     <div class="nav-act">
-      <a class="nav-quiet" href="#walkthrough">Watch the walkthrough</a>
+      <a class="nav-quiet" href="#faq">Questions</a>
       <a class="btn btn-sm btn-light" href="#start" data-demo>Book a demo</a>
       <button class="nav-burger" type="button" id="burger" aria-expanded="false" aria-controls="mnav" aria-label="Open menu"><svg width="18" height="18"><use href="#i-menu"/></svg></button>
     </div>
   </div>
   <div class="mnav" id="mnav" hidden>
-    <a href="#platform">Product</a><a href="#how">How it works</a><a href="#copilot">Copilot</a><a href="#integrations">Integrations</a><a href="#faq">FAQ</a>
+    <a href="#monday">Why</a><a href="#record">Product</a><a href="#works">How it works</a><a href="#copilot">Copilot</a><a href="#routes">Integrations</a><a href="#faq">Questions</a>
     <a class="btn btn-light" href="#start" data-demo>Book a demo</a>
   </div>
 </header>
@@ -74,30 +74,30 @@
 <main id="main">
 <section class="hero" id="top">
   <div class="hero-inner">
-    <a class="pill" href="#copilot"><span class="pill-ic"><svg width="12" height="12"><use href="#i-spark"/></svg></span>Copilot now drafts automations from a sentence <span class="pill-go">See how<svg width="12" height="12"><use href="#i-chev"/></svg></span></a>
-    <div class="hero-row">
-      <h1 class="hero-title">
-        <span class="ln"><span>Operations that</span></span>
-        <span class="ln"><span><span class="chip" aria-hidden="true"><svg width="20" height="20"><use href="#i-flow"/></svg></span> <span class="cycle" id="cycle">hand off on time</span><span class="caret" aria-hidden="true"></span></span></span>
-      </h1>
-      <div class="hero-side">
-        <p class="hero-sub">Projects, automations, Copilot and reporting share one record. When a deal is won, the project, its owner and the kickoff are set up before anyone asks.</p>
-        <div class="hero-cta">
-          <a class="btn btn-light" href="#start" data-demo>Book a demo <svg width="15" height="15"><use href="#i-arrow"/></svg></a>
-          <a class="btn btn-dark" href="#walkthrough">Watch the walkthrough</a>
-        </div>
+    <div class="h-top">
+      <h1 class="hero-title"><span class="ln"><span>Every handoff,</span></span><span class="ln"><span>on the record.</span></span></h1>
+      <p class="h-stamp" aria-hidden="true"><span>Last handoff</span><b id="hStamp">09:12:09</b><span>Kickoff booked · Brightline</span></p>
+    </div>
+    <ol class="runline" id="runline" aria-label="A won deal handed off in five seconds">
+      <li><time>09:12:04</time><b>Deal won</b><span>Brightline Logistics · $32,000</span></li>
+      <li><time>09:12:06</time><b>Project opened</b><span>8 tasks from the client template</span></li>
+      <li><time>09:12:07</time><b>Owner assigned</b><span>Omar Aziz</span></li>
+      <li><time>09:12:09</time><b>Kickoff booked</b><span>Tue 10:00 · invite sent</span></li>
+    </ol>
+    <div class="h-foot">
+      <p class="hero-sub">VELTRIX connects projects, automations, Copilot and reporting. When a deal is won, the project, its owner and the kickoff are ready before anyone asks, and every step is written down.</p>
+      <div class="hero-cta">
+        <a class="btn btn-light" href="#start" data-demo>Book a demo <svg width="15" height="15"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-dark" href="#works">See how it works</a>
       </div>
     </div>
-    <ul class="checks">
-      <li><svg width="14" height="14"><use href="#i-check"/></svg>Keep the tools you use today</li>
-      <li><svg width="14" height="14"><use href="#i-check"/></svg>People approve what Copilot drafts</li>
-      <li><svg width="14" height="14"><use href="#i-check"/></svg>Everything below is a sample workspace</li>
-    </ul>
-    <div class="views" role="tablist" aria-label="Product views" id="views">
-      <button type="button" role="tab" aria-selected="true" class="is-on" data-view="projects"><span class="v-ic"><svg width="16" height="16"><use href="#i-folder"/></svg></span><b>Projects</b><small>Every project, owner and deadline on one list, with risk called out.</small><i class="v-bar"><em></em></i></button>
-      <button type="button" role="tab" aria-selected="false" data-view="rules"><span class="v-ic"><svg width="16" height="16"><use href="#i-flow"/></svg></span><b>Automations</b><small>Rules written as sentences, with a log of every run.</small><i class="v-bar"><em></em></i></button>
-      <button type="button" role="tab" aria-selected="false" data-view="copilot"><span class="v-ic"><svg width="16" height="16"><use href="#i-spark"/></svg></span><b>Copilot</b><small>Answers about the work, with the sources they came from.</small><i class="v-bar"><em></em></i></button>
-      <button type="button" role="tab" aria-selected="false" data-view="report"><span class="v-ic"><svg width="16" height="16"><use href="#i-chart"/></svg></span><b>Reporting</b><small>Revenue and delivery, calculated from the work itself.</small><i class="v-bar"><em></em></i></button>
+    <div class="views" role="tablist" aria-label="Look inside the sample workspace" id="views">
+      <span class="views-l">Look inside</span>
+      <button type="button" role="tab" aria-selected="true" class="is-on" data-view="projects"><i>01</i>Projects<em class="v-bar"><em></em></em></button>
+      <button type="button" role="tab" aria-selected="false" data-view="rules"><i>02</i>Automations<em class="v-bar"><em></em></em></button>
+      <button type="button" role="tab" aria-selected="false" data-view="copilot"><i>03</i>Copilot<em class="v-bar"><em></em></em></button>
+      <button type="button" role="tab" aria-selected="false" data-view="report"><i>04</i>Reporting<em class="v-bar"><em></em></em></button>
+      <span class="views-r">Sample workspace · Northbeam</span>
     </div>
   </div>
 
@@ -192,7 +192,7 @@
                     <div class="ap-acts"><button type="button" class="ap-btn">Draft a reminder for Maya</button><button type="button" class="ap-btn ap-btn-q">Show the timeline</button></div>
                   </div>
                   <p class="ap-q">Who has room for more work?</p>
-                  <div class="ap-a"><p><b>Omar Aziz</b> has the most room at 18 of 40 hours. Moving “Pricing page build” from Priya to Omar takes Priya from 92% to about 78%.</p><div class="ap-src"><span>Calendars</span><span>Task estimates</span></div></div>
+                  <div class="ap-a"><p><b>Omar Aziz</b> has the most room at 18 of 40 hours. Moving “Pricing page build” from Priya to Omar takes Priya from 37 to about 31 of her 40 hours.</p><div class="ap-src"><span>Calendars</span><span>Task estimates</span></div></div>
                   <div class="ap-input"><span>Ask about projects, people or numbers…</span><kbd>Enter</kbd></div>
                 </div>
               </div>
@@ -215,306 +215,257 @@
   </div>
 </section>
 
-<section class="band" aria-label="Tools VELTRIX is built to connect with">
-  <p>Built to connect with the tools your team already uses</p>
-  <div class="marquee"><div class="marquee-track" id="marquee"></div></div>
+<section class="statement-band">
+  <p class="statement"><span>Most operations problems aren’t hard.</span> They’re handoffs nobody owned: a deal nobody turned into a project, a question nobody answered, a report somebody rebuilt by hand.</p>
 </section>
 
-<section class="sec outcomes" id="outcomes">
+<section class="sec monday" id="monday">
   <div class="wrap">
-    <p class="label"><span></span>What changes</p>
-    <h2 class="h2">Your operations lead gets Monday back. <span>See where the hours go before you talk to anyone.</span></h2>
-    <div class="oc-grid">
-      <article class="oc">
-        <h3>Handoffs in seconds</h3>
-        <p>A won deal becomes a project with an owner and a booked kickoff before anyone opens their inbox.</p>
-        <div class="oc-ui">
-          <div class="oc-ui-h"><span>Rule run · Brightline Logistics</span><span class="tag">Sample</span></div>
-          <div class="oc-time"><b>5 s</b><span>from deal won to kickoff booked</span></div>
-          <div class="oc-steps" id="ocSteps"><i style="--w:12%"></i><i style="--w:18%"></i><i style="--w:22%"></i><i style="--w:48%"></i></div>
-          <ul class="oc-legend"><li><span>Deal won</span><time>09:12:04</time></li><li><span>Project opened</span><time>09:12:06</time></li><li><span>Owner assigned</span><time>09:12:07</time></li><li><span>Kickoff booked</span><time>09:12:09</time></li></ul>
-        </div>
-      </article>
-      <article class="oc">
-        <h3>A report that is never stale</h3>
-        <p>Revenue and delivery are calculated from the work as it happens, so Monday’s numbers are already current.</p>
-        <div class="oc-ui">
-          <div class="oc-ui-h"><span>Revenue by week</span><span class="tag">Updated 2 min ago</span></div>
-          <div class="oc-bars" id="ocBars"></div>
-          <div class="oc-time"><b id="ocRev">$47.5k</b><span>week of Oct 29, from 4 projects</span></div>
-        </div>
-      </article>
-      <article class="oc">
-        <h3>Nothing slips quietly</h3>
-        <p>Late tasks are flagged to the lead on day two, not discovered in Friday’s status meeting.</p>
-        <div class="oc-ui">
-          <div class="oc-ui-h"><span>Late tasks flagged · 12 weeks</span><span class="tag">Sample</span></div>
-          <div class="oc-heat" id="ocHeat" aria-hidden="true"></div>
-          <div class="oc-heat-l"><span>12 weeks ago</span><span>This week</span><span class="oc-key">Fewer <i></i><i></i><i></i><i></i> More</span></div>
-        </div>
-      </article>
+    <div class="mo-head">
+      <p class="label">01 · One Monday, two ways</p>
+      <h2 class="h2">The Brightline deal closed at 9:12. <span>Here is what happened next, with and without a shared record.</span></h2>
     </div>
-  </div>
-</section>
-
-<section class="sec calc" id="calc">
-  <div class="wrap calc-grid">
-    <div class="calc-copy">
-      <p class="label"><span></span>Your week, measured</p>
-      <h2 class="h2">How much of your week goes to chasing work? <span>Move the sliders to match your team.</span></h2>
-      <div class="sl">
-        <div class="sl-h"><label for="slHand">Handoffs per week</label><output id="oHand">40</output></div>
-        <input type="range" id="slHand" min="5" max="120" step="5" value="40">
-        <div class="sl-s"><span>5</span><span>120</span></div>
+    <div class="cmp" id="cmp">
+      <div class="cmp-h" aria-hidden="true"><span>What has to happen</span><span>Without a shared record</span><span>With VELTRIX</span></div>
+      <div class="cmp-r">
+        <span class="cmp-s">The deal is marked won</span>
+        <span class="cmp-a" data-l="Without a shared record"><time>09:12</time><span>Marked won in the CRM</span><i class="cmp-bar" style="--d:0"></i></span>
+        <span class="cmp-b" data-l="With VELTRIX"><time>09:12:04</time><span>Marked won in the CRM</span><i class="cmp-bar" style="--d:0"></i></span>
       </div>
-      <div class="sl">
-        <div class="sl-h"><label for="slMin">Minutes each one takes by hand</label><output id="oMin">15</output></div>
-        <input type="range" id="slMin" min="5" max="60" step="5" value="15">
-        <div class="sl-s"><span>5 min</span><span>60 min</span></div>
+      <div class="cmp-r">
+        <span class="cmp-s">A project exists</span>
+        <span class="cmp-a" data-l="Without a shared record"><time>15:30</time><span>Built by hand from an old one</span><i class="cmp-bar" style="--d:76"></i></span>
+        <span class="cmp-b" data-l="With VELTRIX"><time>09:12:06</time><span>8 tasks from the client template</span><i class="cmp-bar" style="--d:0"></i></span>
       </div>
-      <div class="sl">
-        <div class="sl-h"><label for="slPpl">People involved in each one</label><output id="oPpl">2</output></div>
-        <input type="range" id="slPpl" min="1" max="5" step="1" value="2">
-        <div class="sl-s"><span>1</span><span>5</span></div>
+      <div class="cmp-r">
+        <span class="cmp-s">Someone owns it</span>
+        <span class="cmp-a" data-l="Without a shared record"><time>15:30</time><span>Settled in a Slack thread that began at 11:40</span><i class="cmp-bar" style="--d:76"></i></span>
+        <span class="cmp-b" data-l="With VELTRIX"><time>09:12:07</time><span>Omar Aziz, picked by the rule</span><i class="cmp-bar" style="--d:0"></i></span>
       </div>
-      <p class="calc-note">This measures what handoffs cost you today. It is not a promise of savings; that depends on which handoffs you automate.</p>
+      <div class="cmp-r">
+        <span class="cmp-s">The client has a kickoff date</span>
+        <span class="cmp-a" data-l="Without a shared record"><time>16:45</time><span>Thursday, after the client asked at 14:05</span><i class="cmp-bar" style="--d:91"></i></span>
+        <span class="cmp-b" data-l="With VELTRIX"><time>09:12:09</time><span>Tuesday 10:00, invite already sent</span><i class="cmp-bar" style="--d:0"></i></span>
+      </div>
+      <div class="cmp-r">
+        <span class="cmp-s">Monday’s report is right</span>
+        <span class="cmp-a" data-l="Without a shared record"><time>17:30</time><span>Rebuilt by hand from 4 sheets</span><i class="cmp-bar" style="--d:100"></i></span>
+        <span class="cmp-b" data-l="With VELTRIX"><time>All day</time><span>Updated as each step happened</span><i class="cmp-bar" style="--d:0"></i></span>
+      </div>
+      <div class="cmp-t">
+        <span class="cmp-s">From deal to kickoff</span>
+        <span class="cmp-a" data-l="Without a shared record"><b>7 h 33 m</b><small>and two people had to ask</small></span>
+        <span class="cmp-b" data-l="With VELTRIX"><b>5 seconds</b><small>and nobody had to ask</small></span>
+      </div>
     </div>
-    <div class="calc-out">
-      <small>Your team spends</small>
-      <b class="calc-big"><span id="cHours">20</span> hours</b>
-      <small>a week passing work between people and tools</small>
-      <dl class="calc-dl">
-        <div><dt>Hours a year</dt><dd id="cYear">960</dd></div>
-        <div><dt>Working weeks a year</dt><dd id="cWeeks">24</dd></div>
-        <div><dt>Handoffs a year</dt><dd id="cCount">1,920</dd></div>
-      </dl>
-      <div class="calc-act"><a class="btn btn-light" href="#start" data-demo>See which ones a rule could take</a></div>
+    <p class="fine">Bars show how far into the day each step happened, from the deal at 09:12 to 17:30. An illustrative Monday based on the Northbeam sample workspace.</p>
+  </div>
+</section>
+
+<section class="sec week" id="week">
+  <div class="wrap wk">
+    <p class="label">02 · Your week</p>
+    <p class="wk-sentence" id="wkSentence">
+      My team hands off
+      <span class="num" data-k="hand" data-min="5" data-max="120" data-step="5"><button type="button" aria-label="Fewer handoffs">−</button><output>40</output><button type="button" aria-label="More handoffs">+</button></span>
+      pieces of work a week. Each one takes about
+      <span class="num" data-k="min" data-min="5" data-max="60" data-step="5"><button type="button" aria-label="Fewer minutes">−</button><output>15</output><button type="button" aria-label="More minutes">+</button></span>
+      minutes and
+      <span class="num" data-k="ppl" data-min="1" data-max="5" data-step="1"><button type="button" aria-label="Fewer people">−</button><output>2</output><button type="button" aria-label="More people">+</button></span>
+      people.
+    </p>
+    <div class="wk-answer">
+      <p class="wk-big"><span id="wkHours">20</span><small>hours a week</small></p>
+      <p class="wk-line">That is <b id="wkWeeks">24</b> working weeks a year spent passing work along, across <b id="wkCount">1,920</b> handoffs. It measures today’s cost, not a promised saving: that depends on which handoffs a rule can take.</p>
+      <figure class="wk-meter" aria-label="Handoff hours shown inside one person's 40-hour week">
+        <div class="wk-days" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span></div>
+        <div class="wk-cells" id="wkCells" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <figcaption id="wkShare">Half of one person’s week</figcaption>
+      </figure>
     </div>
   </div>
 </section>
 
-<section class="sec platform" id="platform">
+<section class="sec record" id="record">
   <div class="wrap">
-    <div class="pf-head">
-      <div><p class="label"><span></span>Platform</p>
-      <h2 class="h2">Everything operations needs, on one record. <span>Projects, rules, answers and numbers, with every run on the record.</span></h2></div>
-      <div class="pf-cta"><a class="btn btn-light" href="#start" data-demo>Book a demo</a><a class="btn btn-dark" href="#how">How it works</a></div>
+    <div class="rc-head">
+      <p class="label">03 · One record</p>
+      <h2 class="h2">One task, seen six ways. <span>Change it once and every view, rule and number follows.</span></h2>
     </div>
-    <div class="pf-grid">
-      <article class="pf">
-        <div class="pf-ui"><div class="mini-board"><div><small>To do</small><i>Launch email</i><i>Press kit</i></div><div><small>In progress</small><i class="hl">Design QA</i><i>Pricing page</i></div><div><small>Done</small><i class="dn">Pricing copy</i></div></div></div>
-        <h3>Boards and timelines</h3><p>The same tasks as a board, a list or a timeline. Move a card and every view follows.</p>
+    <div class="anatomy" id="anatomy">
+      <ul class="an-side an-l">
+        <li data-f="col"><b>Board</b><span>Sits in In progress on the Q4 launch board</span></li>
+        <li data-f="due"><b>Timeline</b><span>Its bar ends Thursday; the launch email starts after</span></li>
+        <li data-f="rule"><b>Automation</b><span>If it runs two days late, the lead hears in #ops</span></li>
+      </ul>
+      <article class="task" aria-label="Design QA task">
+        <header><span class="task-id">Q4-07</span><span class="task-st">In progress</span></header>
+        <h3>Design QA</h3>
+        <dl>
+          <div data-f="col"><dt>Project</dt><dd>Q4 product launch</dd></div>
+          <div data-f="own"><dt>Owner</dt><dd><i class="av">MO</i>Maya Ortiz</dd></div>
+          <div data-f="due"><dt>Due</dt><dd>Thu, Nov 5</dd></div>
+          <div data-f="prog"><dt>Progress</dt><dd><span class="t-bar"><i style="width:73%"></i></span>8 of 11 screens</dd></div>
+          <div data-f="rule"><dt>Blocks</dt><dd>Launch email · Lena</dd></div>
+          <div data-f="hrs"><dt>Estimate</dt><dd>6 hours this week</dd></div>
+        </dl>
       </article>
-      <article class="pf">
-        <div class="pf-ui"><p class="mini-rule">When a task is <u>2 days late</u>, tell <u>the project lead</u> in <u>#ops</u>.</p></div>
-        <h3>Rules as sentences</h3><p>Automations read like the sentence you would say to a colleague, so anyone can check them.</p>
-      </article>
-      <article class="pf">
-        <div class="pf-ui"><ul class="mini-log"><li><time>09:12</time>Deal won · Brightline</li><li><time>09:12</time>Project opened · 8 tasks</li><li><time>09:12</time>Kickoff booked · Tue 10:00</li></ul></div>
-        <h3>A log of every run</h3><p>Each run records what triggered it and what it did, so nobody has to guess.</p>
-      </article>
-      <article class="pf">
-        <div class="pf-ui"><div class="mini-chat"><p class="q">What changed this week?</p><p class="a">Brightline moved to 88%. Design QA is the one blocker.</p><span class="src">2 sources</span></div></div>
-        <h3>Copilot with sources</h3><p>Ask about projects, people or numbers. Every answer points to the work it came from.</p>
-      </article>
-      <article class="pf">
-        <div class="pf-ui"><div class="mini-load"><div><span>Priya</span><i><em style="width:92%"></em></i><b>92%</b></div><div><span>Lena</span><i><em style="width:70%"></em></i><b>70%</b></div><div><span>Omar</span><i><em style="width:45%"></em></i><b>45%</b></div></div></div>
-        <h3>Workload you can see</h3><p>Hours booked against each person’s week, so you move work before someone burns out.</p>
-      </article>
-      <article class="pf">
-        <div class="pf-ui"><div class="mini-kpi"><small>On-time delivery</small><b id="pfOn">93.0%</b><svg viewBox="0 0 120 30" preserveAspectRatio="none" id="pfSpark"></svg></div></div>
-        <h3>Reporting from the work</h3><p>Revenue, delivery and cycle time come from tasks and invoices, not from a spreadsheet.</p>
-      </article>
+      <ul class="an-side an-r">
+        <li data-f="own"><b>Workload</b><span>Counts toward Maya’s 23 of 40 hours</span></li>
+        <li data-f="prog"><b>Reporting</b><span>Feeds on-time delivery when it closes</span></li>
+        <li data-f="hrs"><b>Copilot</b><span>Reads the estimate when it asks who has room</span></li>
+      </ul>
+      <svg class="an-lines" id="anLines" aria-hidden="true"></svg>
     </div>
   </div>
 </section>
 
-<section class="sec integrations" id="integrations">
-  <div class="wrap">
-    <div class="int-head">
-      <p class="label"><span></span>Integrations</p>
-      <h2 class="h2">Wired into the tools you already run. <span>Deals come in from your CRM, conversations from chat and invoices from finance, both ways.</span></h2>
+<section class="sec works" id="works">
+  <div class="wrap wk-grid">
+    <div class="wk-steps">
+      <p class="label">04 · How it works</p>
+      <h2 class="h2">From first connection to the first rule that runs. <span>Read it in four steps; the window follows.</span></h2>
+      <article class="step is-on" data-step="0"><i>1</i><div><h3>Connect what you already use</h3><p>Your CRM, chat and calendars link as they are. Nothing is moved on day one, and updates go back both ways.</p></div></article>
+      <article class="step" data-step="1"><i>2</i><div><h3>Say the handoff as a sentence</h3><p>Describe what should happen and Copilot drafts the rule. You read every step before it is switched on.</p></div></article>
+      <article class="step" data-step="2"><i>3</i><div><h3>Let it run, and keep the log</h3><p>Each run writes down what triggered it and what it did, to the second.</p></div></article>
+      <article class="step" data-step="3"><i>4</i><div><h3>Read Monday’s summary</h3><p>Risks, runs and revenue arrive in one post. The status meeting gets shorter, or disappears.</p></div></article>
     </div>
-    <div class="hub" id="hub" aria-hidden="true">
-      <svg class="hub-lines" viewBox="0 0 1000 420" preserveAspectRatio="none" id="hubLines"></svg>
-      <div class="hub-core"><span class="mark"><i></i><i></i><i></i></span><b>VELTRIX</b></div>
-    </div>
-    <p class="int-note">These connectors are illustrative: they show what VELTRIX is built to connect, and none is confirmed as available yet. Each will be marked when it ships.</p>
-  </div>
-</section>
-
-<section class="sec how" id="how">
-  <div class="wrap">
-    <p class="label"><span></span>How it works</p>
-    <h2 class="h2">From your first connection to your first rule. <span>No migration on day one, and nothing runs until you turn it on.</span></h2>
-    <div class="how-rows">
-      <article class="how-row">
-        <h3 class="how-word">Connect</h3>
-        <div class="how-copy"><b>Link the tools you already use.</b><p>Your CRM, chat and calendars connect as they are. Work keeps happening where it happens today.</p>
-          <ul><li><svg width="13" height="13"><use href="#i-check"/></svg>Nothing has to be moved first</li><li><svg width="13" height="13"><use href="#i-check"/></svg>Two-way, so updates go back</li><li><svg width="13" height="13"><use href="#i-check"/></svg>Projects link to deals and threads</li></ul></div>
-        <div class="how-ui"><div class="ui-card"><p class="ui-card-h">Connections</p>
-          <div class="tg"><span class="lg-m" style="--logo:url('assets/logos/hubspot.svg')"></span><b>HubSpot</b><small>Deals and contacts</small><i class="sw is-on"></i></div>
-          <div class="tg"><span class="lg-m" style="--logo:url('assets/logos/slack.svg')"></span><b>Slack</b><small>Channels and threads</small><i class="sw is-on"></i></div>
-          <div class="tg"><span class="lg-m" style="--logo:url('assets/logos/googlecalendar.svg')"></span><b>Google Calendar</b><small>Kickoffs and deadlines</small><i class="sw"></i></div></div></div>
-      </article>
-      <article class="how-row">
-        <h3 class="how-word">Automate</h3>
-        <div class="how-copy"><b>Write the handoff once, as a sentence.</b><p>Describe what should happen and Copilot drafts the rule. You check each step before it runs.</p>
-          <ul><li><svg width="13" height="13"><use href="#i-check"/></svg>Plain language, no flowchart editor</li><li><svg width="13" height="13"><use href="#i-check"/></svg>Copilot drafts, a person approves</li><li><svg width="13" height="13"><use href="#i-check"/></svg>Read it back before it goes live</li></ul></div>
-        <div class="how-ui"><div class="ui-card"><p class="ui-card-h">New rule</p><div class="ui-input"><svg width="13" height="13"><use href="#i-spark"/></svg><span id="typeRule"></span><i class="caret"></i></div>
-          <div class="ui-steps"><span>When · Invoice paid</span><span>Then · Close the milestone</span><span>Then · Post in #billing</span></div></div></div>
-      </article>
-      <article class="how-row">
-        <h3 class="how-word">Review</h3>
-        <div class="how-copy"><b>See what ran, and what needs you.</b><p>Every run is logged. Risks surface on the overview, and Monday’s report is already current.</p>
-          <ul><li><svg width="13" height="13"><use href="#i-check"/></svg>A log of every run</li><li><svg width="13" height="13"><use href="#i-check"/></svg>Late work flagged on day two</li><li><svg width="13" height="13"><use href="#i-check"/></svg>Reports that build themselves</li></ul></div>
-        <div class="how-ui"><div class="ui-card"><p class="ui-card-h">Monday morning</p>
-          <div class="ui-ev"><time>08:58</time><span>Weekly summary posted to #ops</span></div>
-          <div class="ui-ev"><time>09:40</time><span>Copilot flagged the launch email</span></div>
-          <div class="ui-ev"><time>10:05</time><span>Invoice 2287 paid · milestone closed</span></div></div></div>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section class="sec walk" id="walkthrough">
-  <div class="wrap">
-    <div class="walk-head">
-      <div><p class="label"><span></span>Walkthrough</p>
-      <h2 class="h2">Watch a won deal become a running project. <span>Three steps, start to finish, no slides.</span></h2></div>
-      <a class="btn btn-dark" href="#start" data-demo>Book a live demo</a>
-    </div>
-    <div class="player" id="player">
-      <div class="pl-screen">
-        <div class="pl-win">
-          <div class="pl-top"><span class="dots"><i></i><i></i><i></i></span><span class="pl-crumb" id="plCrumb">CRM · Deals</span><span class="tag">Sample run</span></div>
-          <div class="pl-body">
-            <div class="pl-scene is-on" data-sc="0">
-              <div class="pl-deal"><small>Deal</small><b>Brightline Logistics</b><span>$32,000 · Annual operations retainer</span><div class="pl-stage"><span>Proposal</span><span>Negotiation</span><span class="is-on" id="plWon">Won</span></div></div>
-            </div>
-            <div class="pl-scene" data-sc="1">
-              <div class="pl-proj"><small>Project opened by a rule</small><b>Brightline onboarding</b><span>Owner · Omar Aziz · due Fri, Nov 13</span>
-                <ol class="pl-tasks"><li>Kickoff call</li><li>Collect access and contacts</li><li>Map current handoffs</li><li>Set up first two rules</li><li>Weekly report for the client</li></ol></div>
-            </div>
-            <div class="pl-scene" data-sc="2">
-              <div class="pl-cal"><small>Calendar · Tue, Oct 27</small><div class="pl-slot"><time>10:00</time><span><b>Brightline kickoff</b><small>Omar Aziz, client team · invite sent 09:12</small></span></div><p class="pl-done"><svg width="14" height="14"><use href="#i-check"/></svg>Handoff complete in 5 seconds. Nobody had to chase it.</p></div>
-            </div>
+    <div class="wk-stage">
+      <div class="win" id="win">
+        <div class="win-top"><span class="dots"><i></i><i></i><i></i></span><span id="winTitle">Connections</span><span class="tag">Sample</span></div>
+        <div class="win-body">
+          <div class="ws is-on" data-ws="0">
+            <div class="tg"><span class="lg-m" style="--logo:url('assets/logos/hubspot.svg')"></span><b>HubSpot</b><small>Deals and contacts</small><i class="sw is-on"></i></div>
+            <div class="tg"><span class="lg-m" style="--logo:url('assets/logos/slack.svg')"></span><b>Slack</b><small>Channels and threads</small><i class="sw is-on"></i></div>
+            <div class="tg"><span class="lg-m" style="--logo:url('assets/logos/googlecalendar.svg')"></span><b>Google Calendar</b><small>Kickoffs and deadlines</small><i class="sw is-on"></i></div>
+            <div class="tg"><span class="lg-m" style="--logo:url('assets/logos/stripe.svg')"></span><b>Stripe</b><small>Payments and revenue</small><i class="sw"></i></div>
+          </div>
+          <div class="ws" data-ws="1">
+            <div class="ui-input"><svg width="13" height="13"><use href="#i-spark"/></svg><span id="typeRule"></span><i class="caret"></i></div>
+            <p class="ws-l">Copilot’s draft · check before it runs</p>
+            <ol class="draft"><li><i>When</i>A deal is marked won and is worth more than $10,000</li><li><i>Then</i>Open an onboarding project from the client template</li><li><i>Then</i>Make Omar the owner</li><li><i>Then</i>Book a kickoff for the next working day at 10:00</li></ol>
+          </div>
+          <div class="ws" data-ws="2">
+            <ol class="rl">
+              <li><time>09:12:04</time><b>Deal won</b><span>Brightline Logistics · $32,000</span></li>
+              <li><time>09:12:05</time><b>Value checked</b><span>more than $10,000</span></li>
+              <li><time>09:12:06</time><b>Project opened</b><span>Brightline onboarding · 8 tasks</span></li>
+              <li><time>09:12:07</time><b>Owner assigned</b><span>Omar Aziz</span></li>
+              <li><time>09:12:09</time><b>Kickoff booked</b><span>Tue, Oct 27 at 10:00</span></li>
+            </ol>
+          </div>
+          <div class="ws" data-ws="3">
+            <div class="post"><span class="av">V</span><div><p class="post-h"><b>VELTRIX</b> in #ops · Mon 08:58</p><p>Morning. Last week: <b id="postRev">$47.5k</b> revenue, on-time delivery <b id="postOn">93.0%</b>, rules ran <b id="postRuns">13</b> times.</p><p>One thing needs you: Design QA blocks the launch email. Maya has 3 screens left.</p></div></div>
           </div>
         </div>
-        <button class="pl-play" type="button" id="plPlay" aria-label="Play walkthrough"><svg width="18" height="18"><use href="#i-play"/></svg></button>
-      </div>
-      <div class="pl-ch" role="tablist" aria-label="Walkthrough chapters">
-        <button type="button" role="tab" class="is-on" data-ch="0"><b>Deal won</b><small>The CRM marks it won</small><i><em></em></i></button>
-        <button type="button" role="tab" data-ch="1"><b>Project opens</b><small>Owner and 8 tasks</small><i><em></em></i></button>
-        <button type="button" role="tab" data-ch="2"><b>Kickoff booked</b><small>Next working day, 10:00</small><i><em></em></i></button>
       </div>
     </div>
   </div>
 </section>
 
 <section class="sec copilot" id="copilot">
-  <div class="wrap cp-grid">
-    <div class="cp-copy">
-      <p class="label"><span></span>Copilot</p>
-      <h2 class="h2">Ask your operations a straight question. <span>Get the answer, and where it came from.</span></h2>
-      <p class="lead">Copilot reads the projects, rules and numbers in your workspace. It drafts tasks and automations for you to approve, and it never acts on its own.</p>
-      <div class="cp-qs" id="cpQs">
-        <button type="button" data-q="risk" class="is-on">Which projects need attention this week?<svg width="14" height="14"><use href="#i-arrow"/></svg></button>
-        <button type="button" data-q="load">Who has room for more work?<svg width="14" height="14"><use href="#i-arrow"/></svg></button>
-        <button type="button" data-q="week">How did last week go?<svg width="14" height="14"><use href="#i-arrow"/></svg></button>
-        <button type="button" data-q="rule">Turn “chase unpaid invoices” into a rule<svg width="14" height="14"><use href="#i-arrow"/></svg></button>
-      </div>
+  <div class="wrap">
+    <div class="cp-head">
+      <div><p class="label">05 · Copilot</p><h2 class="h2">Ask your operations a straight question. <span>Every answer shows its sources.</span></h2></div>
+      <p class="lead">It reads the projects, rules and numbers in your workspace. It drafts tasks and automations for you to approve, and it never acts on its own.</p>
     </div>
-    <div class="cp-side">
-      <div class="cp-win">
-        <div class="cp-top"><svg width="14" height="14"><use href="#i-spark"/></svg><b>Copilot</b><span>Northbeam · sample data</span></div>
-        <div class="cp-log" id="cpLog" aria-live="polite"></div>
-        <div class="cp-in"><span>Ask about projects, people or numbers…</span><span class="cp-send"><svg width="13" height="13"><use href="#i-send"/></svg></span></div>
-      </div>
-      <div class="cp-tiles">
-        <div><b>4</b><small>projects read</small></div>
-        <div><b id="cpTasks">43</b><small>tasks considered</small></div>
-        <div><b>0</b><small>actions taken without approval</small></div>
-      </div>
+    <div class="cp-qs" id="cpQs" role="tablist" aria-label="Sample questions">
+      <button type="button" data-q="risk" class="is-on">Which projects need attention this week?</button>
+      <button type="button" data-q="load">Who has room for more work?</button>
+      <button type="button" data-q="week">How did last week go?</button>
+      <button type="button" data-q="rule">Turn “chase unpaid invoices” into a rule</button>
+    </div>
+    <div class="cp-body">
+      <div class="cp-thread" id="cpLog" aria-live="polite"></div>
+      <aside class="cp-src-rail"><p class="cp-rail-h">Sources for this answer</p><ol id="cpSrc"></ol></aside>
     </div>
   </div>
 </section>
 
-<section class="sec inside" id="inside">
+<section class="sec team" id="team">
   <div class="wrap">
-    <div class="in-head">
-      <p class="label"><span></span>Inside VELTRIX</p>
-      <h2 class="h2">One place for every project, rule and answer. <span>Click a window to bring it forward.</span></h2>
+    <div class="tm-head">
+      <div><p class="label">06 · The team’s week</p><h2 class="h2">See who is full before Friday tells you. <span>Hours booked against each person’s week, day by day.</span></h2></div>
+      <div class="tm-act">
+        <p class="tm-tip"><svg width="13" height="13"><use href="#i-spark"/></svg><span id="tmTip">Copilot suggests moving “Pricing page build” (6 h) from Priya to Omar.</span></p>
+        <button class="btn btn-light btn-sm" type="button" id="tmMove">Apply the move</button>
+      </div>
     </div>
-    <div class="stack" id="stack">
-      <div class="sw-win" data-w="0"><div class="sw-top"><span class="dots"><i></i><i></i><i></i></span><b>Weekly report</b><small>Updated automatically, Monday 08:58</small></div>
-        <div class="sw-body sw-report"><div><small>Revenue, last week</small><b id="swRev">$47.5k</b></div><div><small>On-time delivery</small><b id="swOn">93.0%</b></div><div><small>Projects at risk</small><b>1 of 4</b></div><div><small>Rule runs</small><b>13</b></div></div></div>
-      <div class="sw-win" data-w="1"><div class="sw-top"><span class="dots"><i></i><i></i><i></i></span><b>Team workload</b><small>This week, hours booked of 40</small></div>
-        <div class="sw-body"><div class="mini-load wide"><div><span>Priya Rao</span><i><em style="width:92%"></em></i><b>37 h</b></div><div><span>Lena Kraus</span><i><em style="width:70%"></em></i><b>28 h</b></div><div><span>Maya Ortiz</span><i><em style="width:58%"></em></i><b>23 h</b></div><div><span>Jonas Tan</span><i><em style="width:50%"></em></i><b>20 h</b></div><div><span>Omar Aziz</span><i><em style="width:45%"></em></i><b>18 h</b></div></div></div></div>
-      <div class="sw-win is-front" data-w="2"><div class="sw-top"><span class="dots"><i></i><i></i><i></i></span><b>Q4 product launch</b><small>Board · 8 of 13 tasks done</small></div>
-        <div class="sw-body"><div class="mini-board big"><div><small>To do · 3</small><i>Launch email<em>Lena · Fri</em></i><i>Press kit<em>Omar · Nov 12</em></i><i>Launch day checklist<em>Priya · Nov 20</em></i></div><div><small>In progress · 2</small><i class="hl">Design QA<em>Maya · 8 of 11 screens</em></i><i>Pricing page build<em>Priya · Nov 11</em></i></div><div><small>Done · 8</small><i class="dn">Pricing page copy<em>Lena</em></i><i class="dn">Launch plan<em>Priya</em></i></div></div></div></div>
+    <div class="cap" id="cap" role="table" aria-label="Hours booked this week">
+      <div class="cap-row cap-h" role="row"><span role="columnheader"></span><span role="columnheader">Mon</span><span role="columnheader">Tue</span><span role="columnheader">Wed</span><span role="columnheader">Thu</span><span role="columnheader">Fri</span><span role="columnheader">Week</span></div>
     </div>
+  </div>
+</section>
+
+<section class="sec routes" id="routes">
+  <div class="wrap">
+    <div class="rt-head">
+      <p class="label">07 · Where work comes from</p>
+      <h2 class="h2">Your tools keep their jobs. <span>VELTRIX takes what arrives, does the handoff and sends the result back.</span></h2>
+    </div>
+    <div class="rt" role="table" aria-label="What VELTRIX does with each tool">
+      <div class="rt-row rt-h" role="row"><span role="columnheader">Tool</span><span role="columnheader">What arrives</span><span role="columnheader">What VELTRIX does</span><span role="columnheader">What goes back</span></div>
+      <div class="rt-row" role="row"><span role="cell"><span class="lg-m" style="--logo:url('assets/logos/hubspot.svg')"></span>HubSpot</span><span role="cell">A deal marked won</span><span role="cell">Opens the project and links it to the deal</span><span role="cell">Owner and status on the deal</span></div>
+      <div class="rt-row" role="row"><span role="cell"><span class="lg-m" style="--logo:url('assets/logos/slack.svg')"></span>Slack</span><span role="cell">Messages and threads</span><span role="cell">Turns a message into a task, posts rule alerts</span><span role="cell">Updates in the same thread</span></div>
+      <div class="rt-row" role="row"><span role="cell"><span class="lg-m" style="--logo:url('assets/logos/gmail.svg')"></span>Gmail</span><span role="cell">Client emails</span><span role="cell">Files them against the right project</span><span role="cell">Templated replies from rules</span></div>
+      <div class="rt-row" role="row"><span role="cell"><span class="lg-m" style="--logo:url('assets/logos/googlecalendar.svg')"></span>Google Calendar</span><span role="cell">Who is free, and when</span><span role="cell">Books kickoffs and sets deadlines</span><span role="cell">Events on everyone’s calendar</span></div>
+      <div class="rt-row" role="row"><span role="cell"><span class="lg-m" style="--logo:url('assets/logos/stripe.svg')"></span>Stripe</span><span role="cell">A payment</span><span role="cell">Closes the milestone, counts the revenue</span><span role="cell">Nothing: it only reads</span></div>
+      <div class="rt-row" role="row"><span role="cell"><span class="lg-m" style="--logo:url('assets/logos/jira.svg')"></span>Jira</span><span role="cell">Engineering issues</span><span role="cell">Places them on project timelines</span><span role="cell">Status back to the issue</span></div>
+    </div>
+    <p class="fine">Illustrative: these show what VELTRIX is built to connect. None is confirmed as available yet; each will be marked when it ships.</p>
   </div>
 </section>
 
 <section class="sec faq" id="faq">
-  <div class="wrap faq-grid">
-    <div class="faq-side">
-      <p class="label"><span></span>FAQ</p>
-      <h2 class="h2">Questions, answered <span>before your demo.</span></h2>
-      <p class="lead">The things operations leads ask most before they switch. Anything else, ask on the call.</p>
-      <div class="faq-card"><b>Still have questions?</b><p>Add them to your demo request and they will be covered on the call.</p><a class="btn btn-dark btn-sm" href="#start" data-demo>Ask on the call</a></div>
-    </div>
-    <div class="faq-list">
-      <details open><summary>What exactly is VELTRIX?<i></i></summary><p>An operations workspace that combines project management, workflow automation, team conversation and reporting. The same tasks, people and numbers power every view, and Copilot helps you find risks, draft tasks and write automations.</p></details>
-      <details><summary>Is the data on this page real?<i></i></summary><p>No. Every project, person and figure on this page belongs to a sample workspace called Northbeam, made for demonstration. Copilot’s answers are scripted from that sample data, and the walkthrough is a simulation.</p></details>
-      <details><summary>Do we have to move off our current tools?<i></i></summary><p>No. VELTRIX is designed to connect to the tools you already use, so conversations stay in chat and deals stay in your CRM. The integrations above show the kinds of tools it is built to connect with.</p></details>
-      <details><summary>Does Copilot take actions on its own?<i></i></summary><p>No. Copilot suggests and drafts: tasks from notes, rules from sentences, summaries from what changed. A person approves anything it creates.</p></details>
-      <details><summary>What does pricing look like?<i></i></summary><p>Pricing hasn’t been published yet. Request a demo and it will be shared for your team size.</p></details>
-      <details><summary>What happens after I request a demo?<i></i></summary><p>On the live product, the team would reply to arrange a walkthrough with your own workflows. On this page the form isn’t connected to a backend yet, so it tells you plainly that nothing was sent.</p></details>
+  <div class="wrap">
+    <p class="label">08 · Questions</p>
+    <h2 class="h2">What people ask before a demo.</h2>
+    <div class="qa" id="qa">
+      <details open><summary><i>01</i><span>What exactly is VELTRIX?</span><b aria-hidden="true"></b></summary><p>An operations workspace that combines project management, workflow automation, team conversation and reporting. The same tasks, people and numbers power every view, and Copilot helps you find risks, draft tasks and write automations.</p></details>
+      <details><summary><i>02</i><span>Is the data on this page real?</span><b aria-hidden="true"></b></summary><p>No. Every project, person and figure belongs to a sample workspace called Northbeam, made for demonstration. Copilot’s answers are scripted from that sample, and the runs are simulated.</p></details>
+      <details><summary><i>03</i><span>Do we have to move off our current tools?</span><b aria-hidden="true"></b></summary><p>No. VELTRIX is designed to connect to the tools you already use, so conversations stay in chat and deals stay in your CRM.</p></details>
+      <details><summary><i>04</i><span>Does Copilot take actions on its own?</span><b aria-hidden="true"></b></summary><p>No. Copilot suggests and drafts: tasks from notes, rules from sentences, summaries from what changed. A person approves anything it creates.</p></details>
+      <details><summary><i>05</i><span>What does pricing look like?</span><b aria-hidden="true"></b></summary><p>Pricing hasn’t been published yet. Request a demo and it will be shared for your team size.</p></details>
+      <details><summary><i>06</i><span>What happens after I request a demo?</span><b aria-hidden="true"></b></summary><p>On the live product, the team would reply to arrange a walkthrough with your own workflows. This page isn’t connected to a backend yet, so the form tells you plainly that nothing was sent.</p></details>
     </div>
   </div>
 </section>
 
 <section class="sec start" id="start">
-  <div class="wrap start-grid">
-    <div class="start-copy">
-      <p class="label"><span></span>Get started</p>
-      <h2 class="h2 h2-lg">Run next Monday without the status meeting. <span>Bring one messy handoff to the demo and see it run.</span></h2>
-      <form class="form" id="demoForm" novalidate>
-        <div class="f-row"><label class="f"><span>Full name</span><input name="name" autocomplete="name" required></label><label class="f"><span>Work email</span><input name="email" type="email" autocomplete="email" required></label></div>
-        <div class="f-row"><label class="f"><span>Company</span><input name="company" autocomplete="organization" required></label><label class="f"><span>Team size</span><select name="size" required><option value="">Choose</option><option>1–10</option><option>11–50</option><option>51–200</option><option>200+</option></select></label></div>
-        <label class="f"><span>The handoff you would like to see <em>optional</em></span><textarea name="note" rows="3" maxlength="400" placeholder="For example: when a deal is won, nobody sets up the project for two days."></textarea></label>
-        <div class="f-act"><button class="btn btn-light" type="submit">Request a demo <svg width="15" height="15"><use href="#i-arrow"/></svg></button><span class="f-note">This form isn’t connected to a backend yet. Submitting checks your entries and tells you plainly that nothing was sent.</span></div>
-        <div class="f-state" id="formState" role="status" aria-live="polite" hidden></div>
-      </form>
-    </div>
-    <aside class="setup">
-      <div class="setup-h"><b>Setting up Northbeam</b><span class="tag">Sample</span></div>
-      <div class="setup-bar"><i><em style="width:50%"></em></i><span>2 of 4</span></div>
-      <ol class="setup-list">
-        <li class="is-done"><span class="ck"><svg width="11" height="11"><use href="#i-check"/></svg></span><span><b>Connect your CRM</b><small>HubSpot · deals and contacts</small></span></li>
-        <li class="is-done"><span class="ck"><svg width="11" height="11"><use href="#i-check"/></svg></span><span><b>Invite your team</b><small>5 people joined</small></span></li>
-        <li class="is-now"><span class="ck"></span><span><b>Turn on your first rule</b><small>Deal won → open onboarding</small></span></li>
-        <li><span class="ck"></span><span><b>Ask Copilot your first question</b><small>“What needs attention this week?”</small></span></li>
+  <div class="wrap st-grid">
+    <div class="st-copy">
+      <p class="label">09 · Book a demo</p>
+      <h2 class="h2 h2-lg">Bring one messy handoff. <span>We’ll show it running in VELTRIX.</span></h2>
+      <ol class="next">
+        <li><time>Day 1</time><span>You tell us the handoff that keeps slipping.</span></li>
+        <li><time>Day 2–3</time><span>We set it up in a sample workspace with your steps.</span></li>
+        <li><time>The call</time><span>You watch it run, and ask anything.</span></li>
       </ol>
-    </aside>
+    </div>
+    <form class="form" id="demoForm" novalidate>
+      <label class="f"><span>Full name</span><input name="name" autocomplete="name" required></label>
+      <label class="f"><span>Work email</span><input name="email" type="email" autocomplete="email" required></label>
+      <div class="f-row"><label class="f"><span>Company</span><input name="company" autocomplete="organization" required></label><label class="f"><span>Team size</span><select name="size" required><option value="">Choose</option><option>1–10</option><option>11–50</option><option>51–200</option><option>200+</option></select></label></div>
+      <label class="f"><span>The handoff that slips <em>optional</em></span><textarea name="note" rows="3" maxlength="400" placeholder="When a deal is won, nobody sets up the project for two days."></textarea></label>
+      <div class="f-act"><button class="btn btn-light" type="submit">Request a demo <svg width="15" height="15"><use href="#i-arrow"/></svg></button><span class="f-note">Not connected to a backend yet: submitting checks your entries and tells you plainly that nothing was sent.</span></div>
+      <div class="f-state" id="formState" role="status" aria-live="polite" hidden></div>
+    </form>
   </div>
 </section>
 </main>
 
 <footer class="foot">
   <div class="wrap">
+    <p class="foot-log"><time>17:30</time><span>Monday’s report is ready. Nobody had to build it.</span></p>
     <div class="foot-top">
       <div class="foot-brand"><a class="brand" href="#top"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span><span>VELTRIX</span></a><p>The operations workspace for projects, automations, Copilot and reporting.</p></div>
       <nav class="foot-cols" aria-label="Footer">
-        <div><b>Product</b><a href="#platform">Platform</a><a href="#how">How it works</a><a href="#walkthrough">Walkthrough</a><a href="#copilot">Copilot</a></div>
-        <div><b>Explore</b><a href="#outcomes">What changes</a><a href="#calc">Your week, measured</a><a href="#inside">Inside VELTRIX</a><a href="#integrations">Integrations</a></div>
-        <div><b>Company</b><a href="#faq">FAQ</a><a href="#start">Book a demo</a></div>
+        <div><b>Product</b><a href="#record">One record</a><a href="#works">How it works</a><a href="#copilot">Copilot</a><a href="#team">Team</a></div>
+        <div><b>Explore</b><a href="#monday">One Monday</a><a href="#week">Your week</a><a href="#routes">Integrations</a></div>
+        <div><b>Company</b><a href="#faq">Questions</a><a href="#start">Book a demo</a></div>
       </nav>
     </div>
     <div class="foot-bot"><span>© 2026 VELTRIX. Company and legal details to be added before launch.</span><span>All product data shown is sample data. Logos belong to their owners and are shown for illustration only.</span></div>
-    <p class="foot-word" aria-hidden="true">VELTRIX</p>
   </div>
 </footer>
 

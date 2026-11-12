@@ -134,18 +134,6 @@
   let stT;
   if (ST) new ResizeObserver(() => { clearTimeout(stT); stT = setTimeout(() => ST.refresh(), 200); }).observe(document.body);
 
-  /* ================= hero: a phrase that rewrites itself ================= */
-  const PHRASES = ['hand off on time', 'report themselves', 'flag risks early', 'close the loop'];
-  const cycleEl = $('#cycle');
-  if (cycleEl && motion) {
-    let pi = 0;
-    const typeTo = async text => {
-      for (let n = cycleEl.textContent.length; n >= 0; n--) { cycleEl.textContent = cycleEl.textContent.slice(0, n); await sleep(28); }
-      for (let n = 1; n <= text.length; n++) { cycleEl.textContent = text.slice(0, n); await sleep(52); }
-    };
-    (async () => { await sleep(3600); for (;;) { pi = (pi + 1) % PHRASES.length; await typeTo(PHRASES[pi]); await sleep(3000); } })();
-  }
-
   /* ================= hero: product views drive the window below ================= */
   const VIEW_TITLES = { projects: 'Projects', rules: 'Automations', copilot: 'Copilot', report: 'Reporting' };
   const viewBtns = $$('#views button'), VIEW_MS = 6500;
@@ -203,149 +191,176 @@
   ['#apOn', '#apOn2', '#pfOn'].forEach(s => { const el = $(s); if (el) el.textContent = `${K.ontime30.toFixed(1)}%`; });
   $('#apCy').textContent = `${K.cycle30.toFixed(1)} days`;
 
+  /* ================= hero: the run line plays the real handoff, step by step ================= */
+  const runline = $('#runline'), runSteps = $$('#runline li');
+  const playRun = async () => {
+    if (!motion) { runSteps.forEach(li => li.classList.add('is-on')); return; }
+    runline.style.setProperty('--run', '0%');
+    for (let i = 0; i < runSteps.length; i++) {
+      await sleep(i ? 520 : 900);
+      runSteps[i].classList.add('is-on');
+      runline.style.setProperty('--run', `${(i + 1) / runSteps.length * 100}%`);
+      $('#hStamp').textContent = runSteps[i].querySelector('time').textContent;
+    }
+  };
+
   /* ================= hero entrance (the stage line is unchanged) ================= */
   const heroIn = () => {
     showView(0);
+    playRun();
     if (!motion) return;
     const tl = G.timeline({ defaults: { ease: EASE } });
     tl.from('.nav-bar > *', { y: -14, opacity: 0, duration: 0.9, stagger: 0.06 }, 0)
-      .from('.pill', { y: 12, opacity: 0, duration: 0.8 }, 0.05)
       .from('.hero-title .ln > span', { yPercent: 110, duration: 1.2, stagger: 0.1 }, 0.1)
-      .from('.hero-side > *', { y: 20, opacity: 0, duration: 1, stagger: 0.08 }, 0.4)
-      .from('.checks li', { y: 10, opacity: 0, duration: 0.8, stagger: 0.05 }, 0.55)
-      .from('.views button', { y: 14, opacity: 0, duration: 0.9, stagger: 0.06 }, 0.6)
+      .from('.h-stamp', { y: 12, opacity: 0, duration: 0.9 }, 0.4)
+      .from('.runline li', { y: 12, opacity: 0, duration: 0.8, stagger: 0.06 }, 0.45)
+      .from('.h-foot > *', { y: 18, opacity: 0, duration: 1, stagger: 0.08 }, 0.55)
+      .from('.views > *', { y: 10, opacity: 0, duration: 0.8, stagger: 0.04 }, 0.65)
       .from('#heroStage', { y: 140, opacity: 0, duration: 1.6, ease: 'expo.out' }, 0.5);
   };
   heroIn();
 
-  /* ================= tools band ================= */
-  const TOOLS = [['Slack', 'slack'], ['HubSpot', 'hubspot'], ['Gmail', 'gmail'], ['Google Calendar', 'googlecalendar'], ['Stripe', 'stripe'], ['Jira', 'jira'], ['Salesforce', 'salesforce'], ['QuickBooks', 'quickbooks'], ['Notion', 'notion'], ['Zoom', 'zoom'], ['Google Drive', 'googledrive'], ['Xero', 'xero'], ['GitHub', 'github'], ['Figma', 'figma']];
-  const mq = TOOLS.map(([n, f]) => `<span class="mq"><span class="lg-m" style="--logo:url('assets/logos/${f}.svg')"></span>${n}</span>`).join('');
-  $('#marquee').innerHTML = mq + mq.replace(/class="mq"/g, 'class="mq" aria-hidden="true"');
+  /* ================= one Monday: bars grow to show how late each step landed ================= */
+  const cmp = $('#cmp');
+  if (motion) whenSeen(cmp, () => {
+    $$('.cmp-a .cmp-bar', cmp).forEach((bar, i) => { const v = parseFloat(bar.style.getPropertyValue('--d')) || 0; G.fromTo(bar, { '--d': 0 }, { '--d': v, duration: 1.3, delay: 0.25 + i * 0.12, ease: 'power2.inOut' }); });
+    G.from($$('.cmp-t b', cmp), { opacity: 0, y: 10, duration: 0.9, stagger: 0.15, delay: 0.9, ease: EASE });
+  }, 0.25);
 
-  /* ================= outcomes ================= */
-  const lastBars = w12.map(b => b.v), bmax = Math.max(...lastBars), bmin = Math.min(...lastBars);
-  $('#ocBars').innerHTML = lastBars.map(v => `<i style="height:${(30 + 70 * (v - bmin) / (bmax - bmin)).toFixed(0)}%"></i>`).join('');
-  $('#ocRev').textContent = money(w12[11].v);
-  // late tasks flagged per weekday over 12 weeks: fewer as the rules settled in
-  const heatR = seeded(77);
-  $('#ocHeat').innerHTML = Array.from({ length: 60 }, (_, i) => { const wk = Math.floor(i / 5), base = 3.2 - wk * 0.24 + (heatR() - 0.5) * 1.6; return `<i data-l="${clamp(Math.round(base), 0, 4)}"></i>`; }).join('');
-  // the weekly report window shows last week, so both figures use the last 7 days
-  $('#swRev').textContent = money(periodValue('revenue', 7));
-  $('#swOn').textContent = `${periodValue('ontime', 7).toFixed(1)}%`;
-
-  /* ================= calculator ================= */
-  const sl = { hand: $('#slHand'), min: $('#slMin'), ppl: $('#slPpl') };
-  const calc = () => {
-    Object.values(sl).forEach(i => i.style.setProperty('--p', `${(i.value - i.min) / (i.max - i.min) * 100}%`));
-    $('#oHand').textContent = sl.hand.value; $('#oMin').textContent = sl.min.value; $('#oPpl').textContent = sl.ppl.value;
-    const hrs = sl.hand.value * sl.min.value * sl.ppl.value / 60;
-    $('#cHours').textContent = fmt(hrs);
-    $('#cYear').textContent = fmt(hrs * 48);
-    $('#cWeeks').textContent = fmt(hrs * 48 / 40);
-    $('#cCount').textContent = fmt(sl.hand.value * 48);
+  /* ================= your week: numbers you can change inside the sentence ================= */
+  const wkVal = {};
+  const wkCalc = () => {
+    const hrs = wkVal.hand * wkVal.min * wkVal.ppl / 60;
+    const out = $('#wkHours'), from = parseFloat(out.textContent.replace(/,/g, '')) || 0;
+    if (motion) { const o = { v: from }; G.to(o, { v: hrs, duration: 0.6, ease: 'power2.out', overwrite: true, onUpdate: () => { out.textContent = fmt(o.v); } }); } else out.textContent = fmt(hrs);
+    $('#wkWeeks').textContent = fmt(hrs * 48 / 40);
+    $('#wkCount').textContent = fmt(wkVal.hand * 48);
+    // fill one person's week, Monday first, an hour per cell
+    const filled = Math.min(40, Math.round(hrs));
+    $$('#wkCells i').forEach((cell, n) => cell.classList.toggle('on', n < filled));
+    const share = hrs / 40;
+    $('#wkShare').textContent = share >= 1 ? `${share.toFixed(1)} people’s full weeks` : Math.abs(share - 0.5) < 0.005 ? 'Half of one person’s week' : `${Math.round(share * 100)}% of one person’s week`;
   };
-  Object.values(sl).forEach(i => i.addEventListener('input', calc));
-  calc();
+  $$('#wkSentence .num').forEach(n => {
+    const out = $('output', n), [down, up] = $$('button', n), k = n.dataset.k, min = +n.dataset.min, max = +n.dataset.max, step = +n.dataset.step;
+    wkVal[k] = +out.textContent;
+    const set = v => { wkVal[k] = clamp(v, min, max); out.textContent = wkVal[k]; down.disabled = wkVal[k] <= min; up.disabled = wkVal[k] >= max; wkCalc(); if (motion) G.fromTo(out, { y: -4, opacity: .4 }, { y: 0, opacity: 1, duration: 0.3 }); };
+    down.addEventListener('click', () => set(wkVal[k] - step)); up.addEventListener('click', () => set(wkVal[k] + step));
+    n.addEventListener('wheel', e => { if (document.activeElement && n.contains(document.activeElement)) { e.preventDefault(); set(wkVal[k] + (e.deltaY < 0 ? step : -step)); } }, { passive: false });
+  });
+  $('#wkHours').textContent = '20'; $$('#wkCells i').forEach((cell, n) => cell.classList.toggle('on', n < 20));
 
-  /* ================= platform sparkline ================= */
-  { const v = buckets('ontime', 84).map(b => b.v), lo = Math.min(...v), hi = Math.max(...v);
-    $('#pfSpark').innerHTML = `<path d="${v.map((x, i) => `${i ? 'L' : 'M'}${(i / 11 * 120).toFixed(1)} ${(28 - (x - lo) / (hi - lo || 1) * 26).toFixed(1)}`).join(' ')}"/>`; }
-
-  /* ================= integrations hub ================= */
-  const NODES = [['HubSpot', 'hubspot', 'Deals and contacts', 14, 18], ['Slack', 'slack', 'Channels and threads', 12, 52], ['Gmail', 'gmail', 'Email to tasks', 16, 84], ['Google Calendar', 'googlecalendar', 'Kickoffs and deadlines', 86, 16], ['Stripe', 'stripe', 'Payments and revenue', 89, 50], ['Jira', 'jira', 'Engineering work', 84, 85]];
-  const hub = $('#hub');
-  const placeHub = () => {
-    const mob = innerWidth <= 600;
-    const tab = !mob && innerWidth <= 1100;      // narrower screens pull the nodes in so none crosses the edge
-    const pos = mob ? [[27, 10], [73, 10], [27, 26], [73, 26], [27, 90], [73, 90]] : NODES.map(n => [tab ? (n[3] < 50 ? 21 : 79) : n[3], n[4]]);
-    $$('.hub-node', hub).forEach((el, i) => { el.style.left = `${pos[i][0]}%`; el.style.top = `${pos[i][1]}%`; });
-    $('#hubLines').setAttribute('viewBox', '0 0 1000 1000');
-    $('#hubLines').innerHTML = pos.map(([x, y]) => { const sx = 500, sy = 500, ex = x * 10, ey = y * 10, mx = (sx + ex) / 2; return `<path d="M${sx} ${sy} C${mx} ${sy}, ${mx} ${ey}, ${ex} ${ey}"/><path class="pulse" d="M${sx} ${sy} C${mx} ${sy}, ${mx} ${ey}, ${ex} ${ey}"/>`; }).join('');
+  /* ================= one record: annotations linked to the task's fields ================= */
+  const anat = $('#anatomy'), anLines = $('#anLines');
+  const drawAnat = () => {
+    if (innerWidth <= 960) { anLines.innerHTML = ''; return; }
+    const box = anat.getBoundingClientRect();
+    anLines.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`);
+    anLines.innerHTML = $$('.an-side li', anat).map(li => {
+      const f = $(`.task [data-f="${li.dataset.f}"]`, anat), a = li.getBoundingClientRect(), b = f.getBoundingClientRect(), left = li.closest('.an-l');
+      const y1 = a.top + 12 - box.top, y2 = b.top + b.height / 2 - box.top;
+      const x1 = (left ? a.right + 12 : a.left - 12) - box.left, x2 = (left ? b.left - 2 : b.right + 2) - box.left, mx = (x1 + x2) / 2;
+      return `<path data-f="${li.dataset.f}" d="M${x1} ${y1} C${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}"/><circle data-f="${li.dataset.f}" cx="${x2}" cy="${y2}" r="2.5"/>`;
+    }).join('');
   };
-  hub.insertAdjacentHTML('beforeend', NODES.map(([n, f, d]) => `<div class="hub-node"><span class="lg-m" style="--logo:url('assets/logos/${f}.svg')"></span><span><b>${n}</b><small>${d}</small></span></div>`).join(''));
-  placeHub(); addEventListener('resize', placeHub);
-  if (motion) whenSeen(hub, () => { $$('#hubLines .pulse').forEach((p, i) => { G.fromTo(p, { strokeDashoffset: 1240 }, { strokeDashoffset: 0, duration: 3.2, ease: 'power1.inOut', repeat: -1, repeatDelay: 2.4, delay: i * 0.55 }); }); });
+  $$('.an-side li', anat).forEach(li => {
+    const on = v => {
+      anat.classList.toggle('is-hover', v);
+      li.classList.toggle('is-hot', v);
+      $$(`.task [data-f="${li.dataset.f}"]`, anat).forEach(x => x.classList.toggle('is-hot', v));
+      $$(`#anLines [data-f="${li.dataset.f}"]`).forEach(x => x.classList.toggle('is-hot', v));
+    };
+    li.addEventListener('pointerenter', () => on(true)); li.addEventListener('pointerleave', () => on(false));
+  });
+  drawAnat(); addEventListener('resize', drawAnat); document.fonts?.ready.then(drawAnat);
+  if (motion) whenSeen(anat, () => { drawAnat(); $$('#anLines path').forEach((p, i) => { const n = p.getTotalLength(); G.fromTo(p, { strokeDasharray: n, strokeDashoffset: n }, { strokeDashoffset: 0, duration: 1, delay: 0.2 + i * 0.08, ease: 'power2.out', onComplete: () => { p.style.strokeDasharray = ''; } }); }); }, 0.3);
 
-  /* ================= how it works ================= */
-  const ruleText = 'When an invoice is paid, close its milestone';
-  whenSeen($('#typeRule').closest('.ui-card'), async () => {
-    const el = $('#typeRule');
-    if (!motion) { el.textContent = ruleText; $('.ui-steps').classList.add('is-on'); return; }
-    await sleep(400);
-    for (let n = 1; n <= ruleText.length; n++) { el.textContent = ruleText.slice(0, n); await sleep(38); }
-    await sleep(300); $('.ui-steps').classList.add('is-on');
-  }, 0.5);
+  /* ================= how it works: the step you are reading drives the window ================= */
+  const steps = $$('#works .step'), wss = $$('#win .ws'), WIN_TITLES = ['Connections', 'New rule', 'Run log · Mon, Oct 26', '#ops · Monday'];
+  let typed = false;
+  const typeRule = async () => {
+    if (typed) return; typed = true;
+    const el = $('#typeRule'), text = 'When a deal is won and worth over $10,000, open onboarding and book a kickoff';
+    if (!motion) { el.textContent = text; return; }
+    for (let n = 1; n <= text.length; n++) { el.textContent = text.slice(0, n); await sleep(24); }
+  };
+  const setStep = i => {
+    steps.forEach((s, k) => s.classList.toggle('is-on', k === i));
+    wss.forEach((w, k) => w.classList.toggle('is-on', k === i));
+    $('#winTitle').textContent = WIN_TITLES[i];
+    if (i === 1) typeRule();
+  };
+  const stepIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) setStep(steps.indexOf(e.target)); }), { rootMargin: '-45% 0px -45% 0px' });
+  steps.forEach(s => stepIO.observe(s));
   $$('.tg .sw').forEach(s => { s.setAttribute('role', 'switch'); s.setAttribute('tabindex', '0'); s.setAttribute('aria-checked', s.classList.contains('is-on'));
     const flip = () => { s.classList.toggle('is-on'); s.setAttribute('aria-checked', s.classList.contains('is-on')); };
     s.addEventListener('click', flip); s.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flip(); } }); });
-
-  /* ================= walkthrough player ================= */
-  const player = $('#player'), chBtns = $$('.pl-ch button', player), CRUMBS = ['CRM · Deals', 'Projects · Brightline onboarding', 'Calendar · Tue, Oct 27'], CH_S = 4.2;
-  let chIdx = 0, chTween = null, playing = false;
-  const setScene = i => {
-    chIdx = i;
-    $$('.pl-scene', player).forEach((s, k) => s.classList.toggle('is-on', k === i));
-    chBtns.forEach((b, k) => { b.classList.toggle('is-on', k === i); b.classList.toggle('is-done', k < i); b.setAttribute('aria-selected', k === i); if (motion && k !== i) G.set($('em', b), { scaleX: k < i ? 1 : 0 }); });
-    $('#plCrumb').textContent = CRUMBS[i];
-  };
-  const runFrom = i => {
-    setScene(i); chTween?.kill();
-    if (!motion) return;
-    playing = true; player.classList.add('is-playing'); player.classList.remove('is-done');
-    chTween = G.fromTo($('em', chBtns[i]), { scaleX: 0 }, { scaleX: 1, duration: CH_S, ease: 'none', onComplete: () => { if (i < 2) runFrom(i + 1); else { playing = false; player.classList.remove('is-playing'); player.classList.add('is-done'); $('#plPlay').setAttribute('aria-label', 'Replay walkthrough'); } } });
-  };
-  $('#plPlay').addEventListener('click', () => runFrom(0));
-  chBtns.forEach((b, i) => b.addEventListener('click', () => runFrom(i)));
-  whenSeen(player, () => { if (!playing) runFrom(0); }, 0.5);
-
-  /* ================= Copilot ================= */
   const last7 = { rev: periodValue('revenue', 7), revPrev: periodValue('revenue', 7, 7), ontime: periodValue('ontime', 7), runs: periodValue('runs', 7) };
+  $('#postRev').textContent = money(last7.rev); $('#postOn').textContent = `${last7.ontime.toFixed(1)}%`; $('#postRuns').textContent = fmt(last7.runs);
+
+  /* ================= Copilot: answers cite their sources, listed in the rail ================= */
   const ANSWERS = {
-    risk: () => ({ q: 'Which projects need attention this week?', html: 'Two of the four. <b>Q4 product launch</b> is at risk: Design QA has 3 screens left and the launch email waits on it. <b>Support hiring</b> is behind at 30% with three weeks to go.',
-      card: [['Q4 product launch', 62, 'At risk'], ['Support hiring', 30, 'Behind'], ['Brightline onboarding', 88, 'On track'], ['Website relaunch', 42, 'On track']], src: ['Q4 launch board', 'Design QA task', 'Support hiring timeline'], acts: ['Draft a reminder for Maya', 'Open the Q4 launch board'] }),
-    load: () => ({ q: 'Who has room for more work?', html: '<b>Omar Aziz</b> has the most room at 18 of 40 hours. <b>Priya Rao</b> is at 92%. Moving “Pricing page build” (about 6 hours) from Priya to Omar would take her to about 78%.',
-      card: [['Priya Rao', 92, '37 h'], ['Lena Kraus', 70, '28 h'], ['Maya Ortiz', 58, '23 h'], ['Jonas Tan', 50, '20 h'], ['Omar Aziz', 45, '18 h']], src: ['Calendars', 'Task estimates'], acts: ['Draft the move', 'Keep it as it is'] }),
-    week: () => { const d = pctDelta(last7.rev, last7.revPrev); return { q: 'How did last week go?', html: `The workspace recognised <b>${money(last7.rev)}</b> in revenue, ${d >= 0 ? 'up' : 'down'} ${Math.abs(d).toFixed(1)}% on the week before. On-time delivery averaged <b>${last7.ontime.toFixed(1)}%</b> and rules ran <b>${fmt(last7.runs)}</b> times. One blocker remains: Design QA on the launch.`, src: ['Invoices', 'Tasks', 'Rule log'], acts: ['Post this summary to #ops'] }; },
-    rule: () => ({ q: 'Turn “chase unpaid invoices” into a rule', html: 'Here is a draft. Check it reads the way you meant before you turn it on: <b>When an invoice is 3 days overdue</b>, email the client contact a reminder and tell the account owner in #billing.', src: ['Billing', 'Client contacts'], acts: ['Turn it on', 'Edit the draft'] })
+    risk: () => ({ q: 'Which projects need attention this week?', html: 'Two of the four. <b>Q4 product launch</b> is at risk: Design QA has 3 screens left and the launch email waits on it<sup>1</sup><sup>2</sup>. <b>Support hiring</b> is behind at 30% with three weeks to go<sup>3</sup>.',
+      card: [['Q4 product launch', 62, 'At risk'], ['Support hiring', 30, 'Behind'], ['Brightline onboarding', 88, 'On track'], ['Website relaunch', 42, 'On track']],
+      src: [['Q4 launch board', '8 of 13 tasks done · due Fri, Nov 20'], ['Design QA', 'Task · Maya Ortiz · 8 of 11 screens'], ['Support hiring', '3 of 10 tasks · due Nov 27']], acts: ['Draft a reminder for Maya', 'Open the Q4 launch board'] }),
+    load: () => ({ q: 'Who has room for more work?', html: '<b>Omar Aziz</b> has the most room at 18 of 40 hours<sup>1</sup>. <b>Priya Rao</b> is booked 37 of 40. Moving “Pricing page build” (about 6 hours<sup>2</sup>) from Priya to Omar would bring her to 31 and Omar to 24.',
+      card: [['Priya Rao', 92, '37 h'], ['Lena Kraus', 70, '28 h'], ['Maya Ortiz', 58, '23 h'], ['Jonas Tan', 50, '20 h'], ['Omar Aziz', 45, '18 h']],
+      src: [['Team calendars', 'This week · 5 people'], ['Task estimates', 'Pricing page build · 6 h']], acts: ['Draft the move', 'Keep it as it is'] }),
+    week: () => { const d = pctDelta(last7.rev, last7.revPrev); return { q: 'How did last week go?', html: `The workspace recognised <b>${money(last7.rev)}</b> in revenue, ${d >= 0 ? 'up' : 'down'} ${Math.abs(d).toFixed(1)}% on the week before<sup>1</sup>. On-time delivery averaged <b>${last7.ontime.toFixed(1)}%</b><sup>2</sup> and rules ran <b>${fmt(last7.runs)}</b> times<sup>3</sup>. One blocker remains: Design QA on the launch.`,
+      src: [['Invoices', `Last 7 days · ${money(last7.rev)}`], ['Tasks', 'Closed against their due dates'], ['Rule log', `${fmt(last7.runs)} runs in 7 days`]], acts: ['Post this summary to #ops'] }; },
+    rule: () => ({ q: 'Turn “chase unpaid invoices” into a rule', html: 'Here is a draft. Check it reads the way you meant before you turn it on: <b>when an invoice is 3 days overdue</b>, email the client contact a reminder<sup>1</sup> and tell the account owner in #billing<sup>2</sup>.',
+      src: [['Billing', 'Invoice due dates'], ['Client contacts', 'Primary contact per account']], acts: ['Turn it on', 'Edit the draft'] })
   };
-  const cpLog = $('#cpLog');
+  const cpLog = $('#cpLog'), cpSrc = $('#cpSrc');
   let cpBusy = false;
   async function ask(key) {
     if (cpBusy) return; cpBusy = true;
-    $$('#cpQs button').forEach(b => b.classList.toggle('is-on', b.dataset.q === key));
+    $$('#cpQs button').forEach(b => { const on = b.dataset.q === key; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on); });
     const a = ANSWERS[key]();
     cpLog.insertAdjacentHTML('beforeend', `<p class="cp-q">${esc(a.q)}</p>`);
     const qEl = cpLog.lastElementChild;
     const box = document.createElement('div'); box.className = 'cp-a'; box.innerHTML = '<span class="cp-thinking"><i></i><i></i><i></i></span>'; cpLog.appendChild(box);
     cpLog.scrollTop = cpLog.scrollHeight;
-    await sleep(motion ? 700 : 0);
-    // the answer arrives a few words at a time, the way a streamed reply does
+    cpSrc.innerHTML = '';
+    await sleep(motion ? 650 : 0);
     const words = a.html.split(' '); box.innerHTML = '<p></p>'; const p = $('p', box);
-    for (let n = 1; n <= words.length; n++) { p.innerHTML = words.slice(0, n).join(' '); if (motion) await sleep(26); }
+    for (let n = 1; n <= words.length; n++) { p.innerHTML = words.slice(0, n).join(' '); if (motion) await sleep(24); }
     if (a.card) box.insertAdjacentHTML('beforeend', `<div class="cp-card">${a.card.map(r => `<div class="cp-row"><span>${r[0]}</span><i><em style="width:${r[1]}%"></em></i><b>${r[2]}</b></div>`).join('')}</div>`);
-    box.insertAdjacentHTML('beforeend', `<div class="cp-src">${a.src.map(s => `<span>${s}</span>`).join('')}</div><div class="cp-acts">${a.acts.map((t, i) => `<button type="button" class="btn btn-sm ${i ? 'btn-dark' : 'btn-light'}">${t}</button>`).join('')}</div>`);
+    box.insertAdjacentHTML('beforeend', `<div class="cp-acts">${a.acts.map((t, i) => `<button type="button" class="btn btn-sm ${i ? 'btn-dark' : 'btn-light'}">${t}</button>`).join('')}</div>`);
     $$('.cp-acts button', box).forEach((b, i) => b.addEventListener('click', () => toast(i ? 'Kept as it is.' : 'Drafted. Nothing changes until a person approves it in the full product.', 'i-spark')));
-    if (motion) G.from([...box.children].slice(1), { y: 8, opacity: 0, duration: 0.5, stagger: 0.06, ease: EASE });
-    while (cpLog.children.length > 6) cpLog.firstElementChild.remove();
-    // keep the question in view: scroll so it sits at the top of the window, not past it
-    cpLog.scrollTo({ top: Math.max(0, qEl.offsetTop - 18), behavior: motion ? 'smooth' : 'auto' });
+    cpSrc.innerHTML = a.src.map(s => `<li><b>${s[0]}</b><small>${s[1]}</small></li>`).join('');
+    if (motion) { G.from([...box.children].slice(1), { y: 8, opacity: 0, duration: 0.5, stagger: 0.06, ease: EASE }); G.from($$('li', cpSrc), { x: 10, opacity: 0, duration: 0.5, stagger: 0.08, ease: EASE }); }
+    while (cpLog.children.length > (innerWidth <= 600 ? 2 : 6)) cpLog.firstElementChild.remove();
+    if (innerWidth > 600) cpLog.scrollTo({ top: Math.max(0, qEl.offsetTop - 18), behavior: motion ? 'smooth' : 'auto' });
     cpBusy = false;
   }
   $$('#cpQs button').forEach(b => b.addEventListener('click', () => ask(b.dataset.q)));
   whenSeen(cpLog, () => ask('risk'), 0.4);
 
-  /* ================= stacked windows ================= */
-  const wins = $$('#stack .sw-win');
-  let order = [0, 1, 2];                         // last one is in front
-  const placeWins = () => order.forEach((w, pos) => { wins[w].dataset.pos = pos; wins[w].setAttribute('aria-current', pos === 2); });
-  wins.forEach((w, i) => { w.setAttribute('tabindex', '0'); w.setAttribute('role', 'button');
-    const front = () => { order = order.filter(x => x !== i).concat(i); placeWins(); };
-    w.addEventListener('click', front); w.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); front(); } }); });
-  placeWins();
+  /* ================= team: hours per day, and Copilot's suggested move ================= */
+  const TEAM = [['Priya Rao', 'Operations lead', [8, 8, 7, 7, 7]], ['Lena Kraus', 'Web', [6, 6, 6, 5, 5]], ['Maya Ortiz', 'Design', [5, 5, 5, 4, 4]], ['Jonas Tan', 'People', [4, 4, 4, 4, 4]], ['Omar Aziz', 'Client services', [4, 4, 4, 3, 3]]];
+  const capEl = $('#cap');
+  const initials = n => n.split(' ').map(w => w[0]).join('');
+  capEl.insertAdjacentHTML('beforeend', TEAM.map(([n, r, d], pi) => `<div class="cap-row" role="row" data-p="${pi}"><span class="cap-who" role="cell"><i class="av${pi === 0 ? ' av-1' : ''}">${initials(n)}</i><span>${n}<small>${r}</small></span></span>${d.map(h => `<span class="cap-day" role="cell"><i style="--h:${h}"></i><span>${h}h</span></span>`).join('')}<span class="cap-wk" role="cell"><b></b><small></small></span></div>`).join(''));
+  const paintCap = () => $$('.cap-row[data-p]', capEl).forEach(row => {
+    const d = TEAM[row.dataset.p][2], tot = d.reduce((s, x) => s + x, 0);
+    $$('.cap-day', row).forEach((c, k) => { const i = $('i', c); i.style.setProperty('--h', d[k]); i.classList.toggle('full', d[k] >= 7); $('span', c).textContent = `${d[k]}h`; });
+    $('.cap-wk b', row).textContent = `${tot} h`; $('.cap-wk small', row).textContent = `of 40 · ${40 - tot} free`;
+  });
+  paintCap();
+  let moved = false;
+  $('#tmMove').addEventListener('click', () => {
+    moved = !moved;
+    // the 6-hour task leaves Priya's Wednesday to Friday and lands on Omar's
+    [2, 3, 4].forEach(k => { TEAM[0][2][k] += moved ? -2 : 2; TEAM[4][2][k] += moved ? 2 : -2; });
+    paintCap();
+    [2, 3, 4].forEach(k => { $$('.cap-row[data-p="4"] .cap-day i')[k].classList.toggle('moved', moved); });
+    $('#tmMove').textContent = moved ? 'Undo the move' : 'Apply the move';
+    $('#tmTip').textContent = moved ? 'Moved. Priya is at 31 of 40 hours, Omar at 24. In the full product, both would approve it first.' : 'Copilot suggests moving “Pricing page build” (6 h) from Priya to Omar.';
+  });
 
-  /* ================= FAQ: one answer open at a time ================= */
-  $$('.faq-list details').forEach(d => d.addEventListener('toggle', () => { if (d.open) $$('.faq-list details').forEach(o => { if (o !== d) o.open = false; }); }));
+  /* ================= questions: one answer open at a time ================= */
+  $$('.qa details').forEach(d => d.addEventListener('toggle', () => { if (d.open) $$('.qa details').forEach(o => { if (o !== d) o.open = false; }); }));
 
   /* ================= demo request (honest: there is no backend yet) ================= */
   const form = $('#demoForm'), fstate = $('#formState');
@@ -380,13 +395,13 @@
 
   /* ================= reveals: one gentle language for the whole page ================= */
   if (motion) {
-    const groups = ['.sec .label, .sec .h2, .sec .lead', '.oc', '.calc-out', '.pf', '.hub', '.how-row', '.pl-screen', '.cp-win, .cp-tiles', '.stack', '.faq-list details', '.form, .setup', '.band p'];
+    const groups = ['.sec .label, .sec .h2, .sec .lead', '.statement', '.cmp-h, .cmp-r, .cmp-t', '.wk-sentence, .wk-answer', '.anatomy', '.cp-qs, .cp-body', '.tm-act', '.cap', '.rt-row', '.qa details', '.next li', '.form', '.foot-log'];
     groups.forEach(sel => $$(sel).forEach(el => el.classList.add('rv')));
     // IntersectionObserver reads live positions, so a jump from the nav can never land on an unrevealed section
     let queue = [], flush = null;
     const io = new IntersectionObserver(entries => {
       entries.forEach(e => { if (e.isIntersecting) { io.unobserve(e.target); queue.push(e.target); } });
-      if (queue.length && !flush) flush = requestAnimationFrame(() => { G.to(queue, { opacity: 1, y: 0, duration: 1, stagger: 0.08, ease: EASE, overwrite: true }); queue = []; flush = null; });
+      if (queue.length && !flush) flush = requestAnimationFrame(() => { G.to(queue, { opacity: 1, y: 0, duration: 1, stagger: 0.08, ease: EASE, overwrite: true, onComplete: drawAnat }); queue = []; flush = null; });
     }, { rootMargin: '0px 0px -8% 0px' });
     $$('.rv').forEach(el => io.observe(el));
   }
